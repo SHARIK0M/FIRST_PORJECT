@@ -1,0 +1,135 @@
+﻿<main class="main">
+  
+    <section class="pt-50 pb-150">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 m-auto">
+                    <div class="row">
+                        <div class="col-lg-6 m-auto">
+                            <div class="login_wrap widget-taber-content p-30 background-white border-radius-5">
+                                <div class="padding_eight_all bg-white">
+                                    <!-- Display error messages if any -->
+                                    {{#if message}}
+                                    <div class="alert alert-danger mt-3 alert-dismissible fade show" role="alert">
+                                        {{message}}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                    {{/if}}
+                                    {{#if message1}}
+                                    <div class="alert alert-danger mt-3 alert-dismissible fade show" role="alert">
+                                        {{message1}}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                    {{/if}}
+                                    
+                                    <h3 class="mb-30">Create an Account</h3>
+                                    <form action="/signup" method="post" id="signupForm">    
+                                        <!-- Username input -->
+                                        <div class="form-floating mb-3 input-control">
+                                            <input type="text" class="form-control" id="name" name="name" onchange="validateUsername()" required autofocus>
+                                            <label for="name">Username</label>
+                                            <p class="text-danger" id="usernameError"></p>
+                                        </div>
+                                        <!-- Email input -->
+                                        <div class="form-floating mb-3 input-control">
+                                            <input type="email" class="form-control" id="email" name="email" onchange="validateEmail()" required>
+                                            <label for="email">Email</label>
+                                            <p class="text-danger" id="emailError"></p>
+                                        </div>    
+                                        <!-- Mobile number input -->
+                                        <div class="form-floating mb-3 input-control">
+                                            <input type="tel" class="form-control" id="phone" name="phone" onchange="validatePhoneNumber()" required>
+                                            <label for="phone">Mobile Number</label>
+                                            <p class="text-danger" id="phoneError"></p>
+                                        </div>
+                                        <!-- Password input -->
+                                        <div class="form-floating mb-3 input-control">
+                                            <input type="password" class="form-control" id="password" name="password" onchange="validatePassword()" required>
+                                            <label for="password">Password</label>
+                                            <p class="text-danger" id="passwordError"></p>
+                                        </div>
+                                        <!-- Show password toggle -->
+                                        <div class="login_footer form-group">
+                                            <div class="custome-checkbox">
+                                                <input class="form-check-input" type="checkbox" id="showPasswordCheckbox" onchange="togglePasswordVisibility()">
+                                                <label class="form-check-label" for="showPasswordCheckbox">Show Password</label>
+                                            </div>
+                                        </div>    
+                                        <!-- Confirm password input -->
+                                        <div class="form-floating mb-3 input-control">
+                                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" onchange="validateConfirmPassword()" required>
+                                            <label for="confirmPassword">Confirm Password</label>
+                                            <p class="text-danger" id="confirmPasswordError"></p>
+                                        </div>
+                                        <!-- Show confirm password toggle -->
+                                        <div class="login_footer form-group">
+                                            <div class="custome-checkbox">
+                                                <input class="form-check-input" type="checkbox" id="showPasswordCheckbox2" onchange="togglePasswordVisibility2()">
+                                                <label class="form-check-label" for="showPasswordCheckbox2">Show Password</label>
+                                            </div>
+                                        </div>
+                                        <!-- Submit button -->
+                                        <div class="form-group text-center">
+                                            <button type="submit" class="btn btn-fill-out btn-block hover-up ">Submit & Register</button>
+                                            <div id="error-message" class="text-danger"></div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+
+<script>
+    // Form validation functions
+    function validateUsername() {
+        const usernamePattern = /^[A-Za-z]{4,}$/;
+        const username = document.getElementById("name").value.trim();
+        document.getElementById("usernameError").textContent = usernamePattern.test(username) ? "" : "Username must be at least 4 letters";
+    }
+    
+    function validateEmail() {
+        const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+        document.getElementById("emailError").textContent = emailPattern.test(document.getElementById("email").value.trim()) ? "" : "Invalid email address";
+    }
+    
+    function validatePhoneNumber() {
+        const phonePattern = /^\d{10}$/;
+        document.getElementById("phoneError").textContent = phonePattern.test(document.getElementById("phone").value.trim()) ? "" : "Invalid phone number";
+    }
+    
+    function validatePassword() {
+        document.getElementById("passwordError").textContent = document.getElementById("password").value.trim().length >= 6 ? "" : "Password must be at least 6 characters";
+    }
+    
+    function validateConfirmPassword() {
+        document.getElementById("confirmPasswordError").textContent = document.getElementById("confirmPassword").value.trim() === document.getElementById("password").value.trim() ? "" : "Passwords do not match";
+    }
+    
+    // Toggle password visibility
+    function togglePasswordVisibility() {
+        const password = document.getElementById("password");
+        password.type = password.type === "password" ? "text" : "password";
+    }
+    function togglePasswordVisibility2() {
+        const confirmPassword = document.getElementById("confirmPassword");
+        confirmPassword.type = confirmPassword.type === "password" ? "text" : "password";
+    }
+    
+    // Prevent form submission if validation fails
+    document.getElementById("signupForm").addEventListener("submit", function(event) {
+        validateUsername();
+        validateEmail();
+        validatePhoneNumber();
+        validatePassword();
+        validateConfirmPassword();
+        if (document.querySelector(".text-danger").textContent) {
+            event.preventDefault();
+        }
+    });
+</script>

@@ -1,0 +1,140 @@
+<style>
+    #sar{
+        background-color:#e49e7e;
+    }
+</style>
+    <main class="main-wrap">
+       
+        <section class="content-main" id="sar">
+            <div class="content-header">
+                <h2 class="content-title">Users list</h2>
+                
+            </div>
+            <div class="card mb-4"  style="background-color: #E5C7A3;">                
+                <div class="card-body ">
+                    <div class="table-responsive ">
+                        <table class="table table-hover ">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
+                                    <th>Registered</th>
+                                    <th > Action </th>
+                                </tr>
+                            </thead>
+                            {{#each users}}
+                            <tbody>
+                                <tr>
+                                    <td width="30%">
+                                        <a href="#" class="itemside">
+                                            <div class="left mt-5">
+                                                <img src="/assets/imgs/products/{{this.imageUrl.[0]}}" class="img-sm img-avatar" alt="Userpic" onerror="src='/assetsAdmin/imgs/people/UserImage.png'">
+                                            </div>
+                                            <div class="info pl-3">
+                                                <h6 class="mb-0 title">{{name}}</h6>
+                                                <small class="text-muted">{{mobile}}</small>
+                                            </div>
+                                        </a>
+                                    </td>
+                                    <td width="20%">{{email}}</td>
+                                    {{#if isBlocked}}
+                                    <td width="20%"><span class="badge rounded-pill alert-danger">Blocked</span></td>
+
+                                    {{else}}
+                                    <td width="20%"><span class="badge rounded-pill alert-success">Active</span></td>
+                                    {{/if}}
+                                    
+                                    <td width="20%">24.12.2024</td>
+                                    <td width="20%">
+                                        {{#if this.isBlocked}}
+                                        <a id="blockuser" data-user-id="{{this._id}}" class="btn btn-sm font-sm btn-primary flex-end" href="/admin/blockuser"
+                                            >
+                                            Unblock
+                                        </a>
+                                        {{else}}
+                                        <a id="blockuser" data-user-id="{{this._id}}" class="btn btn-sm font-sm btn-primary" href="/admin/blockuser"
+                                           >
+                                            Block
+                                        </a>
+                                        {{/if}}
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                            {{/each}}
+                        </table> 
+                    </div>
+                </div>
+            </div> 
+            <div class="pagination-area mt-15 mb-50">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-start">
+                    {{#each pages}}
+                    <li class="page-item active"><a class="page-link" href="?page={{this}}">{{this}}</a></li>
+                    {{/each}}
+                </ul>
+            </nav>
+        </div>
+        </section> 
+    
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+
+    /////block USer
+
+            $(document).ready(function () {
+        $(document).on('click','#blockuser',function(e){
+            e.preventDefault();
+            var id = $(this).data('user-id');
+            //var wishId = $(this).data('whishlist-id'); // Corrected variable name to wishId
+
+            // Store reference to $(this) in a variable for use inside AJAX success and error callbacks
+            var $this = $(this);
+
+            Swal.fire({
+                title: "Are you sure?",
+               //text: "Do you want to block the User?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#088178",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: 'PUT',
+                        url: '/admin/blockuser',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ id: id }),
+                        success: function (productData) {
+                            console.log("ProductBlocked");
+                 
+      
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error removing product from wishlist:", error);
+                            swal("Error", "Something went wrong. Please try again later.", "error");
+                        }
+                    });
+                    Swal.fire({
+                        title: "Done!",
+                        //text: "User Successfully Blocked.",
+                        icon: "success"
+                    }).then((confirm) => {
+                                    if (confirm.isConfirmed) {
+                                        window.location.reload();
+                                    }
+                                });;
+                }
+            });
+
+
+        });
+    });
+
+</script>

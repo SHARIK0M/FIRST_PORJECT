@@ -1,0 +1,122 @@
+<main class="main">
+    <section class="mt-50 mb-50">
+        <div class="container">
+            <div class="row flex-row-reverse">
+                <div class="col-lg-9">
+                    <div class="shop-product-fillter">
+                        <div id="totall-product">
+                            <p> We found <strong id="count" class="text-brand">0</strong> items for you!</p>
+                        </div>
+                    </div>
+                    <span id="pro_container">
+                        <div class="row product-grid-3" id="productList">
+                            {{#each iterator}}
+                            <div class="col-lg-4 col-md-4 col-12 col-sm-6">
+                                <div style="background-color: #e2e8f0; width: 260px; height: 320px; border-radius: 2rem; gap: 8px; margin-bottom: 20px;"></div>
+                            </div>
+                            {{/each}}
+                        </div>
+                    </span>
+                    <!-- Pagination -->
+                    <div class="pagination-area mt-15 mb-sm-5 mb-lg-0">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-start" id="paginationList">
+                                {{#each pages}}
+                                <li class="page-item {{#ifEquals this ../currentPage}}active{{/ifEquals}}">
+                                    <a class="page-link" href="javascript:goToPage({{this}});">{{this}}</a>
+                                </li>
+                                {{/each}}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    let currentPage = 1;
+    let limit = 6;
+
+    const fetchProducts = () => {
+        $.ajax({
+            url: '/search',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                page: currentPage,
+                limit,
+            }),
+            success: (data) => {
+                updateProductList(data.products);
+                updatePagination(data.totalProducts);
+                updateProductCount(data.totalProducts);
+            },
+            error: (error) => {
+                console.error('Error fetching products:', error);
+            },
+        });
+    };
+
+    const updateProductList = (products) => {
+        const productList = $('#productList');
+        productList.empty();
+
+        if (products.length === 0) {
+            productList.html('<h2 class="m-5">No product available</h2>');
+            return;
+        }
+
+        products.forEach((product) => {
+            const productHtml = `
+                <div class="col-lg-4 col-md-4 col-12 col-sm-6">
+                    <div class="product-cart-wrap mb-30">
+                        <div class="product-img-action-wrap">
+                            <div class="product-img product-img-zoom">
+                                <a href="/productDetails/${product._id}">
+                                    <img class="default-img" src="/assets/imgs/products/${product.imageUrl[0]}" alt="">
+                                    <img class="hover-img" src="/assets/imgs/products/${product.imageUrl[1]}" alt="">
+                                </a>
+                            </div>
+                        </div>
+                        <div class="product-content-wrap">
+                            <h2><a href="/productDetails/${product._id}">${product.name}</a></h2>
+                            <div class="product-price">
+                                ${product.discountPrice && product.discountPrice < product.price ? 
+                                    `<span>₹${product.discountPrice}</span><span class="old-price">₹${product.price}</span>` : 
+                                    `<span>₹${product.price}</span>`}
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            productList.append(productHtml);
+        });
+    };
+
+    const updatePagination = (totalProducts) => {
+        const paginationList = $('#paginationList');
+        paginationList.empty();
+        const totalPages = Math.ceil(totalProducts / limit);
+
+        for (let i = 1; i <= totalPages; i++) {
+            const activeClass = i === currentPage ? 'active' : '';
+            const pageItem = `<li class="page-item ${activeClass}">
+                <a class="page-link" href="javascript:goToPage(${i});">${i}</a>
+            </li>`;
+            paginationList.append(pageItem);
+        }
+    };
+
+    const updateProductCount = (totalProducts) => {
+        $('#count').text(totalProducts);
+    };
+
+    const goToPage = (page) => {
+        currentPage = page;
+        fetchProducts();
+    };
+
+    fetchProducts();
+</script>

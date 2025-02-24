@@ -1,0 +1,205 @@
+
+
+<style>
+    #sar{
+        background-color:#e49e7e;
+    }
+</style>
+
+ 
+<main class="main-wrap">
+
+    <section class="content-main" id="sar">
+        <div class="content-header">
+            <h2 class="content-title">Product Lists</h2>
+            <div>
+                <a href="/admin/addProduct" class="btn btn-primary"><i class="material-icons md-plus"></i> Create
+                    New Product</a>
+            </div>
+        </div>
+        <div class="card mb-4" style="background-color: #E5C7A3;">
+            
+            <div class="card-body ">
+                <div class="table-responsive ">
+                    <table class="table table-hover ">
+                        <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th class="text-center">Description</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Price</th>                                
+                                <th class="text-center">Stock</th>                           
+                                <th class="text-center">Action </th>
+                            </tr>
+                        </thead>
+                        {{#if product.length}}
+                        {{#each product}}
+                        <tbody>
+                            <tr>
+                                <td width="30%" class="text-center">
+                                    <a href="#" class="itemside">
+                                        <div class="left">
+                                            <img src="/assets/imgs/products/{{imageUrl.[0]}}"
+                                                class="img-sm img-thumbnail" alt="Item">
+                                        </div>
+                                        <div class="info pl-3">
+                                            <h6 class="mb-0 title" >{{this.name}}</h6>
+                                            <small class="text-muted">{{this.Category.category}}</small>
+                                        </div>
+                                    </a>
+                                </td>
+                                <td class="text-center" width="15%">{{this.description}}</td>
+                                {{#if isBlocked}}
+                                <td class="text-center" width="20%"><span
+                                        class="badge rounded-pill alert-danger ">Blocked</span></td>
+                                {{else}}
+                               
+                                <td class="text-center" width="20%"><span
+                                        class="badge rounded-pill alert-success">Active</span></td>
+                                
+                                {{/if}}
+                                <td class="text-center" width="10%">{{price}}</td>
+ 
+                                <td class="text-center" width="10%">{{stock}}</td>
+
+
+                            
+
+                                <td class="text-center" width="20%">
+
+                                    {{#if isBlocked}}
+                                    
+                                    <a id="blockprod" data-product-id="{{this._id}}"
+                                        class="btn btn-sm font-sm btn-light" href="/admin/blockProduct">
+
+                                        UnBlock
+                                    </a>
+                                    {{else}}
+                                    <a id="blockprod" data-product-id="{{this._id}}"
+                                        class="btn btn-sm font-sm btn-light" href="/admin/blockProduct">
+
+                                        Block
+                                    </a>
+
+                                    {{/if}}
+                                    
+                                    <a href="/admin/editProduct/{{this._id}}" 
+                                        class="btn btn-sm font-sm rounded btn-brand">
+                                        <i class="material-icons md-edit"></i> Edit
+                                    </a>
+                        
+
+                                    
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+                        {{/each}}
+                        {{else}}
+                        <tbody>
+                            <tr>
+                                <td colspan="6" class="text-center">No product Avaliable</td>
+                            </tr>
+                        </tbody>
+                         {{/if}}
+                            
+                       
+                    </table> <!-- table-responsive.// -->
+                </div>
+            </div> <!-- card-body end// -->
+        </div> <!-- card end// -->
+        <div class="pagination-area mt-15 mb-50">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-start">
+                    {{#each pages}}
+                    <li class="page-item active"><a class="page-link" href="?page={{this}}">{{this}}</a></li>
+                    {{/each}}
+                </ul>
+            </nav>
+        </div>
+        
+    </section> <!-- content-main end// -->
+    
+</main>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+
+
+
+
+
+<script>
+
+
+    /////block product
+
+    $(document).ready(function () {
+        $(document).on('click', '#blockprod', function (e) {
+            e.preventDefault();
+            var id = $(this).data('product-id');
+            
+            var $this = $(this);
+
+            Swal.fire({
+                title: "Are you sure?",
+                // text: "Do you want to block the Product?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#088178",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: 'PUT',
+                        url: '/admin/blockProduct',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ id: id }),
+                        success: function (productData) {
+                            console.log("ProductBlocked");
+
+
+                            {
+                                Swal.fire({
+                                    title: 'Done!',
+                                    //text: 'Product Succesfully Blocked!!!',
+                                    icon: 'success',
+                                    confirmButtonText: 'Cool'
+                                }).then((confirm) => {
+                                    if (confirm.isConfirmed) {
+                                        window.location.reload();
+                                    }
+                                });
+                            }
+
+
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error removing product from wishlist:", error);
+                            swal("Error", "Something went wrong. Please try again later.", "error");
+                        }
+                    });
+                    Swal.fire({
+                        title: "Done!",
+                       // text: "Your Product has been Blocked.",
+                        icon: "success"
+                    }).then((confirm) => {
+                                    if (confirm.isConfirmed) {
+                                        window.location.reload();
+                                    }
+                                });;
+                }
+            });
+
+
+        });
+    });
+
+
+</script>

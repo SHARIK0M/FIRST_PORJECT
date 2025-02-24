@@ -1,0 +1,259 @@
+<!-- ============================= -->
+<!-- Hero Section -->
+<!-- ============================= -->
+<section class="hero">
+  <div class="hero__slider owl-carousel">
+    <!-- First Hero Slide -->
+    <div class="hero__items set-bg" data-setbg="img/hero/flower-home2.png">
+      <div class="container">
+        <div class="row">
+          <div class="col-xl-5 col-lg-7 col-md-8">
+            <div class="hero__text">
+              <h2>Valentine's-Day Collections</h2>
+              <p>Luxury essentials crafted with exceptional quality.</p>
+              <a href="/shop" class="primary-btn">Shop now <span class="arrow_right"></span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Second Hero Slide -->
+    <div class="hero__items set-bg" data-setbg="img/hero/flower-home.png">
+      <div class="container">
+        <div class="row">
+          <div class="col-xl-5 col-lg-7 col-md-8">
+            <div class="hero__text">
+              <h2>Mother's-Day Collections</h2>
+              <p>Luxury essentials crafted with exceptional quality.</p>
+              <a href="#" class="primary-btn">Shop now <span class="arrow_right"></span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= -->
+<!-- Product Section -->
+<!-- ============================= -->
+<section class="product_spad">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <ul class="filter__controls">
+          <li class="active" data-filter="*">New Arrivals</li>
+        </ul>
+      </div>
+    </div>
+    <div class="row product__filter">
+      {{#each Products}}
+      <div class="col-lg-3 col-md-6 col-sm-6 mix {{this.category.category}}">
+        <div class="product__item {{#if discountPrice}}sale{{/if}}">
+          
+          <!-- Product Image -->
+          <div class="product__item__pic">
+            <a href="/productDetails/{{this._id}}">
+              <img src="assets/imgs/products/{{this.imageUrl.[0]}}" alt="Product Image" class="default-img img-fluid"/>
+              <img src="assets/imgs/products/{{this.imageUrl.[1]}}" alt="Hover Image" class="hover-img img-fluid"/>
+            </a>
+            <span class="label badge badge-primary">{{#if discountPrice}}Sale{{else}}New{{/if}}</span>
+            <ul class="product__hover">
+              <li><a href="#"><img src="img/icon/heart.png" alt="Wishlist" /></a></li>
+              <li><a href="#"><img src="img/icon/compare.png" alt="Compare" /> <span>Compare</span></a></li>
+              <li><a href="#"><img src="img/icon/search.png" alt="Search" /></a></li>
+            </ul>
+          </div>
+          
+          <!-- Product Details -->
+          <div class="product__item__text text-center">
+            <div class="product-category mb-1">
+              <a href="#">{{this.category.category}}</a>
+            </div>
+            <h6 class="product-title"><a href="/productDetails/{{this._id}}">{{this.name}}</a></h6>
+            
+            <!-- Product Rating -->
+            <div class="rating mb-2">
+              {{#times this.rating}}<i class="fa fa-star text-warning"></i>{{/times}}
+              {{#times (subtract 5 this.rating)}}<i class="fa fa-star-o"></i>{{/times}}
+            </div>
+            
+            <!-- Product Price -->
+            <div class="product-price mb-2">
+              {{#if discountPrice}}
+                <span class="text-danger font-weight-bold">₹{{discountPrice}}</span>
+                <span class="old-price text-muted text-decoration-line-through">₹{{price}}</span>
+              {{else}}
+                <span class="font-weight-bold">₹{{price}}</span>
+              {{/if}}
+            </div>
+            
+            <!-- Add to Cart Button -->
+            <div class="product-action">
+              <a aria-label="Add To Cart" class="btn btn-primary btn-sm" href="/addToCart/{{this._id}}">
+                <i class="fi-rs-shopping-bag-add"></i> Add to Cart
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</section>
+
+<!-- ============================= -->
+<!-- Latest Blog Section -->
+<!-- ============================= -->
+<section class="latest spad">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="section-title">
+          <span>Latest News</span>
+          <h2>The Flower Company Tale</h2>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Blog Items -->
+    <div class="row">
+      <div class="col-lg-4 col-md-6 col-sm-6">
+        <div class="blog__item">
+          <div class="blog__item__pic set-bg" data-setbg="img/banner/banner-2.webp"></div>
+          <div class="blog__item__text">
+            <span><img src="img/icon/calendar.png" alt="" /> 16 February 2020</span>
+            <h5>What Curling Irons Are The Best Ones</h5>
+            <a href="#">Read More</a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-md-6 col-sm-6">
+        <div class="blog__item">
+          <div class="blog__item__pic set-bg" data-setbg="img/banner/banner-1.png"></div>
+          <div class="blog__item__text">
+            <span><img src="img/icon/calendar.png" alt="" /> 21 February 2020</span>
+            <h5>Eternity Bands Do Last Forever</h5>
+            <a href="#">Read More</a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-md-6 col-sm-6">
+        <div class="blog__item">
+          <div class="blog__item__pic set-bg" data-setbg="img/banner/banner-3.webp"></div>
+          <div class="blog__item__text">
+            <span><img src="img/icon/calendar.png" alt="" /> 28 February 2020</span>
+            <h5>The Health Benefits Of Sunglasses</h5>
+            <a href="#">Read More</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<style>
+/* Product Image */
+.product__item__pic {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.product__item__pic img {
+  width: 100%;
+  transition: transform 0.3s ease-in-out;
+}
+
+.product__item__pic:hover img.hover-img {
+  opacity: 1;
+}
+
+.product__item__pic img.hover-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* Label (New/Sale) */
+.label {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #ff6b6b;
+  color: white;
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+/* Product Details */
+.product__item__text {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.product-category a {
+  font-size: 14px;
+  color: #888;
+  text-decoration: none;
+}
+
+.product-title a {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  text-decoration: none;
+  transition: color 0.3s ease-in-out;
+}
+
+.product-title a:hover {
+  color: #ff6b6b;
+}
+
+/* Star Ratings */
+.rating i {
+  font-size: 14px;
+  margin: 0 1px;
+}
+
+/* Price Section */
+.product-price {
+  background-color: black;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 8px 12px;
+  border-radius: 5px;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.old-price {
+  color: #bbb;
+  font-size: 14px;
+  text-decoration: line-through;
+  margin-left: 8px;
+}
+
+/* Add to Cart Button */
+.product-action .btn {
+  font-size: 14px;
+  padding: 6px 12px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.product-action .btn:hover {
+  background-color: #ff6b6b;
+  border-color: #ff6b6b;
+}
+</style>
+   

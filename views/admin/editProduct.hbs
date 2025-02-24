@@ -1,0 +1,337 @@
+<main class="main-wrap">
+    <section class="content-main" id="sar">
+        <div class="row">
+            <div class="col-9">
+                <div class="content-header">
+                    <h2 class="content-title">Edit Product</h2>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="card mb-4" style="background-color: #E5C7A3;">
+                    {{!-- <div class="card-header">
+                        <h4>Basic</h4>
+                    </div> --}}
+                    <div class="card-body">
+                        <form method="post" class="form-add-product" action="/admin/updateProduct/{{productData._id}}"
+                              enctype="multipart/form-data" onsubmit="return Validation(event)">
+
+                            <!-- Product Name -->
+                            <div class="mb-4">
+                                <label for="product_name" class="form-label">Product Name</label>
+                                <input type="text" value="{{productData.name}}" placeholder="Type here" name="name"
+                                       class="form-control" id="productName">
+                                <h6 class="alertAddProduct mt-1" style="color: red" id="productNameAlert"></h6>
+                            </div>
+
+                            <!-- Full Description -->
+                            <div class="mb-4">
+                                <label class="form-label">Full description</label>
+                                <textarea placeholder="Type here" name="description" id="longdescription"
+                                          class="form-control" rows="3">{{productData.description}}</textarea>
+                                <h6 class="alertAddProduct mt-1" style="color: red" id="longAlert"></h6>
+                            </div>
+
+                            <div class="row">
+                                <!-- Price -->
+                                <div class="col-lg-4">
+                                    <div class="mb-4">
+                                        <label class="form-label">Price</label>
+                                        <input placeholder="$" type="text" value="{{productData.price}}" id="price"
+                                               name="price" class="form-control">
+                                        <h6 class="alertAddProduct mt-1" style="color: red" id="priceAlert"></h6>
+                                    </div>
+                                </div>
+
+                                <!-- Stock -->
+                                <div class="col-lg-4">
+                                    <div class="mb-4">
+                                        <label class="form-label">Stock</label>
+                                        <input name="stock" value="{{productData.stock}}" class="form-control"
+                                               placeholder="Quantity" type="text" id="Qty">
+                                        <h6 class="alertAddProduct mt-1" style="color: red" id="qtyAlert"></h6>
+                                    </div>
+                                </div>
+
+                                <!-- Category -->
+                                <div class="col-lg-4">
+                                    <label class="form-label">Category:</label>
+                                    <select name="category" id="category" class="form-select">
+                                        {{#each categories}}
+                                        <option value="{{this._id}}" {{#if this.isSelected}}selected{{/if}}>{{this.category}}</option>
+                                        {{/each}}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Product Images -->
+                            <div class="form-group">
+                                <label for="productImage">Product Image:</label>
+                                <div class="d-flex border p-10 m-tb-10">
+                                    <input name="product-id" type="hidden" value="{{productData._id}}">
+                                 {{#each productData.imageUrl}}
+    <div class="image-container" data-image-index="{{@index}}">
+        <div class="badge rounded-pill alert-danger">
+            <p class="close-button" data-image-index="{{@index}}" onclick="deleteProImg({{@index}})" style="cursor: pointer;">×</p>
+        </div>
+        <img src="/assets/imgs/products/{{this}}" alt="images" style="width: 80px; height: auto;" class="m-2 pro-image" data-image-index="{{@index}}">
+    </div>
+{{/each}}
+
+                                </div>
+                                <input type="file" class="form-control-file" id="productImage" multiple name="image">
+                                <h6 id="imgAlert" class="mt-2" style="color: red;"></h6>
+                            </div>
+                            
+
+
+
+
+
+                            <!-- Buttons -->
+                            <div class="d-flex g-2">
+                                <div class="m-2">
+<button onclick="return Validation(event);" class="btn btn-primary">Save</button>
+
+                                </div>
+                                <div class="m-2">
+                                    <a href="/admin/product" type="button" class="btn btn-primary" id="backbutton">Back</a>
+                                </div>
+                            </div> 
+
+
+
+
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+</main>
+
+<style>
+    #sar{
+        background-color:#e49e7e;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>
+
+
+
+
+<script>
+
+function Validation(event) {
+    event.preventDefault(); // Prevent form submission
+    let errors = []; // Array to store validation errors
+
+    const fileInput = document.getElementById('productImage');
+    const productName = document.getElementById("productName").value.trim();
+    const longdescription = document.getElementById("longdescription").value.trim();
+    const Qty = document.getElementById("Qty").value.trim();
+    const price = document.getElementById("price").value.trim();
+
+    // Regular expressions for validation
+    const productNameRegex = /^[a-zA-Z0-9\s\(\)\-\+]{4,}$/;
+    const number = /^[1-9]\d*$/;
+    const number1 = /^[0-9]\d*$/;
+    const descriptionRegex = /^(?!\s*$)[a-zA-Z0-9\s\(\)\-\+]{10,100}$/;
+
+
+    // Alert elements
+    const productNameAlert = document.getElementById("productNameAlert");
+    const qtyAlert = document.getElementById("qtyAlert");
+    const priceAlert = document.getElementById("priceAlert");
+    const longAlert = document.getElementById("longAlert");
+    const imgAlert = document.getElementById('imgAlert');
+
+    // Reset previous alerts
+    productNameAlert.innerHTML = "";
+    qtyAlert.innerHTML = "";
+    priceAlert.innerHTML = "";
+    longAlert.innerHTML = "";
+    imgAlert.innerHTML = "";
+
+    // Validate Product Name
+  if (productName.length < 4) {
+        productNameAlert.innerHTML = "minimum 4 characters.";
+        errors.push("Invalid Product Name");
+    } else if (!productName.match(productNameRegex)) {
+        productNameAlert.innerHTML = "Invalid Name";
+        errors.push("Invalid Product Name");
+    }
+    // Validate Quantity
+    if (!Qty.match(number1)) {
+        qtyAlert.innerHTML = "Stock Invalid";
+        errors.push("Invalid Quantity");
+    }
+
+    // Validate Price
+    if (!price.match(number)) {
+        priceAlert.innerHTML = "Price Invalid.";
+        errors.push("Invalid Price");
+    }
+
+    // Validate Description
+    if (!longdescription.match(descriptionRegex)) {
+        longAlert.innerHTML = "minimum 10 characters";
+        errors.push("Invalid Description");
+    }
+
+    // Validate Images
+    const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    const invalidFileTypes = ['application/pdf'];
+    if (fileInput && fileInput.files.length > 0) {
+        for (let i = 0; i < fileInput.files.length; i++) {
+            const fileType = fileInput.files[i].type;
+            if (invalidFileTypes.includes(fileType)) {
+                imgAlert.innerHTML = "PDF files are not allowed.";
+                errors.push("Invalid Image Type");
+                break;
+            } else if (!validImageTypes.includes(fileType)) {
+                imgAlert.innerHTML = "Invalid file type. Only jpg, png, gif allowed.";
+                errors.push("Invalid Image Format");
+                break;
+            }
+        }
+    }
+
+    // Check maximum images
+    const existingImagesCount = document.querySelectorAll('.pro-image').length;
+    const newImagesCount = fileInput.files.length;
+    const totalImagesCount = existingImagesCount + newImagesCount;
+
+    if (totalImagesCount > 5) {
+        imgAlert.innerHTML = "Only 5 images are allowed.";
+        errors.push("Exceeded Image Limit");
+    }
+
+    // If errors exist, prevent form submission
+    if (errors.length > 0) {
+        console.log("Validation errors:", errors);
+        return false;
+    }
+
+    // If validation passed, submit the form
+    submitform(document.querySelector('.form-add-product'));
+
+    return true; // Allow form submission
+}
+
+
+
+const deleteImage = async (productId, imageIndex) => {
+    try {
+        const response = await fetch(`/admin/product_img_delete?id=${productId}&image=${imageIndex}`, {
+            method: 'DELETE'
+        });
+
+        const data = await response.json();
+        console.log("hei",data);
+
+        if (data) {
+    const imageElem = document.querySelector(`.pro-image[data-image-index="${imageIndex}"]`);
+    const imageContainer = document.querySelector(`.image-container[data-image-index="${imageIndex}"]`);
+    console.log("Image Element:", imageContainer); // Log the image element
+    if (imageElem) {
+        imageContainer.remove()
+    } else {
+        console.warn("Image element not found for index:", imageIndex); // Warn if element is not found
+    }
+} else {
+    console.warn("No data received from the server.");
+}
+
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+const deleteProImg = () => {
+    const deleteButtons = document.querySelectorAll('.close-button');
+    const productId = document.getElementsByName('product-id')[0].value;
+    console.log('product ID=> ' , productId)
+    deleteButtons.forEach((button) => {
+        button.addEventListener('click', async (event) => {
+            const imageIndex = event.target.dataset.imageIndex;
+            await deleteImage(productId, imageIndex);
+        });
+    });
+};
+
+// Call deleteProImg once the DOM is loaded
+document.addEventListener("DOMContentLoaded", deleteProImg);
+
+</script>
+
+
+
+
+<script>
+    
+
+
+    function submitform(form) {
+        
+    
+    Swal.fire({
+        title: "Do you want to save the changes?",
+        //text: "Changes made will be saved.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#088178",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, save it!",
+        cancelButtonText: "No, cancel"
+    
+    }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                    title: "Saved",
+                    //text: "Your changes have been saved.",
+                    icon: "success",
+                    //confirmButtonText: "OK"
+                    confirmButtonText: "Yes, save it!",
+                    timer: 1500 
+                }).then(() => {
+                    form.submit();
+                });
+                }else {
+               
+                console.log("User canceled the action");
+            }
+            }); 
+        }
+    
+
+    // Back Button
+
+    $(document).ready(function () {
+        $('#backbutton').click(function (e) {
+            e.preventDefault();
+
+            Swal.fire({
+                title: "Leave the page?",
+                text: "The Data will not be saved",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#088178",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "/admin/product";
+
+                }
+            });
+            
+        });
+    });
+</script>

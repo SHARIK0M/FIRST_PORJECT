@@ -1,0 +1,72 @@
+<aside class="navbar-aside" id="sar">
+        <div class="aside-top">
+            <a href="/admin/home" class="brand-wrap">
+                <img src="/assetsAdmin/logo.png" class="logo" alt="Evara Dashboard">
+            </a>
+            <div>
+                <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
+            </div>
+        </div>
+        <nav>
+        <ul class="menu-aside">
+            <li class="menu-item">
+                <a class="menu-link" href="/admin/home"> <i class="icon material-icons md-home"></i>
+                    <span class="text">Dashboard</span>
+                </a>
+            </li>
+              <li class="menu-item ">
+                <a class="menu-link" href="/admin/Users"> <i class="icon material-icons md-category"></i>
+                    <span class="text">Users</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a class="menu-link" href="/admin/product"> <i class="icon material-icons md-shopping_bag"></i>
+                    <span class="text">Products</span>
+                </a>
+            </li>
+            <li class="menu-item ">
+                <a class="menu-link" href="/admin/category"> <i class="icon material-icons md-category"></i>
+                    <span class="text">Categories</span>
+                </a>
+            </li>
+        </ul>
+        <hr>
+        <ul class="menu-aside">
+            <li class="menu-item">
+                <a class="menu-link" id="logoutbtn" href="/admin/logout"> <i class="icon material-icons md-exit_to_app"></i>
+                    <span class="text"> Logout </span>
+                </a>
+            </li>
+        </ul>
+        <br>
+        <br>
+    </nav>
+    </aside>
+
+<style>
+    #sar{
+        background-color:#e49e7e;
+    }
+</style>
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#logoutbtn').click(function (e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: "LOGOUT?",
+                    text: "Do you want to logout?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#088178",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "/admin/logout";
+                    }
+                });
+            });
+        });
+    </script>

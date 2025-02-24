@@ -1,0 +1,106 @@
+/* General styles */
+body {
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url("/img/login.jpg");
+    background-size: cover;
+    background-position: center;
+    font-family: "Nunito Sans", sans-serif;
+    color: white;
+}
+
+/* Login container */
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 30px;
+    background: rgba(0, 0, 0, 0.7); /* Dark transparent background */
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(5px); /* Blurred background */
+    text-align: center;
+}
+
+/* Heading */
+.text-center {
+    color: white;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+/* Form styling */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+label {
+    font-weight: 600;
+    color: #ddd;
+}
+
+/* Input fields */
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    transition: 0.3s;
+}
+
+input[type="email"]::placeholder,
+input[type="password"]::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Error message */
+.error-message {
+    color: red;
+    font-size: 0.875rem;
+    margin-top: 5px;
+}
+
+/* Login button */
+.btn-primary {
+    width: 100%;
+    padding: 10px;
+    font-size: 18px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    background: #007bff;
+    color: white;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+    .login-container {
+        max-width: 90%;
+        padding: 20px;
+    }
+}

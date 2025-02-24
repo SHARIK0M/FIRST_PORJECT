@@ -1,0 +1,81 @@
+<main class="sha">        
+    <!-- Sign-in Section -->
+    <section class="content-main mt-80 mb-80" id="sec">
+        <div class="card mx-auto card-login">
+            <div class="card-body" id="card">
+                <h4 class="card-title mb-4">Login</h4>    
+
+                <!-- Display error message if present -->
+                {{#if message}}
+                <div class="alert alert-danger mt-3 alert-dismissible fade show" role="alert">
+                    {{message}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {{/if}}
+
+                <!-- Login Form -->
+                <form method="post" action="/admin/login">
+                    <!-- Email Input Field -->
+                    <div class="mb-4 mt-2">
+                        <input class="form-control" 
+                            name="email"
+                            placeholder="Username or email" 
+                            type="text" 
+                            required>
+                    </div>
+
+                    <!-- Password Input Field -->
+                    <div class="mb-4">
+                        <input class="form-control" 
+                            id="password"
+                            name="password"
+                            placeholder="Password" 
+                            type="password"
+                            required>
+                    </div> 
+
+                    <!-- Show Password Toggle -->
+                    <div class="mb-4 form-check">
+                        <input type="checkbox" class="form-check-input" id="showPassword">
+                        <label class="form-check-label" for="showPassword">Show Password</label>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="mb-4 mt-4">
+                        <button type="submit" class="btn btn-primary w-100"> Login </button>
+                    </div> 
+                </form>
+            </div>
+        </div>
+    </section>
+</main>
+
+<style>
+        .sha {
+        background: url('/img/admin-login.jpg') no-repeat center center fixed;
+        background-size: cover;
+        width: 100%;
+        min-height: 100vh; /* Ensure full screen height */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+#sec {
+    background-color: rgb(172, 126, 228);
+}
+
+#card {
+    background-color:  rgb(172, 126, 228);
+}
+
+
+
+</style>
+
+<!-- JavaScript to toggle password visibility -->
+<script>
+    document.getElementById('showPassword').addEventListener('change', function() {
+        const passwordInput = document.getElementById('password');
+        passwordInput.type = this.checked ? 'text' : 'password';
+    });
+</script>

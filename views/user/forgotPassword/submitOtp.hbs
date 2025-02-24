@@ -1,0 +1,95 @@
+<main class="main">
+
+    <!-- OTP Verification Section -->
+    <section class="pt-50 pb-150">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 m-auto">
+                    <div class="row">
+                        <div class="col-lg-5 m-auto">
+                            <div class="login_wrap widget-taber-content p-30 background-white border-radius-10 mb-md-5 mb-lg-0 mb-sm-5">
+                                <div class="padding_eight_all bg-white">
+
+                                    <!-- Form Heading -->
+                                    <div class="heading_s1">
+                                        <h3 class="text-center mb-30">Enter OTP</h3>
+                                    </div>
+
+                                    <!-- OTP Form -->
+                                    <form action="/otp" method="post">
+                                        
+                                        <!-- Display Error Message if Any -->
+                                        <h6 style="color: red;" class="text-center mb-5">{{otpErr}}</h6>
+
+                                        <!-- OTP Input Field -->
+                                        <div class="form-floating mb-3 input-control">
+                                            <input type="text" class="form-control" id="otp" placeholder="Enter OTP" name="otp" required>
+                                            <label for="otp">Enter OTP</label>
+                                        </div>
+
+                                        <!-- Submit and Resend OTP Button with Timer -->
+                                        <div class="text-center">
+                                            <button type="submit" class="btn btn-fill-out btn-block hover-up">Submit</button>
+                                            <p class="text-primary my-3">Time left: <span id="timer">60</span> seconds</p>
+                                            <button class="btn hover-up" id="resendButton" onclick="resendOTP()">
+                                                <a href="/resend_otp">Resend OTP</a>
+                                            </button>
+                                        </div>
+
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Custom Button Styling -->
+    <style>
+        #resendButton {
+            color: #fff; 
+            background-color: #fff;
+        }
+    </style>
+
+</main>
+
+<!-- OTP Countdown and Resend Logic -->
+<script>
+    let countdown = 60; // Initial countdown value in seconds
+    let timerElement = document.getElementById('timer');
+    let resendButton = document.getElementById('resendButton');
+    let countdownInterval;
+
+    // Function to update the countdown timer
+    function updateTimer() {
+        timerElement.textContent = countdown;
+        countdown--;
+        resendButton.disabled = true;
+
+        if (countdown < 0) {
+            clearInterval(countdownInterval);
+            timerElement.textContent = '0 seconds';
+            resendButton.disabled = false;
+        }
+    }
+
+    // Function to resend OTP
+    function resendOTP() {
+        // Simulate OTP resend logic (e.g., API call to send new OTP)
+        
+        // Reset the timer
+        countdown = 60;
+        timerElement.textContent = countdown + ' seconds';
+        resendButton.disabled = true;
+
+        // Restart the countdown
+        countdownInterval = setInterval(updateTimer, 1000);
+    }
+
+    // Start countdown on page load
+    countdownInterval = setInterval(updateTimer, 1000);
+</script>

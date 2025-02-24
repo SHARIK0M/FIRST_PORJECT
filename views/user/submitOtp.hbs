@@ -1,0 +1,184 @@
+<main class="main">
+
+  <!-- OTP Verification Section -->
+  <section class="pt-150 pb-150">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-10 m-auto">
+          <div class="row">
+            <div class="col-lg-5 m-auto">
+              <div class="login_wrap widget-taber-content p-30 background-white border-radius-10 mb-md-5 mb-lg-0 mb-sm-5">
+                <div class="padding_eight_all bg-white">
+                  
+                  <!-- OTP Input Heading -->
+                  <div class="heading_s1">
+                    <h3 class="text-center mb-30">Enter OTP</h3>
+                  </div>
+                  
+                  <!-- OTP Form -->
+                  <form id="otp-form" action="/submit_otp" method="post">
+                    <h6 id="otp-error" style="color: red;" class="text-center mb-5">{{result.error}}</h6>
+                    
+                    <!-- OTP Input Fields -->
+                    <div class="form-floating mb-3 input-control">
+                      <div class="otp-field mb-4">
+                        <input type="number" name="otp" id="digit1" />
+                        <input type="number" name="otp" id="digit2" disabled />
+                        <input type="number" name="otp" id="digit3" disabled />
+                        <input type="number" name="otp" id="digit4" disabled />
+                      </div>
+                    </div>
+                    
+                    <!-- Submit and Resend OTP Options -->
+                    <div class="text-center">
+                      <button type="submit" class="btn btn-fill-out btn-block hover-up">Submit</button>
+                      <br><br>
+                      <p class="text-primary my-3">Time left: <span id="timer">10</span> seconds</p>
+                      <button type="button" id="resendButton" class="btn hover-up not-allowed" onclick="resendOTP()">
+                        <a href="#" id="resendLink" class="not-allowed">Resend OTP</a>
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- OTP Input Styling -->
+<style>
+  .otp-field {
+    display: flex;
+    flex-direction: row;
+    column-gap: 10px;
+    align-items: center;
+    justify-content: center;
+  }
+  .otp-field input {
+    height: 45px;
+    width: 42px;
+    border-radius: 6px;
+    outline: none;
+    font-size: 1.125rem;
+    text-align: center;
+    border: 1px solid #ddd;
+  }
+  .otp-field input:focus {
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+  }
+  .otp-field input::-webkit-inner-spin-button,
+  .otp-field input::-webkit-outer-spin-button {
+    display: none;
+  }
+  .not-allowed {
+    cursor: not-allowed;
+  }
+</style>
+
+<!-- OTP Input Handling Script -->
+<script>
+  const form = document.getElementById('otp-form');
+  const timerElement = document.getElementById('timer');
+  const resendButton = document.getElementById('resendButton');
+  const resendLink = document.getElementById('resendLink');
+  const timerText = document.querySelector('.text-primary.my-3');
+  const inputs = document.querySelectorAll(".otp-field > input");
+  const button = document.querySelector(".btn");
+
+  let countdown = 10;
+  let countdownInterval;
+  startCountdown();
+
+  // Handle OTP Form Submission
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const otp = Array.from(inputs).map(input => input.value).join('');
+    try {
+      const response = await fetch('/submit_otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ otp }),
+      });
+      const result = await response.json();
+      if (result.error) {
+        document.getElementById('otp-error').textContent = result.error;
+      } else {
+        window.location.href = '/login';
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  });
+
+  // Start Countdown Timer for Resend OTP
+  function startCountdown() {
+    countdown = 10;
+    timerElement.textContent = countdown;
+    timerText.style.display = 'block';
+    disableResendButton();
+
+    countdownInterval = setInterval(() => {
+      countdown--;
+      timerElement.textContent = countdown;
+      if (countdown <= 0) {
+        clearInterval(countdownInterval);
+        timerElement.textContent = '';
+        timerText.style.display = 'none';
+        enableResendButton();
+      }
+    }, 1000);
+  }
+
+  // Resend OTP Functionality
+  function resendOTP() {
+    clearInterval(countdownInterval);
+    startCountdown();
+  }
+
+  // Disable Resend Button Until Timer Expires
+  function disableResendButton() {
+    resendButton.disabled = true;
+    resendButton.classList.add('not-allowed');
+    resendLink.style.pointerEvents = 'none';
+  }
+
+  // Enable Resend Button After Timer Ends
+  function enableResendButton() {
+    resendButton.disabled = false;
+    resendButton.classList.remove('not-allowed');
+    resendLink.style.pointerEvents = 'auto';
+  }
+
+  // OTP Input Navigation
+  window.addEventListener("load", () => inputs[0].focus());
+  button.setAttribute("disabled", "disabled");
+
+  inputs.forEach((input, index) => {
+    input.addEventListener("keyup", (e) => {
+      const nextInput = input.nextElementSibling;
+      const prevInput = input.previousElementSibling;
+      if (input.value.length > 1) input.value = input.value.charAt(0);
+      if (nextInput && input.value !== "") {
+        nextInput.removeAttribute("disabled");
+        nextInput.focus();
+      }
+      if (e.key === "Backspace" && prevInput) {
+        inputs.forEach((inp, idx) => {
+          if (index <= idx) inp.value = "";
+        });
+        prevInput.focus();
+      }
+      if (Array.from(inputs).every(inp => inp.value)) {
+        button.classList.add("active");
+        button.removeAttribute("disabled");
+      } else {
+        button.classList.remove("active");
+        button.setAttribute("disabled", "disabled");
+      }
+    });
+  });
+</script>

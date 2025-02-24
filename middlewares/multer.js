@@ -1,0 +1,29 @@
+const multer = require("multer");
+const path = require("path");
+
+// Allowed file types for image uploads
+const FILE_TYPE_MAP = {
+  "image/png": "png",
+  "image/jpeg": "jpeg",
+  "image/jpg": "jpg",
+  "image/avif": "avif",
+};
+
+// Storage configuration for uploaded files
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const isValid = FILE_TYPE_MAP[file.mimetype];
+    const uploadError = isValid ? null : new Error("Invalid image type");
+
+    cb(uploadError, path.join(__dirname, "../public/assets/imgs/products"));
+  },
+  filename: function (req, file, cb) {
+    const fileName = Date.now() + "_" + file.originalname;
+    cb(null, fileName);
+  },
+});
+
+// Multer instance with defined storage settings
+const store = multer({ storage });
+
+module.exports = store;
