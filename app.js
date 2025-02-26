@@ -47,10 +47,11 @@ app.use(
   session({
     secret: process.env.SECRET_KEY,
     resave: false,
-    saveUninitialized: true,// Creates an empty session immediately
-    cookie: { secure: false, httpOnly: true, maxAge: 72 * 60 * 60 * 1000 }, // Change to true in production with HTTPS
+    saveUninitialized: true,
+    cookie: { secure: false, httpOnly: true, maxAge: 10 * 60 * 1000 }, // 10 minutes
   })
 );
+
 
 app.use(nocache());// avoid showing old data
 

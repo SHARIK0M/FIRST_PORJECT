@@ -33,10 +33,10 @@
                     <div class="text-center">
                       <button type="submit" class="btn btn-fill-out btn-block hover-up">Submit</button>
                       <br><br>
-                      <p class="text-primary my-3">Time left: <span id="timer">10</span> seconds</p>
-                      <button type="button" id="resendButton" class="btn hover-up not-allowed" onclick="resendOTP()">
-                        <a href="#" id="resendLink" class="not-allowed">Resend OTP</a>
-                      </button>
+                      <p class="text-primary my-3">Time left: <span id="timer">60</span> seconds</p>
+                     <button type="button" id="resendButton" class="btn hover-up not-allowed" onclick="resendOTP()">
+                        Resend OTP
+                    </button>
                     </div>
                   </form>
                 </div>
@@ -81,104 +81,101 @@
 
 <!-- OTP Input Handling Script -->
 <script>
-  const form = document.getElementById('otp-form');
-  const timerElement = document.getElementById('timer');
-  const resendButton = document.getElementById('resendButton');
-  const resendLink = document.getElementById('resendLink');
-  const timerText = document.querySelector('.text-primary.my-3');
-  const inputs = document.querySelectorAll(".otp-field > input");
-  const button = document.querySelector(".btn");
+ // Initialize Elements
+const form = document.getElementById("otp-form");
+const timerElement = document.getElementById("timer");
+const resendButton = document.getElementById("resendButton");
+const timerText = document.querySelector(".text-primary.my-3");
+const inputs = document.querySelectorAll(".otp-field > input");
+const button = document.querySelector(".btn");
 
-  let countdown = 10;
-  let countdownInterval;
+let countdown = 60;
+let countdownInterval;
+
+//  Start Countdown Timer on Page Load
+window.onload = function () {
   startCountdown();
+};
 
-  // Handle OTP Form Submission
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const otp = Array.from(inputs).map(input => input.value).join('');
-    try {
-      const response = await fetch('/submit_otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ otp }),
+//  Start Countdown Function
+function startCountdown() {
+  clearInterval(countdownInterval); // Clear previous intervals
+  countdown = 60;
+  timerElement.textContent = countdown;
+  timerText.style.display = "block";
+  disableResendButton();
+
+  countdownInterval = setInterval(() => {
+    countdown--;
+    timerElement.textContent = countdown;
+    if (countdown <= 0) {
+      clearInterval(countdownInterval);
+      timerText.style.display = "none";
+      enableResendButton();
+    }
+  }, 1000);
+}
+
+//  Disable Resend Button
+function disableResendButton() {
+  resendButton.disabled = true;
+  resendButton.classList.add("not-allowed");
+}
+
+//  Enable Resend Button
+function enableResendButton() {
+  resendButton.disabled = false;
+  resendButton.classList.remove("not-allowed");
+}
+
+// Resend OTP Function 
+async function resendOTP() {
+  try {
+    disableResendButton();
+    console.log("Requesting new OTP..."); // Debugging Log
+
+    const response = await fetch("/resend_otp", { method: "GET" });
+    const data = await response.json(); // Parse JSON response
+
+    if (!response.ok) throw new Error(data.error || "Failed to resend OTP");
+
+    console.log("OTP has been resent to your email."); // Debugging Log
+    startCountdown(); // Restart countdown after resending
+  } catch (error) {
+    console.error("Resend OTP Error:", error);
+    enableResendButton();
+  }
+}
+
+
+//  OTP Input Navigation & Validation
+window.addEventListener("load", () => inputs[0].focus());
+button.setAttribute("disabled", "disabled");
+
+inputs.forEach((input, index) => {
+  input.addEventListener("keyup", (e) => {
+    const nextInput = input.nextElementSibling;
+    const prevInput = input.previousElementSibling;
+
+    if (input.value.length > 1) input.value = input.value.charAt(0);
+    if (nextInput && input.value !== "") {
+      nextInput.removeAttribute("disabled");
+      nextInput.focus();
+    }
+    if (e.key === "Backspace" && prevInput) {
+      inputs.forEach((inp, idx) => {
+        if (index <= idx) inp.value = "";
       });
-      const result = await response.json();
-      if (result.error) {
-        document.getElementById('otp-error').textContent = result.error;
-      } else {
-        window.location.href = '/login';
-      }
-    } catch (error) {
-      console.error(error);
+      prevInput.focus();
+    }
+    if (Array.from(inputs).every((inp) => inp.value)) {
+      button.classList.add("active");
+      button.removeAttribute("disabled");
+    } else {
+      button.classList.remove("active");
+      button.setAttribute("disabled", "disabled");
     }
   });
+});
 
-  // Start Countdown Timer for Resend OTP
-  function startCountdown() {
-    countdown = 10;
-    timerElement.textContent = countdown;
-    timerText.style.display = 'block';
-    disableResendButton();
-
-    countdownInterval = setInterval(() => {
-      countdown--;
-      timerElement.textContent = countdown;
-      if (countdown <= 0) {
-        clearInterval(countdownInterval);
-        timerElement.textContent = '';
-        timerText.style.display = 'none';
-        enableResendButton();
-      }
-    }, 1000);
-  }
-
-  // Resend OTP Functionality
-  function resendOTP() {
-    clearInterval(countdownInterval);
-    startCountdown();
-  }
-
-  // Disable Resend Button Until Timer Expires
-  function disableResendButton() {
-    resendButton.disabled = true;
-    resendButton.classList.add('not-allowed');
-    resendLink.style.pointerEvents = 'none';
-  }
-
-  // Enable Resend Button After Timer Ends
-  function enableResendButton() {
-    resendButton.disabled = false;
-    resendButton.classList.remove('not-allowed');
-    resendLink.style.pointerEvents = 'auto';
-  }
-
-  // OTP Input Navigation
-  window.addEventListener("load", () => inputs[0].focus());
-  button.setAttribute("disabled", "disabled");
-
-  inputs.forEach((input, index) => {
-    input.addEventListener("keyup", (e) => {
-      const nextInput = input.nextElementSibling;
-      const prevInput = input.previousElementSibling;
-      if (input.value.length > 1) input.value = input.value.charAt(0);
-      if (nextInput && input.value !== "") {
-        nextInput.removeAttribute("disabled");
-        nextInput.focus();
-      }
-      if (e.key === "Backspace" && prevInput) {
-        inputs.forEach((inp, idx) => {
-          if (index <= idx) inp.value = "";
-        });
-        prevInput.focus();
-      }
-      if (Array.from(inputs).every(inp => inp.value)) {
-        button.classList.add("active");
-        button.removeAttribute("disabled");
-      } else {
-        button.classList.remove("active");
-        button.setAttribute("disabled", "disabled");
-      }
-    });
-  });
 </script>

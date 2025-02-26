@@ -25,7 +25,7 @@ const verifyEmail = async (email) => {
       from: process.env.USER_MAIL,
       to: email,
       subject: "OTP Verification",
-      text: `Welcome to MobileBazaar! Your OTP is: ${otp}`,
+      text: `Welcome to Floritta! Your OTP is: ${otp}`,
     };
 
     // Send OTP email
