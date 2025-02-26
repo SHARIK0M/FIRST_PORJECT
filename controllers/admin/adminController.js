@@ -23,6 +23,7 @@ const doLogin = async (req, res) => {
     const { email, password } = req.body;
 
     if (admin.mail === email && admin.password === password) {
+      req.session.user = null; // Ensure user session is cleared
       req.session.admin = admin;
       console.log("Admin logged in:", req.session);
       return res.redirect("/admin/home");
@@ -35,25 +36,22 @@ const doLogin = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in doLogin:", error);
-    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
+    res.status(500).send("Internal Server Error");
   }
 };
+
 
 // Handle Admin Logout
 const doLogout = async (req, res) => {
   try {
-    req.session.destroy((err) => {
-      if (err) {
-        console.error("Error in doLogout:", err);
-        return res.status(HttpStatus.InternalServerError).send("Logout Failed");
-      }
-      res.redirect("/admin/login");
-    });
+    req.session.admin = null; // Only clear admin session
+    res.redirect("/admin/login");
   } catch (error) {
     console.error("Error in doLogout:", error);
-    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
+    res.status(500).send("Internal Server Error");
   }
 };
+
 
 module.exports = {
   getLogin,

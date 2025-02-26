@@ -6,10 +6,7 @@ const {
   doLogout,
 } = require("../controllers/admin/adminController");
 const { isLogin, isLogout } = require("../middlewares/adminAuth");
-const {
-  usersPage,
-  blockUser,
-} = require("../controllers/admin/UserManagement");
+const { usersPage, blockUser } = require("../controllers/admin/UserManagement");
 const {
   addCategoryPage,
   addNewCategory,

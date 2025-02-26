@@ -2,9 +2,9 @@
 const isLogin = (req, res, next) => {
   try {
     if (!req.session.admin) {
-      return res.redirect("/admin/login"); // Redirects to login if admin is not logged in
+      return res.redirect("/admin/login"); // Redirect if admin is not logged in
     }
-    next(); // Proceeds to the next middleware or route handler
+    next();
   } catch (error) {
     console.error("Error in isLogin middleware:", error);
     res.status(500).send("Internal Server Error");
@@ -15,9 +15,9 @@ const isLogin = (req, res, next) => {
 const isLogout = (req, res, next) => {
   try {
     if (req.session.admin) {
-      return res.redirect("/admin/home"); // Redirects to home if admin is already logged in
+      return res.redirect("/admin/home"); // Redirect if admin is already logged in
     }
-    next(); // Proceeds to the next middleware or route handler
+    next();
   } catch (error) {
     console.error("Error in isLogout middleware:", error);
     res.status(500).send("Internal Server Error");

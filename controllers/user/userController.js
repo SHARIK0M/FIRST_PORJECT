@@ -6,7 +6,6 @@ const HttpStatus = require("../../httpStatus");
 const Category = require("../../models/categorySchema");
 const Product = require("../../models/productSchema");
 
-
 let otp, userOtp, userEmail, hashedPassword, userRegData, userData;
 
 //Renders the home page.
@@ -151,7 +150,6 @@ const getSignup = async (req, res) => {
   }
 };
 
-
 const doSignup = async (req, res) => {
   try {
     const hashedPassword = await userHelper.hashPassword(req.body.password);
@@ -199,11 +197,10 @@ const getOtp = (req, res) => {
   }
 };
 
-
 // Handles OTP submission and user registration.
 const submitOtp = async (req, res) => {
   try {
-    let userOtp = req.body.otp; 
+    let userOtp = req.body.otp;
 
     if (!req.session.otp) {
       return res.json({ error: "Session expired. Please request a new OTP." });
@@ -214,9 +211,7 @@ const submitOtp = async (req, res) => {
       ? userOtp.join("")
       : userOtp.toString().trim();
 
-
     if (userOtp === req.session.otp.toString().trim()) {
-
       const newUser = new User({
         name: req.session.userRegData.name,
         email: req.session.userRegData.email,
@@ -234,19 +229,14 @@ const submitOtp = async (req, res) => {
       req.session.userRegData = null;
       req.session.hashedPassword = null;
 
-       return res.redirect("/login"); 
-    }else{
-        return res.json({ error: "Incorrect OTP" });
+      return res.redirect("/login");
+    } else {
+      return res.json({ error: "Incorrect OTP" });
     }
-
   } catch (error) {
     return res.json({ error: "An error occurred while submitting the OTP." });
   }
 };
-
-
-
-
 
 //Resends OTP to the user.
 const resendOtp = async (req, res) => {
@@ -272,7 +262,6 @@ const resendOtp = async (req, res) => {
   }
 };
 
-
 //Handles Google authentication callback.
 const googleCallback = async (req, res) => {
   try {
@@ -296,7 +285,6 @@ const googleCallback = async (req, res) => {
     res.redirect("/login");
   }
 };
-
 
 const productDetails = async (req, res) => {
   try {
@@ -331,8 +319,6 @@ const productDetails = async (req, res) => {
   }
 };
 
-
-
 module.exports = {
   getHome,
   getLogin,
@@ -345,5 +331,4 @@ module.exports = {
   doLogout,
   googleCallback,
   productDetails,
-
 };

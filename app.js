@@ -42,7 +42,6 @@ app.engine(
   })
 );
 
-
 app.use(
   session({
     secret: process.env.SECRET_KEY,
@@ -52,8 +51,7 @@ app.use(
   })
 );
 
-
-app.use(nocache());// avoid showing old data
+app.use(nocache()); // avoid showing old data
 
 // Middleware to parse request body
 app.use(express.json());
