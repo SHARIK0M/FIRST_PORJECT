@@ -23,7 +23,22 @@ const storage = multer.diskStorage({
   },
 });
 
-// Multer instance with defined storage settings
-const store = multer({ storage });
+// Multer instance for handling both single and multiple uploads
+const store = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    if (FILE_TYPE_MAP[file.mimetype]) {
+      cb(null, true);
+    } else {
+      cb(new Error("Invalid file type"), false);
+    }
+  },
+});
 
-module.exports = store;
+// Middleware to handle various image upload scenarios
+const uploadImages = {
+  categoryImage: store.single("image"), // For categories (single image)
+  productImages: store.array("image", 5), // For products (multiple images)
+};
+
+module.exports = uploadImages;

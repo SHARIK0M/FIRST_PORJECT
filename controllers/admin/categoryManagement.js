@@ -1,59 +1,54 @@
 const Category = require("../../models/categorySchema");
+const fs = require("fs");
+const path = require("path");
+const Product = require("../../models/productSchema");
+const productModel = require("../../models/productSchema");
 const HttpStatus = require("../../httpStatus");
 
-// Load Category Page
+// Display Category Page with Pagination
 const showCategoryPage = async (req, res) => {
   try {
     let page = req.query.page ? req.query.page : 1;
-    const limit = 5;
-
-    // Fetch categories with pagination
+    const limit = 3;
     const category = await Category.find({})
       .skip((page - 1) * limit)
       .limit(limit)
       .lean();
-
-    // Count total categories
+    
     const count = await Category.countDocuments();
     const totalPages = Math.ceil(count / limit);
     const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-
-    // Category added message
-    const catSaveMsg = req.session.catSave
-      ? "Category added successfully..!!"
-      : null;
-    req.session.catSave = false;
 
     res.render("admin/show_category", {
       admin: true,
       pages,
       currentPage: page,
       category,
-      catSaveMsg,
-      layout: "adminLayout",
+      layout: "adminlayout",
     });
   } catch (error) {
-    console.error(error.message);
-    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
+    console.error("Error displaying category page:", error);
   }
 };
 
-// Load Add Category Page
+// Render Add Category Page with Messages
 const addCategoryPage = (req, res) => {
   try {
-    const catExistMsg = req.session.catExist
-      ? "Category already exists..!!"
-      : null;
-    req.session.catExist = false;
+    let messages = {}; // Initialize an empty messages object
 
-    res.render("admin/add_category", {
-      admin: true,
-      catExistMsg,
-      layout: "adminLayout",
-    });
+    if (req.session.catSave) {
+      messages.catSaveMsg = "Category added successfully!";
+      req.session.catSave = false; // Reset session flag
+    } 
+    
+    if (req.session.catExist) {
+      messages.catExistMsg = "Category already exists!";
+      req.session.catExist = false; // Reset session flag
+    }
+
+    res.render("admin/add_category", { ...messages, layout: "adminlayout" });
   } catch (error) {
-    console.error(error.message);
-    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
+    console.error("Error rendering add category page:", error);
   }
 };
 
@@ -62,72 +57,60 @@ const addNewCategory = async (req, res) => {
   try {
     const catName = req.body.name;
     const image = req.file;
-
-    // Check if category already exists (case-insensitive)
-    const catExist = await Category.findOne({
-      category: { $regex: new RegExp(`^${catName}$`, "i") },
-    });
-
+    const catExist = await Category.findOne({ category: { $regex: new RegExp(`^${catName}$`, "i") } });
+    
     if (!catExist) {
-      await new Category({
-        category: catName,
-        imageUrl: image.filename,
-      }).save();
+      const category = new Category({ category: catName, imageUrl: image.filename });
+      await category.save();
       req.session.catSave = true;
-      return res.redirect("/admin/category");
+    } else {
+      req.session.catExist = true;
     }
-
-    req.session.catExist = true;
     res.redirect("/admin/addCategory");
   } catch (error) {
-    console.error(error.message);
-    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
+    console.error("Error adding category:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
-// Unlist Category
+// Toggle Category Listing Status
 const unListCategory = async (req, res) => {
   try {
     const { id } = req.body;
-
-    // Toggle category listing status
     const category = await Category.findById(id);
-    await Category.findByIdAndUpdate(
-      id,
-      { isListed: !category.isListed },
-      { new: true }
-    );
+    const newListed = category.isListed;
+
+    await Category.findByIdAndUpdate(id, { isListed: !newListed }, { new: true });
+    await productModel.updateMany({ category: category }, { isBlocked: newListed });
 
     res.redirect("/admin/category");
   } catch (error) {
-    console.error(error.message);
+    console.error("Error updating category status:", error);
     res.status(HttpStatus.InternalServerError).send("Internal Server Error");
   }
 };
 
-// Load Edit Category Page
+// Render Edit Category Page
 const showEditCategory = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id).lean();
-    res.render("admin/editCategory", { layout: "adminLayout", category });
+    res.render("admin/editCategory", { layout: "adminlayout", category });
   } catch (error) {
-    console.error(error.message);
-    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
+    console.error("Error rendering edit category page:", error);
   }
 };
 
-// Update Category
+// Update Category Details
 const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
+    const category = await Category.findById(id);
+    if (!category) return res.status(404).send("Category not found");
+
     const newCategoryName = req.body.name;
     const image = req.file;
-
-    // Fetch existing category
-    const category = await Category.findById(id).lean();
-    const updImage = image ? image.filename : category.imageUrl;
-
-    // Check if category name already exists (excluding current category)
+    const updatedImage = image ? image.filename : category.imageUrl;
+    
     const categoryExist = await Category.findOne({
       category: { $regex: new RegExp(`^${newCategoryName}$`, "i") },
       _id: { $ne: id },
@@ -138,16 +121,12 @@ const updateCategory = async (req, res) => {
       return res.redirect(`/admin/editCategory/${id}`);
     }
 
-    await Category.findByIdAndUpdate(
-      id,
-      { category: newCategoryName, imageUrl: updImage },
-      { new: true }
-    );
+    await Category.findByIdAndUpdate(id, { category: newCategoryName, imageUrl: updatedImage }, { new: true });
     req.session.categoryUpdate = true;
     res.redirect("/admin/category");
   } catch (error) {
     console.error("Error updating category:", error);
-    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
+    res.status(500).send("Internal Server Error");
   }
 };
 

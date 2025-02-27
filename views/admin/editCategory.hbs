@@ -1,116 +1,87 @@
-<style>
-    #sar{
-        background-color:#e49e7e;
-    }
-</style>
-    <main class="main-wrap">
-        <section class="content-main" id="sar">
-            <div class="content-header">
-                <div>
-                    <h2 class="content-title card-title">Edit Categories </h2>
-                    <p>Edit category</p>
-                </div>
-                <div>
-                    <input type="text" placeholder="Search Categories" class="form-control bg-white">
-                </div>
+<main class="main-wrap">
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Edit Categories</h2>
+                <p>Modify an existing category</p>
             </div>
-            <div class="card"  style="background-color: #E5C7A3;">
-                <div class="card-body">
-                    {{#if catSaveMsg}}
-            <div class="alert alert-success mt-3 alert-dismissible fade  {{#if catSaveMsg}}show{{/if}}" role="alert">
-              {{catSaveMsg}}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div>
+                <input type="text" placeholder="Search Categories" class="form-control bg-white">
             </div>
-            {{/if}}
-            {{#if catExistMsg}}
-            <div class="alert alert-danger mt-3 alert-dismissible fade {{#if catExistMsg}}show{{/if}}" role="alert">
-              {{catExistMsg}}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            {{/if}}
-                    <div class="row">
-                        <div class="col-md-12">
-            
-                            <form action="/admin/updateCategory/{{category._id}}" method="post" enctype="multipart/form-data" onsubmit="return Validation() && submitform(this);">
-                                <div class="mb-4">
-                                    <label for="productName" class="form-label">Category Name:</label>
-                                    <input type="text"  class="form-control" id="productName" name="name" value="{{category.category}}" >
-                                    <div class="error" style="color: red;" id="nameError"></div>
-                                </div>
-                                
-                                
-                                <div class="form-group">
-                                    <label for="productImage" >Category Image:</label>
-                                    <br>
-                                    <img class="border m-2" style="width: 80px; height: auto;" src="/assets/imgs/products/{{category.imageUrl}}"   alt="">
-                                    <br>
-                                    <input type="file" class="form-control-file" name="image" id="productImage" onchange="validateFile()">
-                                    <div class="error" style="color: red;" id="fileError"></div>
-                                    
-                                    
-                                </div>
-                                
-                                
-                                <div class="d-flex g-2 mt-4">
-    <div class="m-2">
-        <button type="submit" class="btn btn-primary">Save</button>
-    </div>
-    <div class="m-2">
-        <a href="/admin/Category" type="button" class="btn btn-primary" id="backbutton">Back</a>
-    </div>
-</div>
-                                   
-                                    
-                                </div>
-                            </form>
-                        </div>
-                     
-                    </div> <!-- .row // -->
-                </div> <!-- card body .// -->
-            </div> <!-- card .// -->
-        </section> <!-- content-main end// -->
-       
-    </main>
+        </div>
+        <div class="card">
+            <div class="card-body">
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                <!-- Success message for category update -->
+                {{#if catSaveMsg}}
+                <div class="alert alert-success mt-3 alert-dismissible fade {{#if catSaveMsg}}show{{/if}}" role="alert">
+                    {{catSaveMsg}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {{/if}}
 
+                <!-- Error message if category already exists -->
+                {{#if catExistMsg}}
+                <div class="alert alert-danger mt-3 alert-dismissible fade {{#if catExistMsg}}show{{/if}}" role="alert">
+                    {{catExistMsg}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {{/if}}
+
+                <div class="row">
+                    <div class="col-md-12">
+
+                        <!-- Category Edit Form -->
+                        <form action="/admin/updateCategory/{{category._id}}" method="post" enctype="multipart/form-data" onsubmit="return Validation()">
+                            
+                            <!-- Input for category name -->
+                            <div class="mb-4">
+                                <label for="productName" class="form-label">Category Name:</label>
+                                <input type="text" class="form-control" id="productName" name="name" value="{{category.category}}">
+                                <div class="error" style="color: red;" id="nameError"></div>
+                            </div>
+                            
+                            <!-- Upload new category image -->
+                            <div class="form-group">
+                                <label for="productImage">Category Image:</label>
+                                <br>
+                                <img class="border m-2" style="width: 80px; height: auto;" src="/assets/imgs/products/{{category.imageUrl}}" alt="">
+                                <br>
+                                <input type="file" class="form-control-file" name="image" id="productImage" onchange="validateFile()">
+                                <div class="error" style="color: red;" id="fileError"></div>
+                            </div>
+                            
+                            <!-- Buttons: Submit and Back -->
+                            <div class="d-flex g-2">
+                                <div class="m-2">
+                                    <button type="submit" class="btn btn-primary">Edit Category</button>
+                                </div>
+                                <div class="m-2">
+                                    <a href="/admin/Category" type="button" class="btn btn-primary" id="backbutton">Back</a>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div> <!-- End of row -->
+            </div> <!-- End of card body -->
+        </div> <!-- End of card -->
+    </section> <!-- End of main content section -->
+</main>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 <script>
-
-    function submitform(form) {
-    Swal.fire({
-        title: "Do you want to save the changes?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#088178",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, save it!",
-        cancelButtonText: "No, cancel"
-    }).then((result) => {
-        if (result.isConfirmed) {
-            Swal.fire({
-                title: "Saved",
-                icon: "success",
-                confirmButtonText: "OK"
-            }).then(() => {
-                form.submit(); // Submit the form if confirmed
-            });
-        } else {
-            console.log("User canceled the action");
-        }
-    });
-    return false; // Prevent default form submission
-}
-
-    ////////////back
+    // Handle back button click with a confirmation alert
     $(document).ready(function () {
         $('#backbutton').click(function (e) {
             e.preventDefault();
 
-
             Swal.fire({
                 title: "Leave the page?",
-                text: "The Data will not be saved",
+                text: "Unsaved data will be lost.",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#088178",
@@ -118,60 +89,47 @@
                 confirmButtonText: "Yes"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = "/admin/category";
-
+                    window.location.href = "/admin/Category";
                 }
             });
-
-
         });
     });
 </script>
 
-
-
 <script>
+    // Validate category name input
     function Validation() {
-    var name = document.getElementById('productName').value;
-    var nameError = document.getElementById('nameError');
-    var categoryPattern = /^[a-zA-Z0-9\s]{4,}$/;
-    //var categoryPattern = /^[a-zA-Z]{4,}(?: [a-zA-Z]+)*$/;
+        let errors = [];
 
-    // Validate Category Name
-    if (!name.match(categoryPattern)) {
-        nameError.innerHTML = "Name Not Valid";
-        return false; // Prevent form submission
+        var name = document.getElementById('productName').value;
+        var nameError = document.getElementById('nameError');
+        var categoryPattern = /^[a-zA-Z]{4,}(?: [a-zA-Z]+)*$/; // At least 4 letters, spaces allowed
+
+        if (!name.match(categoryPattern)) {
+            errors.push("Invalid name format");
+        }
+
+        if (errors.length > 0) {
+            nameError.innerHTML = errors.includes("Invalid name format") ? "Invalid name format" : "";
+            return false; // Prevent form submission
+        }
+        return true;
     }
 
-    return true;
-}
+    // Validate file upload (only image formats allowed)
+    function validateFile() {
+        const fileInput = document.getElementById('productImage');
+        const fileError = document.getElementById('fileError');
+        const filePath = fileInput.value;
+        const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
 
-// Validate File Upload
-function validateFile() {
-    const fileInput = document.getElementById('productImage');
-    const fileError = document.getElementById('fileError');
-    const filePath = fileInput.value;
-    const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
-
-    const file = fileInput.files[0];
-    const maxSize = 5 * 1024 * 1024; // 5MB
-
-    // Check file extension
-    if (!allowedExtensions.exec(filePath)) {
-        fileError.innerHTML = "Invalid file type. Please upload an image (JPG, JPEG, PNG, GIF).";
-        fileInput.value = ''; // Clear the file input
-        return false;
+        if (!allowedExtensions.exec(filePath)) {
+            fileError.innerHTML = "Invalid file type. Upload JPG, JPEG, PNG, or GIF.";
+            fileInput.value = ''; // Clear file input
+            return false;
+        } else {
+            fileError.innerHTML = ""; // Clear error message
+            return true;
+        }
     }
-
-    // Check file size
-    if (file && file.size > maxSize) {
-        fileError.innerHTML = "File size should be less than 5MB.";
-        fileInput.value = ''; // Clear the file input
-        return false;
-    }
-
-    fileError.innerHTML = ""; // Clear error message
-    return true;
-}
-
 </script>

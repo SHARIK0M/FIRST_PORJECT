@@ -1,5 +1,5 @@
 <main class="main-wrap">
-    <section class="content-main" id="sar">
+    <section class="content-main">
         <div class="row">
             <div class="col-9">
                 <div class="content-header">
@@ -7,100 +7,86 @@
                 </div>
             </div>
             <div class="col-lg-12">
-                <div class="card mb-4" style="background-color: #E5C7A3;">
-                    {{!-- <div class="card-header">
-                        <h4>Basic</h4>
-                    </div> --}}
+                <div class="card mb-4">
                     <div class="card-body">
                         <form method="post" class="form-add-product" action="/admin/updateProduct/{{productData._id}}"
-                              enctype="multipart/form-data" onsubmit="return Validation(event)">
+                              enctype="multipart/form-data" onsubmit="return Validation()">
 
-                            <!-- Product Name -->
+                            <!-- Input for Product Name -->
                             <div class="mb-4">
                                 <label for="product_name" class="form-label">Product Name</label>
-                                <input type="text" value="{{productData.name}}" placeholder="Type here" name="name"
+                                <input type="text" value="{{productData.name}}" placeholder="Enter product name" name="name"
                                        class="form-control" id="productName">
-                                <h6 class="alertAddProduct mt-1" style="color: red" id="productNameAlert"></h6>
+                                <h6 class="alertAddProduct mt-1 text-danger" id="productNameAlert"></h6>
                             </div>
 
-                            <!-- Full Description -->
+                            <!-- Input for Full Description -->
                             <div class="mb-4">
-                                <label class="form-label">Full description</label>
-                                <textarea placeholder="Type here" name="description" id="longdescription"
+                                <label class="form-label">Full Description</label>
+                                <textarea placeholder="Enter full description" name="description" id="longdescription"
                                           class="form-control" rows="3">{{productData.description}}</textarea>
-                                <h6 class="alertAddProduct mt-1" style="color: red" id="longAlert"></h6>
+                                <h6 class="alertAddProduct mt-1 text-danger" id="longAlert"></h6>
                             </div>
 
                             <div class="row">
-                                <!-- Price -->
+                                <!-- Input for Price -->
                                 <div class="col-lg-4">
                                     <div class="mb-4">
                                         <label class="form-label">Price</label>
-                                        <input placeholder="$" type="text" value="{{productData.price}}" id="price"
+                                        <input placeholder="Enter price" type="text" value="{{productData.price}}" id="price"
                                                name="price" class="form-control">
-                                        <h6 class="alertAddProduct mt-1" style="color: red" id="priceAlert"></h6>
+                                        <h6 class="alertAddProduct mt-1 text-danger" id="priceAlert"></h6>
                                     </div>
                                 </div>
 
-                                <!-- Stock -->
+                                <!-- Input for Stock Quantity -->
                                 <div class="col-lg-4">
                                     <div class="mb-4">
                                         <label class="form-label">Stock</label>
                                         <input name="stock" value="{{productData.stock}}" class="form-control"
-                                               placeholder="Quantity" type="text" id="Qty">
-                                        <h6 class="alertAddProduct mt-1" style="color: red" id="qtyAlert"></h6>
+                                               placeholder="Enter stock quantity" type="text" id="Qty">
+                                        <h6 class="alertAddProduct mt-1 text-danger" id="qtyAlert"></h6>
                                     </div>
                                 </div>
 
-                                <!-- Category -->
+                                <!-- Dropdown for Category Selection -->
                                 <div class="col-lg-4">
-                                    <label class="form-label">Category:</label>
+                                    <label class="form-label">Category</label>
                                     <select name="category" id="category" class="form-select">
                                         {{#each categories}}
-                                        <option value="{{this._id}}" {{#if this.isSelected}}selected{{/if}}>{{this.category}}</option>
+                                        <option value="{{this._id}}">{{this.category}}</option>
                                         {{/each}}
                                     </select>
                                 </div>
                             </div>
 
-                            <!-- Product Images -->
+                            <!-- Product Images Section -->
                             <div class="form-group">
-                                <label for="productImage">Product Image:</label>
+                                <label for="productImage">Product Images</label>
                                 <div class="d-flex border p-10 m-tb-10">
                                     <input name="product-id" type="hidden" value="{{productData._id}}">
-                                 {{#each productData.imageUrl}}
-    <div class="image-container" data-image-index="{{@index}}">
-        <div class="badge rounded-pill alert-danger">
-            <p class="close-button" data-image-index="{{@index}}" onclick="deleteProImg({{@index}})" style="cursor: pointer;">×</p>
-        </div>
-        <img src="/assets/imgs/products/{{this}}" alt="images" style="width: 80px; height: auto;" class="m-2 pro-image" data-image-index="{{@index}}">
-    </div>
-{{/each}}
-
+                                    {{#each productData.imageUrl}}
+                                        <div class="image-container" data-image-index="{{@index}}">
+                                            <div class="badge rounded-pill alert-danger">
+                                                <p class="close-button" data-image-index="{{@index}}" onclick="deleteProImg({{@index}})" style="cursor: pointer;">×</p>
+                                            </div>
+                                            <img src="/assets/imgs/products/{{this}}" alt="Product Image" style="width: 80px; height: auto;" class="m-2 pro-image" data-image-index="{{@index}}">
+                                        </div>
+                                    {{/each}}
                                 </div>
                                 <input type="file" class="form-control-file" id="productImage" multiple name="image">
-                                <h6 id="imgAlert" class="mt-2" style="color: red;"></h6>
+                                <h6 id="imgAlert" class="mt-2 text-danger"></h6>
                             </div>
                             
-
-
-
-
-
-                            <!-- Buttons -->
+                            <!-- Action Buttons -->
                             <div class="d-flex g-2">
                                 <div class="m-2">
-<button onclick="return Validation(event);" class="btn btn-primary">Save</button>
-
+                                    <button onclick="submitform(this.form)" class="btn btn-primary">Save</button>
                                 </div>
                                 <div class="m-2">
                                     <a href="/admin/product" type="button" class="btn btn-primary" id="backbutton">Back</a>
                                 </div>
-                            </div> 
-
-
-
-
+                            </div>
 
                         </form>
                     </div>
@@ -108,124 +94,95 @@
             </div>
         </div>
     </section>
-    
 </main>
 
-<style>
-    #sar{
-        background-color:#e49e7e;
-    }
-</style>
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>
-
-
-
-
 <script>
+function Validation() {
+    var errors = []; // Stores validation errors
 
-function Validation(event) {
-    event.preventDefault(); // Prevent form submission
-    let errors = []; // Array to store validation errors
+    var fileInput = document.getElementById('productImage'); // File input element
+    let productName = document.getElementById("productName").value;
+    let longdescription = document.getElementById("longdescription").value;
+    let Qty = document.getElementById("Qty").value;
+    let price = document.getElementById("price").value;
 
-    const fileInput = document.getElementById('productImage');
-    const productName = document.getElementById("productName").value.trim();
-    const longdescription = document.getElementById("longdescription").value.trim();
-    const Qty = document.getElementById("Qty").value.trim();
-    const price = document.getElementById("price").value.trim();
+    let productNameRegex = /^[a-zA-Z0-9\s\(\)\-\+]{4,}$/; // Product name validation (min 4 chars, alphanumeric & special chars allowed)
+    let number = /^[0-9]\d*$/; // Number validation (only digits, no negative values)
+    let descriptionRegex = /^(?!\s*$)[\s\S]{1,100}$/; // Description validation (1-100 chars, no empty values)
 
-    // Regular expressions for validation
-    const productNameRegex = /^[a-zA-Z0-9\s\(\)\-\+]{4,}$/;
-    const number = /^[1-9]\d*$/;
-    const number1 = /^[0-9]\d*$/;
-    const descriptionRegex = /^(?!\s*$)[a-zA-Z0-9\s\(\)\-\+]{10,100}$/;
+    let productNameAlert = document.getElementById("productNameAlert");
+    let qtyAlert = document.getElementById("qtyAlert");
+    let priceAlert = document.getElementById("priceAlert");
+    let longAlert = document.getElementById("longAlert");
+    let imgAlert = document.getElementById('imgAlert');
 
-
-    // Alert elements
-    const productNameAlert = document.getElementById("productNameAlert");
-    const qtyAlert = document.getElementById("qtyAlert");
-    const priceAlert = document.getElementById("priceAlert");
-    const longAlert = document.getElementById("longAlert");
-    const imgAlert = document.getElementById('imgAlert');
-
-    // Reset previous alerts
+    // Clear previous error messages
     productNameAlert.innerHTML = "";
     qtyAlert.innerHTML = "";
     priceAlert.innerHTML = "";
     longAlert.innerHTML = "";
     imgAlert.innerHTML = "";
 
-    // Validate Product Name
-  if (productName.length < 4) {
-        productNameAlert.innerHTML = "minimum 4 characters.";
-        errors.push("Invalid Product Name");
-    } else if (!productName.match(productNameRegex)) {
-        productNameAlert.innerHTML = "Invalid Name";
+    // Validate product name
+    if (!productName.match(productNameRegex)) {
         errors.push("Invalid Product Name");
     }
-    // Validate Quantity
-    if (!Qty.match(number1)) {
-        qtyAlert.innerHTML = "Stock Invalid";
+
+    // Validate quantity
+    if (!Qty.match(number)) {
         errors.push("Invalid Quantity");
     }
 
-    // Validate Price
+    // Validate price
     if (!price.match(number)) {
-        priceAlert.innerHTML = "Price Invalid.";
         errors.push("Invalid Price");
     }
 
-    // Validate Description
+    // Validate description
     if (!longdescription.match(descriptionRegex)) {
-        longAlert.innerHTML = "minimum 10 characters";
         errors.push("Invalid Description");
     }
 
-    // Validate Images
-    const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
-    const invalidFileTypes = ['application/pdf'];
-    if (fileInput && fileInput.files.length > 0) {
-        for (let i = 0; i < fileInput.files.length; i++) {
-            const fileType = fileInput.files[i].type;
-            if (invalidFileTypes.includes(fileType)) {
-                imgAlert.innerHTML = "PDF files are not allowed.";
-                errors.push("Invalid Image Type");
-                break;
-            } else if (!validImageTypes.includes(fileType)) {
-                imgAlert.innerHTML = "Invalid file type. Only jpg, png, gif allowed.";
-                errors.push("Invalid Image Format");
-                break;
-            }
+    // Validate uploaded images
+    const validImageTypes = ['image/jpeg', 'image/png', 'image/gif']; // Allowed image formats
+    const invalidFileTypes = ['application/pdf']; // Disallowed file types
+
+    for (let i = 0; i < fileInput.files.length; i++) {
+        const fileType = fileInput.files[i].type;
+        
+        if (invalidFileTypes.includes(fileType)) {
+            errors.push("PDF files are not allowed.");
+            break; // Stop checking if PDF is found
+        } else if (!validImageTypes.includes(fileType)) {
+            errors.push("Invalid file type. Only JPG, PNG, and GIF are allowed.");
+            break;
         }
     }
 
-    // Check maximum images
+    // Limit total images to 5
     const existingImagesCount = document.querySelectorAll('.pro-image').length;
     const newImagesCount = fileInput.files.length;
     const totalImagesCount = existingImagesCount + newImagesCount;
 
     if (totalImagesCount > 5) {
-        imgAlert.innerHTML = "Only 5 images are allowed.";
-        errors.push("Exceeded Image Limit");
+        errors.push("Maximum 5 images allowed.");
     }
 
-    // If errors exist, prevent form submission
+    // Show errors if any
     if (errors.length > 0) {
-        console.log("Validation errors:", errors);
-        return false;
-    }
+        productNameAlert.innerHTML = errors.includes("Invalid Product Name") ? "Invalid Product Name" : "";
+        qtyAlert.innerHTML = errors.includes("Invalid Quantity") ? "Invalid Quantity" : "";
+        priceAlert.innerHTML = errors.includes("Invalid Price") ? "Invalid Price" : "";
+        longAlert.innerHTML = errors.includes("Invalid Description") ? "Invalid Description" : "";
+        imgAlert.innerHTML = errors.includes("PDF files are not allowed.") ? "PDF files are not allowed." : 
+                             errors.includes("Invalid file type. Only JPG, PNG, and GIF are allowed.") ? "Invalid file type. Only JPG, PNG, and GIF are allowed." : 
+                             errors.includes("Maximum 5 images allowed.") ? "Maximum 5 images allowed." : "";
 
-    // If validation passed, submit the form
-    submitform(document.querySelector('.form-add-product'));
+        return false; // Prevent form submission
+    }
 
     return true; // Allow form submission
 }
-
-
 
 const deleteImage = async (productId, imageIndex) => {
     try {
@@ -234,30 +191,31 @@ const deleteImage = async (productId, imageIndex) => {
         });
 
         const data = await response.json();
-        console.log("hei",data);
+        console.log("Response: ", data);
 
         if (data) {
-    const imageElem = document.querySelector(`.pro-image[data-image-index="${imageIndex}"]`);
-    const imageContainer = document.querySelector(`.image-container[data-image-index="${imageIndex}"]`);
-    console.log("Image Element:", imageContainer); // Log the image element
-    if (imageElem) {
-        imageContainer.remove()
-    } else {
-        console.warn("Image element not found for index:", imageIndex); // Warn if element is not found
-    }
-} else {
-    console.warn("No data received from the server.");
-}
+            const imageElem = document.querySelector(`.pro-image[data-image-index="${imageIndex}"]`);
+            const imageContainer = document.querySelector(`.image-container[data-image-index="${imageIndex}"]`);
+            
+            if (imageElem) {
+                imageContainer.remove(); // Remove image from DOM
+            } else {
+                console.warn("Image element not found for index: ", imageIndex);
+            }
+        } else {
+            console.warn("No response from server.");
+        }
 
     } catch (error) {
-        console.error(error);
+        console.error("Error deleting image: ", error);
     }
 };
 
 const deleteProImg = () => {
     const deleteButtons = document.querySelectorAll('.close-button');
     const productId = document.getElementsByName('product-id')[0].value;
-    console.log('product ID=> ' , productId)
+    console.log('Product ID: ', productId);
+    
     deleteButtons.forEach((button) => {
         button.addEventListener('click', async (event) => {
             const imageIndex = event.target.dataset.imageIndex;
@@ -266,60 +224,53 @@ const deleteProImg = () => {
     });
 };
 
-// Call deleteProImg once the DOM is loaded
+// Initialize delete functionality when page loads
 document.addEventListener("DOMContentLoaded", deleteProImg);
 
 </script>
-
-
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
     
-
-
     function submitform(form) {
-        
-    
-    Swal.fire({
-        title: "Do you want to save the changes?",
-        //text: "Changes made will be saved.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#088178",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, save it!",
-        cancelButtonText: "No, cancel"
-    
-    }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
+        event.preventDefault();    
+
+        // Show confirmation popup before saving changes
+        Swal.fire({
+            title: "Do you want to save the changes?",
+            text: "Changes made will be saved.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#088178",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, save it!",
+            cancelButtonText: "No, cancel"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show success message after confirming save
+                Swal.fire({
                     title: "Saved",
-                    //text: "Your changes have been saved.",
+                    text: "Your changes have been saved.",
                     icon: "success",
-                    //confirmButtonText: "OK"
-                    confirmButtonText: "Yes, save it!",
-                    timer: 1500 
+                    confirmButtonText: "OK"
                 }).then(() => {
                     form.submit();
                 });
-                }else {
-               
+            } else {
                 console.log("User canceled the action");
             }
-            }); 
-        }
-    
-
-    // Back Button
+        }); 
+    }
 
     $(document).ready(function () {
         $('#backbutton').click(function (e) {
             e.preventDefault();
 
+            // Show confirmation popup before navigating away
             Swal.fire({
                 title: "Leave the page?",
-                text: "The Data will not be saved",
+                text: "Unsaved data will be lost.",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#088178",
@@ -327,11 +278,11 @@ document.addEventListener("DOMContentLoaded", deleteProImg);
                 confirmButtonText: "Yes"
             }).then((result) => {
                 if (result.isConfirmed) {
+                    // Redirect to the product page if confirmed
                     window.location.href = "/admin/product";
-
                 }
             });
-            
         });
     });
+
 </script>

@@ -1,98 +1,76 @@
+
 <main class="main-wrap">
-    <section class="content-main" id="sar">
+    <section class="content-main">
         <div class="content-header">
             <div>
                 <h2 class="content-title card-title">Add Categories</h2>
             </div>
         </div>
         
-        <!-- Card Section for Adding Categories -->
-        <div class="card"  style="background-color: #E5C7A3;">
+        <div class="card">
             <div class="card-body">
                 
-                <!-- Success Message Alert -->
-                {{#if catSaveMsg}}
-                <div class="alert alert-success mt-3 alert-dismissible fade show" role="alert">
-                    {{catSaveMsg}}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {{/if}}
-                
-                <!-- Error Message Alert -->
+                <!-- Display success or error messages for category operations -->
                 {{#if catExistMsg}}
-                <div class="alert alert-danger mt-3 alert-dismissible fade show d-inline-block w-50" role="alert">
-                    {{catExistMsg}}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
+                    <div class="alert alert-danger mt-3 alert-dismissible fade show" role="alert">
+                        {{catExistMsg}}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {{else if catSaveMsg}}
+                    <div class="alert alert-success mt-3 alert-dismissible fade show" role="alert">
+                        {{catSaveMsg}}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
                 {{/if}}
-                
+
                 <div class="row">
                     <div class="col-md-12">
-                        <!-- Form for Adding Categories -->
+                        <!-- Category form for adding a new category -->
                         <form action="/admin/addCategory" method="post" id="product_form" enctype="multipart/form-data">
                             
-                            <!-- Category Name Input Field -->
+                            <!-- Category Name Input -->
                             <div class="mb-4">
                                 <label for="categoryName" class="form-label">Category Name:</label>
-                                <input type="text" placeholder="Type here" class="form-control" name="name" id="product_name" required />
+                                <input type="text" placeholder="Type here" class="form-control" name="name" id="category_name" required />
                             </div>
                             <div id="name-validation-message" class="text-danger"></div>
                             
-                            <!-- Category Image Input Field -->
+                            <!-- Category Image Upload -->
                             <div class="mb-4">
                                 <label for="categoryImage" class="form-label">Category Image:</label>
-                                <input type="file" class="form-control-file" name="image" accept="image/*" id="category_image"/>
-                                <div id="image-validation-message" class="text-danger"></div>
+                                <input type="file" class="form-control-file" name="image" accept="image/*" id="category_image" />
                             </div>
                             
-                            <!-- Buttons: Submit & Back -->
+                            <!-- Action Buttons -->
                             <div class="d-flex g-2">
                                 <div class="m-2">
-                                    <button type="submit" class="btn btn-primary">Create category</button>
+                                    <button type="submit" class="btn btn-primary">Create Category</button>
                                 </div>
                                 <div class="m-2">
-                                    <a href="/admin/Category" id="backbutton" class="btn btn-primary">Back</a>
+                                    <a href="/admin/Category" class="btn btn-primary">Back</a>
                                 </div>
                             </div>
                         </form>
                     </div>
-                </div> 
-            </div> 
-        </div> 
-    </section> 
+                </div>
+            </div>
+        </div>
+    </section>
 </main>
 
-<style>
-    #sar{
-        background-color:#e49e7e;
-    }
-</style>
 
-<!-- External Scripts -->
+    
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
-    // Form Submission Validation: Ensure Category Image is Uploaded
-    document.getElementById('product_form').addEventListener('submit', function(event) {
-        const imageInput = document.getElementById('category_image');
-        const imageErrorMessage = document.getElementById('image-validation-message');
-        imageErrorMessage.textContent = '';
-        
-        if (!imageInput.files.length) {
-            event.preventDefault();  
-            imageErrorMessage.textContent = 'Please select a category image.';
-        }
-    });
-
-    // Confirmation Alert for Back Button Click
     $(document).ready(function () {
         $('#backbutton').click(function (e) {
             e.preventDefault();
-            
             Swal.fire({
                 title: "Leave the page?",
-                text: "The data will not be saved.",
+                text: "The Data will not be saved",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#088178",
@@ -104,5 +82,5 @@
                 }
             });
         });
-    });
+    })
 </script>

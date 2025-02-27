@@ -2,207 +2,150 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css">
 </head>
 
-<style>
-    #sar{
-        background-color:#e49e7e;
-    }
-</style>
 
 <main class="main-wrap">
-    <section class="content-main" id="sar">
+    <section class="content-main">
         <div class="row">
             <div class="col-9">
                 <div class="content-header">
                     <h2 class="content-title">Add New Product</h2>
-
                 </div>
             </div>
-            <div class="col-lg-12"  style="background-color: #E5C7A3;">
-                <div class="card mb-4"  style="background-color: #E5C7A3;">
+            <div class="col-lg-12">
+                <div class="card mb-4">
                     <div class="card-header">
-                        <h4>Basic</h4>
+                        <h4>Basic Details</h4>
                     </div>
                     <div class="card-body">
-                        {{#if productExists}}
-                            <div class="alert alert-danger mt-3">
-                                Product already exists.
-                            </div>
-                        {{/if}}
-                        <form method="post" id="product_form" class="form-add-product" action="/admin/addProduct"
-                            enctype="multipart/form-data" onsubmit="return submitform(this)">
+                        <form method="post" id="product_form" class="form-add-product" 
+                            action="/admin/addProduct" enctype="multipart/form-data" 
+                            onsubmit="return submitform(this)">
+                            
+                            <!-- Product Name -->
                             <div class="mb-4">
-                                <label for="product_name" class="form-label">Product Name</label>
-                                <input type="text" placeholder="Type here" name="name" class="form-control"
-                                    id="productName" onchange="validate_productName()" id="productName"
-                                    onchange="validate_productName()">
-                                <h6 class="alertAddProduct mt-1" style="color: red" id="productNameAlert"></h6>
-
+                                <label for="productName" class="form-label">Product Name</label>
+                                <input type="text" placeholder="Enter product name" name="name" 
+                                    class="form-control" id="productName" onchange="validate_productName()">
+                                <h6 class="alertAddProduct mt-1 text-danger" id="productNameAlert"></h6>
                             </div>
+
+                            <!-- Description -->
                             <div class="mb-4">
-                                <label class="form-label">Full description</label>
-                                <textarea placeholder="Type here" name="description" id="longdescription"
-                                    id="longdescription" onchange="validate_description()" .0 class="form-control"
-                                    rows="5"></textarea>
-                                <h6 class="alertAddProduct mt-1" style="color: red" id="longAlert"></h6>
-
+                                <label for="longdescription" class="form-label">Full Description</label>
+                                <textarea placeholder="Enter product description" name="description" 
+                                    id="longdescription" class="form-control" rows="5" 
+                                    onchange="validate_description()"></textarea>
+                                <h6 class="alertAddProduct mt-1 text-danger" id="longAlert"></h6>
                             </div>
+
                             <div class="row">
+                                <!-- Price -->
                                 <div class="col-lg-4">
                                     <div class="mb-4">
-                                        <label class="form-label">Price</label>
-                                        <div class="row gx-2">
-                                            <input placeholder="₹" type="number" id="price" name="price"
-                                                class="form-control">
-                                        </div>
-                                        <h6 class="alertAddProduct mt-1" style="color: red" id="priceAlert"></h6>
-
-
+                                        <label for="price" class="form-label">Price (₹)</label>
+                                        <input type="number" placeholder="Enter price" name="price" 
+                                            id="price" class="form-control">
+                                        <h6 class="alertAddProduct mt-1 text-danger" id="priceAlert"></h6>
                                     </div>
                                 </div>
+
+                                <!-- Stock Quantity -->
                                 <div class="col-lg-4">
                                     <div class="mb-4">
-                                        <label class="form-label">Stock</label>
-                                        <input name="stock" class="form-control" placeholder="Quantity" type="number"
-                                            id="Qty">
+                                        <label for="Qty" class="form-label">Stock Quantity</label>
+                                        <input type="number" placeholder="Enter quantity" name="stock" 
+                                            id="Qty" class="form-control">
+                                        <h6 class="alertAddProduct mt-1 text-danger" id="qtyAlert"></h6>
                                     </div>
-                                    <h6 class="alertAddProduct mt-1" style="color: red" id="qtyAlert"></h6>
                                 </div>
+
+                                <!-- Category Selection -->
                                 <div class="col-lg-4">
-                                    <label class="form-label">Category:</label>
+                                    <label for="productCategory" class="form-label">Category</label>
                                     <select name="category" id="productCategory" class="form-select">
                                         {{#each category}}
                                         <option value="{{this._id}}">{{this.category}}</option>
                                         {{/each}}
                                     </select>
                                 </div>
-
-
-
                             </div>
+
+                            <!-- Image Uploads (5 Separate Sections) -->
                             <div class="row">
+                                <!-- Image 1 -->
                                 <div class="col-lg-4">
                                     <div class="mb-4">
-                                        <label class="form-label">Image 1</label>
-                                        <div class="input-group">
-                                            <input class="form-control" type="file" name="image" id="input1"
-                                                accept="image/png, image/jpeg, image/jpg" 
-                                                onchange="viewImage1(event),viewImage(event, 1)"/>
-                                                <label for="input1" id="file-1-preview">
-                                            <img src="/assets/imgs/theme/upload.svg" alt="" id="imgView1">
-                                        </div>
-                                        <div class="image-cropper" style="display: none; width: 200px; height: 250px;">
-                                            <img src="" id="croppedImg1" alt="" />
-                                            <button type="button" id="saveButton1"
-                                                class="btn btn-primary">Save</button>
-                                        </div>
+                                        <label for="input1" class="form-label">Image 1</label>
+                                        <input type="file" class="form-control" name="image" id="input1" 
+                                            accept="image/png, image/jpeg, image/jpg" 
+                                            onchange="viewImage(event, 1)">
+                                        <img src="/assets/imgs/theme/upload.svg" alt="Upload Image" id="imgView1">
                                     </div>
                                 </div>
 
-                                <!-- Repeat the above code for Image 2 to Image 5 with appropriate IDs -->
-                                                                <div class="col-lg-4">
+                                <!-- Image 2 -->
+                                <div class="col-lg-4">
                                     <div class="mb-4">
-                                        <label class="form-label">Image 2</label>
-                                        <div class="input-group">
-                                            <input class="form-control" type="file" name="image" id="input2"
-                                                accept="image/png, image/jpeg, image/jpg" 
-                                                onchange="viewImage1(event),viewImage(event, 2)"/>
-                                                <label for="input1" id="file-2-preview">
-                                            <img src="/assets/imgs/theme/upload.svg" alt="" id="imgView2">
-                                        </div>
-                                        <div class="image-cropper" style="display: none; width: 200px; height: 250px;">
-                                            <img src="" id="croppedImg2" alt="" />
-                                            <button type="button" id="saveButton2"
-                                                class="btn btn-primary">Save</button>
-                                        </div>
+                                        <label for="input2" class="form-label">Image 2</label>
+                                        <input type="file" class="form-control" name="image" id="input2" 
+                                            accept="image/png, image/jpeg, image/jpg" 
+                                            onchange="viewImage(event, 2)">
+                                        <img src="/assets/imgs/theme/upload.svg" alt="Upload Image" id="imgView2">
                                     </div>
                                 </div>
 
-                                <!-- Repeat the above code for Image 2 to Image 5 with appropriate IDs -->
-                                                                <div class="col-lg-4">
+                                <!-- Image 3 -->
+                                <div class="col-lg-4">
                                     <div class="mb-4">
-                                        <label class="form-label">Image 3</label>
-                                        <div class="input-group">
-                                            <input class="form-control" type="file" name="image" id="input3"
-                                                accept="image/png, image/jpeg, image/jpg" 
-                                                onchange="viewImage1(event),viewImage(event, 3)"/>
-                                                <label for="input1" id="file-3-preview">
-                                            <img src="/assets/imgs/theme/upload.svg" alt="" id="imgView3">
-                                        </div>
-                                        <div class="image-cropper" style="display: none; width: 200px; height: 250px;">
-                                            <img src="" id="croppedImg3" alt="" />
-                                            <button type="button" id="saveButton3"
-                                                class="btn btn-primary">Save</button>
-                                        </div>
+                                        <label for="input3" class="form-label">Image 3</label>
+                                        <input type="file" class="form-control" name="image" id="input3" 
+                                            accept="image/png, image/jpeg, image/jpg" 
+                                            onchange="viewImage(event, 3)">
+                                        <img src="/assets/imgs/theme/upload.svg" alt="Upload Image" id="imgView3">
                                     </div>
                                 </div>
 
-                                <!-- Repeat the above code for Image 2 to Image 5 with appropriate IDs -->
-                                                               <div class="col-lg-4">
+                                <!-- Image 4 -->
+                                <div class="col-lg-4">
                                     <div class="mb-4">
-                                        <label class="form-label">Image 4</label>
-                                        <div class="input-group">
-                                            <input class="form-control" type="file" name="image" id="input4"
-                                                accept="image/png, image/jpeg, image/jpg" 
-                                                onchange="viewImage1(event),viewImage(event, 4)"/>
-                                                <label for="input1" id="file-4-preview">
-                                            <img src="/assets/imgs/theme/upload.svg" alt="" id="imgView4">
-                                        </div>
-                                        <div class="image-cropper" style="display: none; width: 200px; height: 250px;">
-                                            <img src="" id="croppedImg4" alt="" />
-                                            <button type="button" id="saveButton4"
-                                                class="btn btn-primary">Save</button>
-                                        </div>
+                                        <label for="input4" class="form-label">Image 4</label>
+                                        <input type="file" class="form-control" name="image" id="input4" 
+                                            accept="image/png, image/jpeg, image/jpg" 
+                                            onchange="viewImage(event, 4)">
+                                        <img src="/assets/imgs/theme/upload.svg" alt="Upload Image" id="imgView4">
                                     </div>
                                 </div>
 
-                                <!-- Repeat the above code for Image 2 to Image 5 with appropriate IDs -->
-                                                                <div class="col-lg-4">
+                                <!-- Image 5 -->
+                                <div class="col-lg-4">
                                     <div class="mb-4">
-                                        <label class="form-label">Image 5</label>
-                                        <div class="input-group">
-                                            <input class="form-control" type="file" name="image" id="input5"
-                                                accept="image/png, image/jpeg, image/jpg" 
-                                                onchange="viewImage1(event),viewImage(event, 5)"/>
-                                                <label for="input1" id="file-5-preview">
-                                            <img src="/assets/imgs/theme/upload.svg" alt="" id="imgView5">
-                                        </div>
-                                        <div class="image-cropper" style="display: none; width: 200px; height: 250px;">
-                                            <img src="" id="croppedImg5" alt="" />
-                                            <button type="button" id="saveButton5"
-                                                class="btn btn-primary">Save</button>
-                                        </div>
+                                        <label for="input5" class="form-label">Image 5</label>
+                                        <input type="file" class="form-control" name="image" id="input5" 
+                                            accept="image/png, image/jpeg, image/jpg" 
+                                            onchange="viewImage(event, 5)">
+                                        <img src="/assets/imgs/theme/upload.svg" alt="Upload Image" id="imgView5">
                                     </div>
                                 </div>
-
-                                <!-- Repeat the above code for Image 2 to Image 5 with appropriate IDs -->
-
                             </div>
-                            <h6 id="imgAlert" class=" mt-2" style="color: red;"></h6>
 
+                            <h6 id="imgAlert" class="mt-2 text-danger"></h6>
 
+                            <!-- Submit & Back Buttons -->
                             <div class="d-flex g-2">
                                 <div class="m-2">
                                     <button type="submit" class="btn btn-primary">Add Product</button>
-
                                 </div>
                                 <div class="m-2">
-                                    <a href="/admin/product" type="button" class="btn btn-primary"
-                                        id="backbutton">Back</a>
-
+                                    <a href="/admin/product" class="btn btn-secondary">Back</a>
                                 </div>
-
-
                             </div>
-                            
+
                         </form>
                     </div>
                 </div> 
-
-
-
             </div>
+        </div>
     </section> 
-   
 </main>
 
 
@@ -213,12 +156,12 @@
 
 
 <script>
-    
-
+    // Function to display selected image
     function viewImage1(event) {
-        document.getElementById('imgView1').src = URL.createObjectURL(event.target.files[0])
+        document.getElementById('imgView1').src = URL.createObjectURL(event.target.files[0]);
     }
 
+    // Function to handle image preview and cropping
     function viewImage(event, index) {
         let input = event.target;
         let reader = new FileReader();
@@ -228,7 +171,7 @@
             let image = document.getElementById('imgView' + index);
             image.src = dataURL;
 
-            // Initialize Cropper.js on the image
+            // Initialize Cropper.js
             let cropper = new Cropper(image, {
                 aspectRatio: 1 / 1, 
                 viewMode: 1,
@@ -238,40 +181,36 @@
                 zoomable: true
             });
 
-
-            // Show the image cropper container
+            // Display cropped image container
             let cropperContainer = document.querySelector('#croppedImg' + index).parentNode;
             cropperContainer.style.display = 'block';
 
-            // Update the cropped image when the "Save" button is clicked
+            // Save cropped image when button is clicked
             let saveButton = document.querySelector('#saveButton' + index);
             saveButton.addEventListener('click', async function () {
                 let croppedCanvas = cropper.getCroppedCanvas();
                 let croppedImage = document.getElementById("croppedImg" + index);
                 croppedImage.src = croppedCanvas.toDataURL('image/jpeg', 1.0);
 
-                // Generate a unique name for the cropped image file based on the current timestamp
+                // Generate unique filename using timestamp
                 let timestamp = new Date().getTime();
                 let fileName = `cropped-img-${timestamp}-${index}.png`;
 
                 await croppedCanvas.toBlob(blob => {
-                    let input = document.getElementById('input' + index)
-                    let imgFile = new File([blob], fileName, blob)
+                    let input = document.getElementById('input' + index);
+                    let imgFile = new File([blob], fileName, blob);
                     const fileList = new DataTransfer();
                     fileList.items.add(imgFile);
-                    input.files = fileList.files
+                    input.files = fileList.files;
                 });
-                // cropperContainer.style.display = 'none';
             });
         };
         reader.readAsDataURL(input.files[0]);
     }
 
-
-
+    // Function to validate form inputs
     function Validation() {
-        var errors = []; // Array to store validation errors
-
+        var errors = [];
         var fileInput = document.getElementById('input1');
 
         let productName = document.getElementById("productName").value;
@@ -279,65 +218,57 @@
         let Qty = document.getElementById("Qty").value;
         let price = document.getElementById("price").value;
 
-
+        // Regular expressions for validation
         let productNameRegex = /^[a-zA-Z0-9\s\(\)\-\+]{4,}$/;
         let number = /^[1-9]\d*$/;
-        let descriptionRegex = /^(?!\s*$)[\s\S]{1,100}$/
+        let descriptionRegex = /^(?!\s*$)[\s\S]{1,1000}$/;
 
-
+        // Alert elements
         let productNameAlert = document.getElementById("productNameAlert");
         let qtyAlert = document.getElementById("qtyAlert");
         let priceAlert = document.getElementById("priceAlert");
         let longAlert = document.getElementById("longAlert");
-        let imgAlert = document.getElementById('imgAlert')
+        let imgAlert = document.getElementById('imgAlert');
 
-        
+        // Validation checks
+        if (!productName.match(productNameRegex)) {
+            errors.push("Invalid product name");
+        }
 
-       if (!productName.match(productNameRegex)) {
-        errors.push("Name Not Valid");
+        if (!Qty.match(number)) {
+            errors.push("Invalid quantity");
+        }
+
+        if (!price.match(number)) {
+            errors.push("Invalid price");
+        }
+
+        if (!longdescription.match(descriptionRegex)) {
+            errors.push("Invalid description");
+        }
+
+        if (fileInput.files.length === 0) {
+            errors.push("Image required");
+        }
+
+        // Display error messages
+        productNameAlert.innerHTML = errors.includes("Invalid product name") ? "Invalid product name" : "";
+        qtyAlert.innerHTML = errors.includes("Invalid quantity") ? "Invalid quantity" : "";
+        priceAlert.innerHTML = errors.includes("Invalid price") ? "Invalid price" : "";
+        longAlert.innerHTML = errors.includes("Invalid description") ? "Invalid description" : "";
+        imgAlert.innerHTML = errors.includes("Image required") ? "Image required" : "";
+
+        return errors.length === 0; // Return true if no errors, false otherwise
     }
-
-    if (!Qty.match(number)) {
-        errors.push("Please Check Qty Again");
-    }
-
-    if (!number.test(price)) {
-        errors.push("Please Check Price Again");
-    }
-
-    if (!longdescription.match(descriptionRegex)) {
-        errors.push("Please Check about Again");
-    }
-    if (fileInput.files.length === 0) {
-        errors.push("Please choose an image");
-    }
-    
-
-    // Display all error messages
-    if (errors.length > 0) {
-        productNameAlert.innerHTML = errors.includes("Name Not Valid") ? "Name Not Valid" : "";
-        qtyAlert.innerHTML = errors.includes("Please Check Qty Again") ? "Please Check Qty Again" : "";
-        priceAlert.innerHTML = errors.includes("Please Check Price Again") ? "Please Check Price Again" : "";
-        longAlert.innerHTML = errors.includes("Please Check about Again") ? "Please Check about Again" : "";
-        imgAlert.innerHTML = errors.includes("Please choose an image") ? "Please choose an image" : "";
-
-        
-        return false; // Prevent form submission
-    }
-
-    return true; // Allow form submission if no errors
-    }
-
-
-
-
 </script>
+
 <script>
-      $(document).ready(function () {
+    $(document).ready(function () {
+        // Handle back button click event
         $('#backbutton').click(function (e) {
             e.preventDefault();
 
-
+            // Show confirmation alert before leaving the page
             Swal.fire({
                 title: "Leave the page?",
                 text: "The Data will not be saved",
@@ -349,32 +280,17 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.location.href = "/admin/product";
-
                 }
             });
-
-
         });
     });
 
-        ////add products form submit
+    // Handle product form submission
     function submitform(form) {
-        event.preventDefault(); // Prevent default form submission action
-        const productName = form.name.value;
-        fetch('/admin/checkProductExists', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ name: productName }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.productExists) {
-                // Product already exists, show error message
-                document.getElementById('productExistsAlert').style.display = 'block';
-            } 
+        event.preventDefault(); // Prevent default form submission
+
         if (Validation(form)) {
+            // Show confirmation alert before adding the product
             Swal.fire({
                 title: "Are you sure?",
                 text: "Do you want to Add the Product?",
@@ -385,19 +301,19 @@
                 confirmButtonText: "Yes!"
             }).then((result) => {
                 if (result.isConfirmed) {
+                    // Show success alert and submit the form
                     Swal.fire({
-                    title: "Saved",
-                    text: "Product added successfully",
-                    icon: "success",
-                    confirmButtonText: "OK"
-                }).then(() => {
-                    form.submit();
-                });
-                }else {
-               
-                console.log("User canceled the action");
-            }
-            }); 
+                        title: "Saved",
+                        text: "Product added successfully",
+                        icon: "success",
+                        confirmButtonText: "OK"
+                    }).then(() => {
+                        form.submit();
+                    });
+                } else {
+                    console.log("User canceled the action");
+                }
+            });
         }
     }
 </script>

@@ -748,8 +748,9 @@ ol {
 .categories {
 	background: #f3f2ee;
 	overflow: hidden;
-	padding-top: 150px;
-	padding-bottom: 125px;
+	padding-top: 50px;
+	padding-bottom: 50px;
+	text-align: center;
 }
 
 .categories__text {

@@ -1,4 +1,12 @@
 <main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="/" rel="nofollow">Home</a>
+                <span></span> Shop
+            </div>
+        </div>
+    </div>
     <section class="mt-50 mb-50">
         <div class="container">
             <div class="row flex-row-reverse">
@@ -7,49 +15,99 @@
                         <div id="totall-product">
                             <p> We found <strong id="count" class="text-brand">0</strong> items for you!</p>
                         </div>
+                        <div class="sort-by-product-area">
+                            <div class="sort-by-cover mr-10">
+                                <div class="sort-by-product-wrap">
+                                    <div class="sort-by">
+                                        <span><i class="fi-rs-apps"></i>Show</span>
+                                    </div>
+                                    <div class="sort-by-dropdown-wrap">
+                                        <span> <i class="fi-rs-angle-small-down"></i></span>
+                                    </div>
+                                </div>
+                                <div class="sort-by-dropdown">
+                                    <ul>
+                                        <li><a onclick="limits(1)">1</a></li>
+                                        <li><a onclick="limits(3)">3</a></li>
+                                        <li><a onclick="limits(6)">6</a></li>
+                                        <li><a onclick="limits(9)">9</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                    
+                    <!-- Product List -->
                     <span id="pro_container">
                         <div class="row product-grid-3" id="productList">
-                            {{#each iterator}}
-                            <div class="col-lg-4 col-md-4 col-12 col-sm-6">
-                                <div style="background-color: #e2e8f0; width: 260px; height: 320px; border-radius: 2rem; gap: 8px; margin-bottom: 20px;"></div>
+                            {{#if proData}}
+                            <!-- Product data will be rendered here -->
+                            {{else}}
+                            <div>
+                                <h2 class="m-5">No product available</h2>
                             </div>
-                            {{/each}}
+                            {{/if}}
                         </div>
                     </span>
+                    
                     <!-- Pagination -->
                     <div class="pagination-area mt-15 mb-sm-5 mb-lg-0">
                         <nav aria-label="Page navigation example">
                             <ul class="pagination justify-content-start" id="paginationList">
-                                {{#each pages}}
-                                <li class="page-item {{#ifEquals this ../currentPage}}active{{/ifEquals}}">
-                                    <a class="page-link" href="javascript:goToPage({{this}});">{{this}}</a>
-                                </li>
-                                {{/each}}
+                                <!-- Pagination links will be dynamically added here -->
                             </ul>
                         </nav>
                     </div>
+                </div>
+                
+                <!-- Sidebar with Category Filter -->
+                <div class="col-lg-3 primary-sidebar sticky-sidebar">
+                    <div class="widget-category mb-30">
+                        <h5 class="section-title style-1 mb-30 wow fadeIn animated">Category</h5>
+                        <ul class="categories">
+                            {{#each loadCatData}}
+                            <li>
+                                <a onclick="filterByCategory('{{this._id}}')">{{this.category}}</a>
+                            </li>
+                            {{/each}}
+                        </ul>
+                    </div>
+                    
+                    <!-- Clear Filter Button -->
+                    <button onclick="clearfilter()" class="btn btn-fill-out btn-block hover-up mb-30" name="login">Clear filter</button>
                 </div>
             </div>
         </div>
     </section>
 </main>
 
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="/javascripts/products.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
     let currentPage = 1;
+    let currentSort = '';
+    let currentCategory = '';
+    let searchQuery = '';
     let limit = 6;
 
+    // Fetch products based on filters and pagination
     const fetchProducts = () => {
         $.ajax({
             url: '/search',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({
+                searchQuery,
+                sortOption: currentSort,
+                categoryFilter: currentCategory,
                 page: currentPage,
                 limit,
             }),
             success: (data) => {
+                console.log(data);
                 updateProductList(data.products);
                 updatePagination(data.totalProducts);
                 updateProductCount(data.totalProducts);
@@ -60,6 +118,7 @@
         });
     };
 
+    // Update the product list in the UI
     const updateProductList = (products) => {
         const productList = $('#productList');
         productList.empty();
@@ -80,21 +139,79 @@
                                     <img class="hover-img" src="/assets/imgs/products/${product.imageUrl[1]}" alt="">
                                 </a>
                             </div>
+                            <div class="product-action-1">
+                                <a aria-label="Quick view" class="action-btn hover-up" href="/productDetails/${product._id}" data-bs-target="#quickViewModal">
+                                    <i class="fi-rs-search"></i></a>
+                                <a data-id="${product._id}" aria-label="Add To Wishlist" class="wish action-btn hover-up" href="#">
+                                    <i class="fi-rs-heart"></i>
+                                </a>
+                            </div>
+                            <div class="product-badges product-badges-position product-badges-mrg">
+                                <span class="hot">Hot</span>
+                            </div>
                         </div>
                         <div class="product-content-wrap">
+                            <div class="product-category">
+                                <a href="shop-grid-right.html">${product.category.category}</a>
+                            </div>
                             <h2><a href="/productDetails/${product._id}">${product.name}</a></h2>
+                            <div class="rating-result" title="90%">
+                                <span><span>90%</span></span>
+                            </div>
                             <div class="product-price">
-                                ${product.discountPrice && product.discountPrice < product.price ? 
-                                    `<span>₹${product.discountPrice}</span><span class="old-price">₹${product.price}</span>` : 
-                                    `<span>₹${product.price}</span>`}
+                                ${product.discountPrice ? `<span>₹${product.discountPrice}</span><span class="old-price">₹${product.price}</span>` : `<span>₹${product.price}</span>`}
+                            </div>
+                            <div class="product-action-1 show">
+                                <span>
+                                    <a data-id="${product._id}" aria-label="Add To Wishlist" class="wish action-btn hover-up" href="#">
+                                        <i class="fi-rs-heart"></i>
+                                    </a>
+                                </span>
                             </div>
                         </div>
                     </div>
                 </div>`;
+            
             productList.append(productHtml);
         });
     };
 
+    // Handle wishlist addition
+    $(document).ready(function () {
+        const userId = "";
+
+        $('#productList').on('click', '.wish.action-btn', function (event) {
+            event.preventDefault();
+            var $button = $(this);
+            var id = $button.data('id');
+
+            $.ajax({
+                type: 'POST',
+                url: '/addtowishlist',
+                contentType: 'application/json',
+                data: JSON.stringify({ id: id, userId: userId }),
+                success: function () {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Product Successfully added to Wishlist!',
+                        icon: 'success',
+                        confirmButtonText: 'Cool'
+                    });
+                },
+                error: function (error) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Failed to add product to Wishlist!',
+                        icon: 'error',
+                        confirmButtonText: 'Cool'
+                    });
+                    console.error(error);
+                }
+            });
+        });
+    });
+
+    // Update pagination
     const updatePagination = (totalProducts) => {
         const paginationList = $('#paginationList');
         paginationList.empty();
@@ -102,21 +219,51 @@
 
         for (let i = 1; i <= totalPages; i++) {
             const activeClass = i === currentPage ? 'active' : '';
-            const pageItem = `<li class="page-item ${activeClass}">
-                <a class="page-link" href="javascript:goToPage(${i});">${i}</a>
-            </li>`;
+            const pageItem = `<li class="page-item ${activeClass}"><a class="page-link" href="javascript:goToPage(${i});">${i}</a></li>`;
             paginationList.append(pageItem);
         }
     };
 
+    // Update product count display
     const updateProductCount = (totalProducts) => {
         $('#count').text(totalProducts);
     };
 
+    // Navigate to selected page
     const goToPage = (page) => {
         currentPage = page;
         fetchProducts();
     };
 
+    // Search products based on input query
+    const searchProducts = () => {
+        searchQuery = $('#searchInput').val();
+        fetchProducts();
+    };
+
+    // Filter products by category
+    const filterByCategory = (categoryId) => {
+        currentCategory = categoryId;
+        fetchProducts();
+    };
+
+    // Set product limit per page
+    const limits = (ct) => {
+        limit = ct;
+        currentPage = 1;
+        fetchProducts();
+    };
+
+    // Clear all filters and reset to default
+    const clearfilter = () => {
+        currentPage = 1;
+        currentSort = '';
+        currentCategory = '';
+        searchQuery = '';
+        limit = 6;
+        fetchProducts();
+    };
+
+    // Initial fetch when page loads
     fetchProducts();
 </script>

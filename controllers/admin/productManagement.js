@@ -1,14 +1,13 @@
 const Product = require("../../models/productSchema");
-const Category = require("../../models/categorySchema");
 const fs = require("fs");
 const path = require("path");
-const HttpStatus = require("../../httpStatus");
+const Category = require("../../models/categorySchema");
 
-// Display Product Page with Pagination
+// Display Products with Pagination
 const showProduct = async (req, res) => {
   try {
     let page = req.query.page || 1;
-    const limit = 4;
+    let limit = 3;
 
     const product = await Product.aggregate([
       {
@@ -28,83 +27,56 @@ const showProduct = async (req, res) => {
     const totalPages = Math.ceil(count / limit);
     const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
-    res.render("admin/product", { layout: "adminLayout", product, pages });
+    res.render("admin/product", { layout: "adminlayout", product, pages });
   } catch (error) {
-    console.error(error.message);
-    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
+    console.error(error);
   }
 };
 
-// Display Add Product Page
+// Render Add Product Page
 const addProductPage = async (req, res) => {
   try {
     const category = await Category.find({}).lean();
-    const productExists = req.session.productExists;
-    req.session.productExists = null;
-
-    res.render("admin/add_product", {
-      layout: "adminLayout",
-      category,
-      productExists,
-    });
+    res.render("admin/add_product", { layout: "adminlayout", category });
   } catch (error) {
-    console.error(error.message);
-    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
+    console.error(error);
   }
 };
 
-// Add a New Product
+// Add New Product
 const addProduct = async (req, res) => {
   try {
-    const { name, price, description, category, stock } = req.body;
     const images = req.files.map((file) => file.filename);
 
-    const existingProduct = await Product.findOne({
-      name: { $regex: new RegExp(`^${name}$`, "i") },
-    });
-
-    if (existingProduct) {
-      req.session.productExists = true;
-      return res.redirect("/admin/addProduct");
-    }
-
     const newProduct = new Product({
-      name,
-      price,
-      description,
-      category,
-      stock,
+      name: req.body.name,
+      price: req.body.price,
+      description: req.body.description,
+      category: req.body.category,
+      stock: req.body.stock,
       imageUrl: images,
     });
 
     await newProduct.save();
     res.redirect("/admin/product");
   } catch (error) {
-    console.error("Error creating product:", error);
-    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
+    console.error("Error creating Product:", error);
   }
 };
 
-// Display Edit Product Page
+// Render Edit Product Page
 const showeditProduct = async (req, res) => {
   try {
-    const productId = req.params.id;
-    const productData = await Product.findById(productId).lean();
+    const productData = await Product.findById(req.params.id).lean();
     const categories = await Category.find({ isListed: true }).lean();
-
-    categories.forEach((category) => {
-      category.isSelected =
-        category._id.toString() === productData.category.toString();
-    });
 
     res.render("admin/editProduct", {
       productData,
       categories,
-      layout: "adminLayout",
+      layout: "adminlayout",
     });
   } catch (error) {
-    console.error("Error fetching product details:", error);
-    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
+    console.error(error);
   }
 };
 
@@ -113,42 +85,26 @@ const updateProduct = async (req, res) => {
   try {
     const proId = req.params.id;
     const product = await Product.findById(proId);
-    const exImage = product.imageUrl;
-    const updImages =
-      req.files.length > 0
-        ? [...exImage, ...req.files.map((file) => file.filename)]
-        : exImage;
+    let updImages = product.imageUrl;
+
+    if (req.files && req.files.length > 0) {
+      const newImages = req.files.map((file) => file.filename);
+      updImages = [...updImages, ...newImages];
+    }
 
     const { name, price, description, category, stock } = req.body;
 
-    await Product.findByIdAndUpdate(proId, {
-      name,
-      price,
-      description,
-      category,
-      stock,
-      isBlocked: false,
-      imageUrl: updImages,
-    });
-
-    if (product.price !== price) {
-      const existingOffer = await productOffer.findOne({
-        productId: product._id,
-        currentStatus: true,
-      });
-
-      if (existingOffer) {
-        existingOffer.discountPrice =
-          price - (price * existingOffer.productOfferPercentage) / 100;
-        await existingOffer.save();
-      }
-    }
+    await Product.findByIdAndUpdate(
+      proId,
+      { name, price, description, category, stock, isBlocked: false, imageUrl: updImages },
+      { new: true }
+    );
 
     req.session.productSave = true;
     res.redirect("/admin/product");
   } catch (error) {
     console.error("Error updating product:", error);
-    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
+    res.status(500).send("Internal Server Error");
   }
 };
 
@@ -158,40 +114,41 @@ const deleteProdImage = async (req, res) => {
     const { id, image } = req.query;
     const product = await Product.findById(id);
 
-    if (!product || !product.imageUrl[image]) {
-      return res.status(HttpStatus.NotFound).send({ error: "Image not found" });
-    }
+    if (!product) return res.status(404).send({ error: "Product not found" });
 
     const deletedImage = product.imageUrl.splice(image, 1)[0];
+    if (!deletedImage) return res.status(400).send({ error: "Image not found" });
+
     await product.save();
 
-    const imagePath = path.join(
-      __dirname,
-      `../../public/assets/imgs/products/${deletedImage}`
-    );
+    const imagePath = path.join(__dirname, `../../public/assets/imgs/products/${deletedImage}`);
+
     if (fs.existsSync(imagePath)) {
       fs.unlinkSync(imagePath);
+    } else {
+      return res.status(404).send({ error: "Image file not found" });
     }
 
     res.status(200).send({ message: "Image deleted successfully" });
   } catch (error) {
     console.error("Error deleting image:", error);
-    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
+    res.status(500).send({ error: error.message });
   }
 };
 
-// Block/Unblock Product
+// Toggle Product Block Status
 const blockProduct = async (req, res) => {
   try {
     const { id } = req.body;
     const product = await Product.findById(id);
-    await Product.findByIdAndUpdate(id, {
-      $set: { isBlocked: !product.isBlocked },
-    });
+
+    if (product) {
+      await Product.findByIdAndUpdate(id, { $set: { isBlocked: !product.isBlocked } });
+    }
+
     res.redirect("/admin/product");
   } catch (error) {
-    console.error(error.message);
-    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
+    console.error(error);
   }
 };
 

@@ -1,110 +1,83 @@
-<style>
-    #sar{
-        background-color:#e49e7e;
-    }
-</style>
-
- 
 
 <main class="main-wrap">
 
-  <section class="content-main" id="sar">
+  <section class="content-main">
     <div class="content-header">
       <div>
         <h2 class="content-title card-title">Category List</h2>
-
       </div>
       <div>
-
-        <a  class="btn btn-primary btn-sm rounded" href="/admin/addCategory">Create New Category</a>
+        <a class="btn btn-primary btn-sm rounded" href="/admin/addCategory">Create New Category</a>
       </div>
     </div>
-
-<div class="card mb-4"  style="background-color: #E5C7A3;">
-    <div class="card-body">
-        {{#if catSaveMsg}}
-        <div class="alert alert-success mt-3 alert-dismissible fade show d-inline-block w-50  {{#if catSaveMsg}}show{{/if}}" role="alert">
-            {{catSaveMsg}}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {{/if}}
-        {{#if catExistMsg}}
-        <div class="alert alert-danger mt-3 alert-dismissible fade {{#if catExistMsg}}show{{/if}}" role="alert">
-            {{catExistMsg}}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {{/if}}
-        <!-- Table Structure -->
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th class="text-center">Category Image</th>
-                    <th class="text-center">Category Name</th>
-                    <th class="text-center">Status</th>
-                    <th class="text-center">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each category}}
-                <tr>
-                    <!-- Category Image -->
-                    <td class="text-center">
-                        <img src="/assets/imgs/products/{{this.imageUrl}}" class="img-sm img-thumbnail" alt="Item" style="max-width: 80px; height: auto;">
-                    </td>
-
-                    <!-- Category Name -->
-                    <td class="text-center">
-                        <h6 class="mb-0">{{this.category}}</h6>
-                    </td>
-
-                    <!-- Status (Listed/Unlisted) -->
-                    <td class="text-center">
-                        {{#if this.isListed}}
-                            <span class="badge rounded-pill alert-success">Listed</span>
-                        {{else}}
-                            <span class="badge rounded-pill alert-danger">Unlisted</span>
-                        {{/if}}
-                    </td>
-
-                    <!-- Actions -->
-                    <td class="text-center">
-                        <a href="/admin/editCategory/{{this._id}}" class="btn btn-pill font-sm rounded btn-brand mx-1">
-                            Edit<i class="material-icons md-edit" style="font-size: 16px;"></i> 
-                        </a>
-                        {{#if this.isListed}}
-                            <a href="/admin/unlistCategory" id="listunlistrod" data-product-id="{{this._id}}" class="btn btn font-sm btn-light rounded mx-1">
-                                Unlist<i class="material-icons md-delete_forever" style="font-size: 16px;"></i> 
-                            </a>
-                        {{else}}
-                            <a href="/admin/unlistCategory" id="listunlistrod" data-product-id="{{this._id}}" class="btn btn font-sm btn-light rounded mx-1">
-                                List<i class="material-icons md-delete_forever" style="font-size: 16px;"></i> 
-                            </a>
-                        {{/if}}
-                    </td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
+    <div class="card mb-4">
+      
+      <div class="card-body">
+        
+        {{#each category}}
+        <article class="itemlist">
+          <div class="row align-items-center">
+            
+            <!-- Category Image -->
+            <div class="col-lg-3 col-sm-3 col-3 flex-grow-1 col-name jsutify-content-center text-align-center">
+              <a class="itemside" href="#">
+                <div class="d-flex align-items-center justify-content-center">
+                  <img src="/assets/imgs/products/{{imageUrl}}" class="img-sm img-thumbnail" alt="Item">
+                </div>
+              </a>
+            </div>
+            
+            <!-- Category Name -->
+            <div class="col-lg-3 col-sm-3 col-3 flex-grow-1 col-name text-align-center">
+              <a class="itemside" href="#">
+                <div class="info">
+                  <h6 class="mb-0">{{this.category}}</h6>
+                </div>
+              </a>
+            </div>
+            
+            <!-- Category Status -->
+            <div class="col-lg-3 col-sm-3 col-3 col-status">
+              {{#if isListed}}
+              <span class="badge rounded-pill alert-success">Listed</span>
+              {{else}}
+              <span class="badge rounded-pill alert-danger">Unlisted</span>
+              {{/if}}
+            </div>
+            
+            <!-- Edit Button -->
+            <div class="col-lg-1 col-sm-1 col-1 col-date text-end">
+              <a href="/admin/editCategory/{{this._id}}" class="btn btn-pill font-sm rounded btn-brand">
+                <i class="material-icons md-edit"></i> Edit
+              </a>
+            </div>
+            
+            <!-- List/Unlist Button -->
+            <div class="col-lg-1 col-sm-1 col-1 col-date text-end">
+              <a href="/admin/unlistCategory" id="listunlistrod" data-product-id="{{this._id}}" class="btn btn font-sm btn-light rounded">
+                <i class="material-icons md-delete_forever"></i> {{#if isListed}}Unlist{{else}}List{{/if}}
+              </a>
+            </div>
+            
+          </div> 
+        </article>
+        {{/each}}
+        
+      </div>
     </div>
-</div>
-
-
-
-
-
-
-    <!-- card end// -->
+    
+    <!-- Pagination Section -->
     <div class="pagination-area mt-15 mb-50">
-            <nav aria-label="Page navigation example">
-                <ul class="pagination justify-content-start">
-                    {{#each pages}}
-                    <li class="page-item active"><a class="page-link" href="?page={{this}}">{{this}}</a></li>
-                    {{/each}}
-                </ul>
-            </nav>
-        </div>
+      <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-start">
+          {{#each pages}}
+          <li class="page-item active"><a class="page-link" href="?page={{this}}">{{this}}</a></li>
+          {{/each}}
+        </ul>
+      </nav>
+    </div>
   </section>
-
+  
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -112,17 +85,15 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 
-
 <script>   
-
 $(document).ready(function () {
+    // Handle click event on the unlist button
     $(document).on('click', '#listunlistrod', function (e) {
         e.preventDefault();
-        var id = $(this).data('product-id');
-        // Store reference to $(this) in a variable for use inside AJAX success and error callbacks
-        var $this = $(this);
+        var id = $(this).data('product-id'); // Get product ID from data attribute
+        var $this = $(this); // Store reference to the clicked element
         
-
+        // Show confirmation popup
         Swal.fire({
             title: "Are you sure?",
             icon: "warning",
@@ -132,6 +103,7 @@ $(document).ready(function () {
             confirmButtonText: "Yes!"
         }).then((result) => {
             if (result.isConfirmed) {
+                // Send AJAX request to unlist the product
                 $.ajax({
                     type: 'POST',
                     url: '/admin/unlistCategory',
@@ -140,19 +112,16 @@ $(document).ready(function () {
                     success: function (productData) {
                         console.log("Product unlisted successfully");
 
-                        // Show success message after AJAX success
+                        // Show success message and reload page
                         Swal.fire({
                             title: 'Done!',
-                            //text: "Product unlisted successfully",
                             icon: 'success',
-                            //confirmButtonText: 'Cool'
                         }).then(() => {                            
                             window.location.reload();
                         });
-
                     },
                     error: function (xhr, status, error) {
-                        console.error("Error removing product from wishlist:", error);
+                        console.error("Error unlisting product:", error);
                         Swal.fire("Error", "Something went wrong. Please try again later.", "error");
                     }
                 });
@@ -160,7 +129,4 @@ $(document).ready(function () {
         });
     });
 });
-
-
-
 </script>

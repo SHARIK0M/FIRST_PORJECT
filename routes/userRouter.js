@@ -1,5 +1,8 @@
 const express = require("express");
 const router = express.Router();
+const passport = require("passport");
+require("../middlewares/googleAuth");
+
 const { logedout, checkUserBlocked } = require("../middlewares/userAuth");
 const {
   getHome,
@@ -14,6 +17,7 @@ const {
   googleCallback,
   productDetails,
 } = require("../controllers/user/userController");
+
 const {
   submitMail,
   submitMailPost,
@@ -23,45 +27,34 @@ const {
   resetPassword,
   resendOTP,
 } = require("../controllers/user/forgotPassword");
-require("../middlewares/googleAuth");
-const passport = require("passport");
-const {
-  getProduct,
-  searchAndSort,
-} = require("../controllers/user/shopManagement");
 
-// Apply `checkUserBlocked` middleware to all routes that require authentication
+const { getProduct, searchAndSort } = require("../controllers/user/shopManagement");
+
+// Home and Product Routes
 router.get("/", checkUserBlocked, getHome);
 router.get("/shop", checkUserBlocked, getProduct);
 router.get("/productDetails/:id", checkUserBlocked, productDetails);
 router.post("/search", checkUserBlocked, searchAndSort);
 
-// Signup
+// Signup Routes
 router.get("/signup", logedout, getSignup);
 router.post("/signup", logedout, doSignup);
 
-// Submit Otp & Resend Otp
+// OTP Verification Routes
 router.get("/submit_otp", logedout, getOtp);
 router.post("/submit_otp", logedout, submitOtp);
 router.get("/resend_otp", logedout, resendOtp);
 
-// Google authentication
-router.get(
-  "/auth/google",
-  passport.authenticate("google", { scope: ["email", "profile"] })
-);
-router.get(
-  "/google/callback",
-  passport.authenticate("google", { failureRedirect: "/login" }),
-  googleCallback
-);
+// Google Authentication Routes
+router.get("/auth/google", passport.authenticate("google", { scope: ["email", "profile"] }));
+router.get("/google/callback", passport.authenticate("google", { failureRedirect: "/login" }), googleCallback);
 
-// Login & Logout
+// Login and Logout Routes
 router.get("/login", logedout, getLogin);
 router.post("/login", doLogin);
 router.get("/logout", doLogout);
 
-// Forgot Password
+// Forgot Password Routes
 router.get("/forgotPassword", logedout, submitMail);
 router.post("/forgotPassword", logedout, submitMailPost);
 router.get("/otp", logedout, forgotOtppage);
