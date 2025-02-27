@@ -191,6 +191,8 @@ const doSignup = async (req, res) => {
 //Renders the OTP submission page
 const getOtp = (req, res) => {
   try {
+    // Store the OTP timestamp (current time)
+    req.session.otpGeneratedAt = Date.now();
     res.render("user/submitOtp");
   } catch (error) {
     console.error("Error loading OTP page:", error.message);
@@ -204,6 +206,13 @@ const submitOtp = async (req, res) => {
 
     if (!req.session.otp) {
       return res.json({ error: "Session expired. Please request a new OTP." });
+    }
+
+    // Check if OTP has expired (60 seconds)
+    const otpExpirationTime = 60000; // 60 seconds
+    const otpGeneratedAt = req.session.otpGeneratedAt || 0;
+    if (Date.now() - otpGeneratedAt > otpExpirationTime) {
+      return res.render("user/submitOtp", { result: { error: "OTP has expired. Please request a new OTP" } })
     }
 
     // Convert OTP array to string
@@ -228,15 +237,17 @@ const submitOtp = async (req, res) => {
       req.session.otp = null;
       req.session.userRegData = null;
       req.session.hashedPassword = null;
+      req.session.otpGeneratedAt = null;  // Clear the OTP generation time
 
       return res.redirect("/login");
     } else {
-      return res.json({ error: "Incorrect OTP" });
+      return res.render("user/submitOtp", { result: { error: "Incorrect OTP" } });
     }
   } catch (error) {
     return res.json({ error: "An error occurred while submitting the OTP." });
   }
 };
+
 
 //Resends OTP to the user.
 const resendOtp = async (req, res) => {
@@ -252,6 +263,7 @@ const resendOtp = async (req, res) => {
     // Generate new OTP and update session
     const newOtp = await userHelper.verifyEmail(userEmail);
     req.session.otp = newOtp;
+    req.session.otpGeneratedAt = Date.now();  // Reset OTP generation time
 
     console.log("New OTP sent to:", userEmail, newOtp);
 

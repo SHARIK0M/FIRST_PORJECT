@@ -12,7 +12,7 @@
                 </div>
             </div>
             <div class="col-lg-12">
-                <div class="card mb-4">
+                <div class="card mb-4" style="background-color: #e6b3b3;">
                     <div class="card-header">
                         <h4>Basic Details</h4>
                     </div>
@@ -28,7 +28,7 @@
                                     class="form-control" id="productName" onchange="validate_productName()">
                                 <h6 class="alertAddProduct mt-1 text-danger" id="productNameAlert"></h6>
                             </div>
-
+                          <div id="productNameError" style="color: red; display: none;"></div>
                             <!-- Description -->
                             <div class="mb-4">
                                 <label for="longdescription" class="form-label">Full Description</label>
@@ -285,35 +285,54 @@
         });
     });
 
-    // Handle product form submission
     function submitform(form) {
-        event.preventDefault(); // Prevent default form submission
+    event.preventDefault(); // Prevent default form submission
 
-        if (Validation(form)) {
-            // Show confirmation alert before adding the product
-            Swal.fire({
-                title: "Are you sure?",
-                text: "Do you want to Add the Product?",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#088178",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Yes!"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Show success alert and submit the form
-                    Swal.fire({
-                        title: "Saved",
-                        text: "Product added successfully",
-                        icon: "success",
-                        confirmButtonText: "OK"
-                    }).then(() => {
-                        form.submit();
-                    });
-                } else {
-                    console.log("User canceled the action");
-                }
-            });
-        }
+    if (Validation(form)) {
+        // Show confirmation alert before adding the product
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to Add the Product?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#088178",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Send form data via AJAX
+                $.ajax({
+                    type: 'POST',
+                    url: form.action,  // Ensure the form action is set to the backend route
+                    data: new FormData(form),
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        // If the product is added successfully
+                        Swal.fire({
+                            title: "Saved",
+                            text: "Product added successfully",
+                            icon: "success",
+                            confirmButtonText: "OK"
+                        }).then(() => {
+                            form.submit();  // Submit the form
+                        });
+                    },
+                    error: function(xhr) {
+                        // Handle error (product already exists)
+                        if (xhr.status === 400) {
+                            const errorMessage = xhr.responseJSON.error;
+
+                            // Display the error message near the input box
+                            $('#productNameError').text(errorMessage).show();
+                        }
+                    }
+                });
+            } else {
+                console.log("User canceled the action");
+            }
+        });
     }
+}
+
 </script>

@@ -19,6 +19,7 @@ const showProduct = async (req, res) => {
         },
       },
       { $unwind: "$Category" },
+      { $sort: { createdAt: -1 } }, // 🔹 Sort by newest products first
       { $skip: (page - 1) * limit },
       { $limit: limit },
     ]);
@@ -43,26 +44,39 @@ const addProductPage = async (req, res) => {
   }
 };
 
+
 // Add New Product
 const addProduct = async (req, res) => {
   try {
-    const images = req.files.map((file) => file.filename);
+    const { name, price, description, category, stock } = req.body;
 
-    const newProduct = new Product({
-      name: req.body.name,
-      price: req.body.price,
-      description: req.body.description,
-      category: req.body.category,
-      stock: req.body.stock,
-      imageUrl: images,
-    });
+    // Check if a product with the same name already exists
+    const existingProduct = await Product.findOne({ name: name });
+    if (existingProduct) {
+      return res.status(400).json({
+        error: "Product name already exists! Please choose a different name."
+      });
+    } else {
+      const images = req.files.map((file) => file.filename);
 
-    await newProduct.save();
-    res.redirect("/admin/product");
+      const newProduct = new Product({
+        name,
+        price,
+        description,
+        category,
+        stock,
+        imageUrl: images,
+      });
+
+      await newProduct.save();
+      res.redirect("/admin/product");
+    }
   } catch (error) {
     console.error("Error creating Product:", error);
+    res.status(500).send("Internal Server Error");
   }
 };
+
 
 // Render Edit Product Page
 const showeditProduct = async (req, res) => {

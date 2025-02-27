@@ -13,7 +13,7 @@ const getProduct = async (req, res) => {
     const userData = req.session.user;
 
     const newProduct = await Product.find()
-      .sort({ createdOn: -1 })
+      .sort({ createdAt: -1 })
       .limit(3)
       .lean();
 

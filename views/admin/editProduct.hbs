@@ -7,7 +7,7 @@
                 </div>
             </div>
             <div class="col-lg-12">
-                <div class="card mb-4">
+                <div class="card mb-4" style="background-color: #e6b3b3;">
                     <div class="card-body">
                         <form method="post" class="form-add-product" action="/admin/updateProduct/{{productData._id}}"
                               enctype="multipart/form-data" onsubmit="return Validation()">
@@ -109,6 +109,7 @@ function Validation() {
     let productNameRegex = /^[a-zA-Z0-9\s\(\)\-\+]{4,}$/; // Product name validation (min 4 chars, alphanumeric & special chars allowed)
     let number = /^[0-9]\d*$/; // Number validation (only digits, no negative values)
     let descriptionRegex = /^(?!\s*$)[\s\S]{1,100}$/; // Description validation (1-100 chars, no empty values)
+    let priceRegex = /^(?!0(\.0+)?$)(\d+(\.\d{1,2})?)$/; // Price validation (positive number, up to 2 decimal places)
 
     let productNameAlert = document.getElementById("productNameAlert");
     let qtyAlert = document.getElementById("qtyAlert");
@@ -134,7 +135,7 @@ function Validation() {
     }
 
     // Validate price
-    if (!price.match(number)) {
+    if (!price.match(priceRegex)) {
         errors.push("Invalid Price");
     }
 
@@ -234,34 +235,39 @@ document.addEventListener("DOMContentLoaded", deleteProImg);
 <script>
     
     function submitform(form) {
-        event.preventDefault();    
+    event.preventDefault();    
 
-        // Show confirmation popup before saving changes
-        Swal.fire({
-            title: "Do you want to save the changes?",
-            text: "Changes made will be saved.",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#088178",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, save it!",
-            cancelButtonText: "No, cancel"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Show success message after confirming save
-                Swal.fire({
-                    title: "Saved",
-                    text: "Your changes have been saved.",
-                    icon: "success",
-                    confirmButtonText: "OK"
-                }).then(() => {
-                    form.submit();
-                });
-            } else {
-                console.log("User canceled the action");
-            }
-        }); 
+    // Perform validation before showing the confirmation popup
+    if (!Validation()) {
+        return; // Don't show confirmation if validation fails
     }
+
+    // Show confirmation popup before saving changes
+    Swal.fire({
+        title: "Do you want to save the changes?",
+        text: "Changes made will be saved.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#088178",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, save it!",
+        cancelButtonText: "No, cancel"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Show success message after confirming save
+            Swal.fire({
+                title: "Saved",
+                text: "Your changes have been saved.",
+                icon: "success",
+                confirmButtonText: "OK"
+            }).then(() => {
+                form.submit(); // Submit the form after confirmation
+            });
+        } else {
+            console.log("User canceled the action");
+        }
+    }); 
+}
 
     $(document).ready(function () {
         $('#backbutton').click(function (e) {
