@@ -17,9 +17,10 @@
                         <h4>Basic Details</h4>
                     </div>
                     <div class="card-body">
-                        <form method="post" id="product_form" class="form-add-product" 
-                            action="/admin/addProduct" enctype="multipart/form-data" 
-                            onsubmit="return submitform(this)">
+                       <form method="post" id="product_form" class="form-add-product" 
+                         action="/admin/addProduct" enctype="multipart/form-data" 
+                         onsubmit="return submitform(event, this)">
+
                             
                             <!-- Product Name -->
                             <div class="mb-4">
@@ -28,7 +29,8 @@
                                     class="form-control" id="productName" onchange="validate_productName()">
                                 <h6 class="alertAddProduct mt-1 text-danger" id="productNameAlert"></h6>
                             </div>
-                          <div id="productNameError" style="color: red; display: none;"></div>
+                          <h6 class="alertAddProduct mt-1 text-danger" id="productNameError"></h6>
+
                             <!-- Description -->
                             <div class="mb-4">
                                 <label for="longdescription" class="form-label">Full Description</label>
@@ -285,14 +287,13 @@
         });
     });
 
-    function submitform(form) {
-    event.preventDefault(); // Prevent default form submission
+function submitform(event, form) {
+    event.preventDefault(); // ✅ Stop form from submitting normally
 
     if (Validation(form)) {
-        // Show confirmation alert before adding the product
         Swal.fire({
             title: "Are you sure?",
-            text: "Do you want to Add the Product?",
+            text: "Do you want to add the Product?",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#088178",
@@ -300,39 +301,41 @@
             confirmButtonText: "Yes!"
         }).then((result) => {
             if (result.isConfirmed) {
-                // Send form data via AJAX
                 $.ajax({
                     type: 'POST',
-                    url: form.action,  // Ensure the form action is set to the backend route
+                    url: form.action,
                     data: new FormData(form),
                     processData: false,
                     contentType: false,
+                    dataType: "json", // ✅ Ensures the response is handled as JSON
                     success: function(response) {
-                        // If the product is added successfully
                         Swal.fire({
-                            title: "Saved",
-                            text: "Product added successfully",
+                            title: "Saved!",
+                            text: response.message, // ✅ Extract the message correctly
                             icon: "success",
                             confirmButtonText: "OK"
                         }).then(() => {
-                            form.submit();  // Submit the form
+                            // ✅ Redirect after clicking "OK"
+                            window.location.href = "/admin/product";
                         });
                     },
                     error: function(xhr) {
-                        // Handle error (product already exists)
                         if (xhr.status === 400) {
-                            const errorMessage = xhr.responseJSON.error;
-
-                            // Display the error message near the input box
-                            $('#productNameError').text(errorMessage).show();
+                            $('#productNameError').text(xhr.responseJSON.errormsg).show(); // ✅ Show error message
+                        } else {
+                            Swal.fire({
+                                title: "Error",
+                                text: "Something went wrong! Please try again.",
+                                icon: "error",
+                                confirmButtonText: "OK"
+                            });
                         }
                     }
                 });
-            } else {
-                console.log("User canceled the action");
             }
         });
     }
 }
+
 
 </script>

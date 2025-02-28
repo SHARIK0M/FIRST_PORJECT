@@ -53,19 +53,14 @@ const forgotOtpSubmit = async (req, res) => {
   try {
     const enteredOtp = req.body.otp;
     const storedOtp = req.session.otp;
-    const otpGeneratedAt = req.session.otpTimestamp || 0;
 
-    // Check if OTP exists and hasn't expired
-    const otpExpirationTime = 60000; // 60 seconds
-    if (!storedOtp || (Date.now() - otpGeneratedAt > otpExpirationTime)) {
+    if (!storedOtp) {
       req.session.otpErr = true;
-      return res.render("user/submitOtp", { otpErr: { error: "OTP has expired. Please request a new OTP" } })
+      return res.json({ error: "Session expired. Please request a new OTP." });
     }
 
-    // Check if the OTP is correct
     if (enteredOtp.trim() === storedOtp.toString().trim()) {
       req.session.otp = null;
-      req.session.otpTimestamp = null; // Clear OTP timestamp
       res.redirect("/resetPassword");
     } else {
       req.session.otpErr = true;
@@ -76,7 +71,6 @@ const forgotOtpSubmit = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
-
 
 // Resend OTP for Forgot Password
 const resendOTP = async (req, res) => {
@@ -90,11 +84,9 @@ const resendOTP = async (req, res) => {
         });
     }
 
-    // Generate new OTP and update session
     const otp = await userHelper.verifyEmail(email);
     req.session.otp = otp;
-    req.session.otpTimestamp = Date.now();  // Reset OTP timestamp
-
+    req.session.otpTimestamp = Date.now();
     return res.json({ success: true, message: "OTP resent successfully" });
   } catch (error) {
     console.error("Error resending OTP:", error);
@@ -103,7 +95,6 @@ const resendOTP = async (req, res) => {
       .json({ error: "Error resending OTP. Please try again later." });
   }
 };
-
 
 // Render Reset Password Page
 const resetPasswordPage = async (req, res) => {

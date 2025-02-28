@@ -1,12 +1,5 @@
 <main class="main">
-  <div class="page-header breadcrumb-wrap">
-    <div class="container">
-      <div class="breadcrumb">
-        <a href="index.html" rel="nofollow">Home</a>
-        <span></span> OTP
-      </div>
-    </div>
-  </div>
+
   <!-- OTP Verification Section -->
   <section class="pt-150 pb-150">
     <div class="container">
@@ -24,6 +17,7 @@
                   
                   <!-- OTP Form -->
                   <form id="otp-form" action="/submit_otp" method="post">
+                    <h6 id="otp-error" style="color: red;" class="text-center mb-5">{{result.error}}</h6>
                     
                     <!-- OTP Input Fields -->
                     <div class="form-floating mb-3 input-control">
@@ -35,8 +29,6 @@
                       </div>
                     </div>
                     
-                    <h6 id="otp-error" style="color: red;" class="text-center mb-5">{{result.error}}</h6>
-
                     <!-- Submit and Resend OTP Options -->
                     <div class="text-center">
                       <button type="submit" class="btn btn-fill-out btn-block hover-up">Submit</button>
