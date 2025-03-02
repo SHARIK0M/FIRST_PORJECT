@@ -29,7 +29,7 @@
                                     class="form-control" id="productName" onchange="validate_productName()">
                                 <h6 class="alertAddProduct mt-1 text-danger" id="productNameAlert"></h6>
                             </div>
-                          <h6 class="alertAddProduct mt-1 text-danger" id="productNameError"></h6>
+                          <h6 class="alertAddProduct mt-1 text-danger" id="productNameError" style="display: none;"></h6>
 
                             <!-- Description -->
                             <div class="mb-4">
@@ -320,17 +320,18 @@ function submitform(event, form) {
                         });
                     },
                     error: function(xhr) {
-                        if (xhr.status === 400) {
-                            $('#productNameError').text(xhr.responseJSON.errormsg).show(); // ✅ Show error message
-                        } else {
-                            Swal.fire({
-                                title: "Error",
-                                text: "Something went wrong! Please try again.",
-                                icon: "error",
-                                confirmButtonText: "OK"
-                            });
-                        }
-                    }
+    if (xhr.status === 400) {
+        $('#productNameError').text(xhr.responseJSON.error).show(); // ✅ Fix error display
+    } else {
+        Swal.fire({
+            title: "Error",
+            text: "Something went wrong! Please try again.",
+            icon: "error",
+            confirmButtonText: "OK"
+        });
+    }
+}
+
                 });
             }
         });

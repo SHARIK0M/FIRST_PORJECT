@@ -48,34 +48,36 @@ const addProductPage = async (req, res) => {
 // Add New Product
 const addProduct = async (req, res) => {
   try {
-    const { name, price, description, category, stock } = req.body;
+      const { name, price, description, category, stock } = req.body;
 
-    // Check if product name already exists
-    const existingProduct = await Product.findOne({ name });
+      // Check if a product with the same name already exists
+      const existingProduct = await Product.findOne({ name: name });
+      if (existingProduct) {
+          return res.status(400).json({
+              error: "Product name already exists! Please choose a different name."
+          });
+      } 
 
-    if (existingProduct) {
-      return res.status(400).json({ errormsg: "Product name already exists!" });
-    }
+      const images = req.files.map((file) => file.filename);
 
-    // Save new product
-    const newProduct = new Product({
-      name,
-      price,
-      description,
-      category,
-      stock,
-      images: req.files.map((file) => file.filename), // Assuming you're using multer for file upload
-    });
+      const newProduct = new Product({
+          name,
+          price,
+          description,
+          category,
+          stock,
+          imageUrl: images,
+      });
 
-    await newProduct.save();
-    
-    res.status(200).json({ message: "Product added successfully!" });
+      await newProduct.save();
+      return res.json({ message: "Product added successfully!" });
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ errormsg: "Something went wrong. Please try again!" });
+      console.error("Error creating Product:", error);
+      res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 
 

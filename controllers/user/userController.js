@@ -204,13 +204,10 @@ const submitOtp = async (req, res) => {
     let userOtp = req.body.otp;
 
     if (!req.session.otp) {
-      return res.json({ error: "Session expired. Please request a new OTP." });
+      return res.status(400).json({ error: "Session expired. Please request a new OTP." });
     }
 
-    // Convert OTP array to string
-    userOtp = Array.isArray(userOtp)
-      ? userOtp.join("")
-      : userOtp.toString().trim();
+    userOtp = Array.isArray(userOtp) ? userOtp.join("") : userOtp.toString().trim();
 
     if (userOtp === req.session.otp.toString().trim()) {
       const newUser = new User({
@@ -225,17 +222,16 @@ const submitOtp = async (req, res) => {
       await newUser.save();
       req.session.regSuccessMsg = true;
 
-      // Clear only the necessary session data instead of destroying everything
       req.session.otp = null;
       req.session.userRegData = null;
       req.session.hashedPassword = null;
 
-      return res.redirect("/login");
+      return res.status(200).json({ success: true, redirectUrl: "/login" }); 
     } else {
-      return res.json({ error: "Incorrect OTP" });
+      return res.status(400).json({ error: "Incorrect OTP" });
     }
   } catch (error) {
-    return res.json({ error: "An error occurred while submitting the OTP." });
+    return res.status(500).json({ error: "An error occurred while submitting the OTP." });
   }
 };
 
