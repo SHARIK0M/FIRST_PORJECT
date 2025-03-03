@@ -72,7 +72,18 @@
                             {{/each}}
                         </ul>
                     </div>
-                    
+                     <!-- Fillter By Price -->
+                    <div class="widget-category mb-30">
+                        <h5 class="section-title style-1 mb-30 wow fadeIn animated">Sort</h5>
+                        <ul style="background-color: #f3f2ee;  text-align: center;">
+                            <li><a onclick="sortLowToHigh()">Price: Low to High</a></li>
+                            <li><a onclick="sortHighToLow()">Price: High to Low</a></li>
+                            <li><a onclick="sortAZ()">A - Z</a></li>
+                            <li><a onclick="sortZA()">Z - A</a></li>
+                            <li><a onclick="newArrivals()">New Arrivals</a></li>
+                            <li><a onclick="popularity()">Popularity</a></li>
+                        </ul>
+                    </div>
                     <!-- Clear Filter Button -->
                     <button onclick="clearfilter()" class="btn btn-fill-out btn-block hover-up mb-30" name="login">Clear filter</button>
                 </div>
@@ -88,182 +99,139 @@
 
 <script>
     let currentPage = 1;
-    let currentSort = '';
-    let currentCategory = '';
-    let searchQuery = '';
-    let limit = 6;
+let currentSort = '';
+let currentCategory = '';
+let searchQuery = '';
+let limit = 6;
 
-    // Fetch products based on filters and pagination
-    const fetchProducts = () => {
-        $.ajax({
-            url: '/search',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                searchQuery,
-                sortOption: currentSort,
-                categoryFilter: currentCategory,
-                page: currentPage,
-                limit,
-            }),
-            success: (data) => {
-                console.log(data);
-                updateProductList(data.products);
-                updatePagination(data.totalProducts);
-                updateProductCount(data.totalProducts);
-            },
-            error: (error) => {
-                console.error('Error fetching products:', error);
-            },
-        });
-    };
+const fetchProducts = () => {
+    $.ajax({
+        url: '/search',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            searchQuery,
+            sortOption: currentSort,
+            categoryFilter: currentCategory,
+            page: currentPage,
+            limit,
+        }),
+        success: (data) => {
+            updateProductList(data.products);
+            updatePagination(data.totalProducts);
+            updateProductCount(data.totalProducts);
+        },
+        error: (error) => console.error('Error fetching products:', error),
+    });
+};
 
-    // Update the product list in the UI
-    const updateProductList = (products) => {
-        const productList = $('#productList');
-        productList.empty();
+const updateProductList = (products) => {
+    const productList = $('#productList');
+    productList.empty();
 
-        if (products.length === 0) {
-            productList.html('<h2 class="m-5">No product available</h2>');
-            return;
-        }
+    if (products.length === 0) {
+        productList.html('<h2 class="m-5">No product available</h2>');
+        return;
+    }
 
-        products.forEach((product) => {
-            const productHtml = `
-                <div class="col-lg-4 col-md-4 col-12 col-sm-6">
-                    <div class="product-cart-wrap mb-30">
-                        <div class="product-img-action-wrap">
-                            <div class="product-img product-img-zoom">
-                                <a href="/productDetails/${product._id}">
-                                    <img class="default-img" src="/assets/imgs/products/${product.imageUrl[0]}" alt="">
-                                    <img class="hover-img" src="/assets/imgs/products/${product.imageUrl[1]}" alt="">
-                                </a>
-                            </div>
-                            <div class="product-action-1">
-                                <a aria-label="Quick view" class="action-btn hover-up" href="/productDetails/${product._id}" data-bs-target="#quickViewModal">
-                                    <i class="fi-rs-search"></i></a>
-                                <a data-id="${product._id}" aria-label="Add To Wishlist" class="wish action-btn hover-up" href="#">
-                                    <i class="fi-rs-heart"></i>
-                                </a>
-                            </div>
-                            <div class="product-badges product-badges-position product-badges-mrg">
-                                <span class="hot">Hot</span>
-                            </div>
+    products.forEach((product) => {
+        const productHtml = `
+            <div class="col-lg-4 col-md-4 col-12 col-sm-6">
+                <div class="product-cart-wrap mb-30">
+                    <div class="product-img-action-wrap">
+                        <div class="product-img product-img-zoom">
+                            <a href="/productDetails/${product._id}">
+                                <img class="default-img" src="/assets/imgs/products/${product.imageUrl[0]}" alt="">
+                                <img class="hover-img" src="/assets/imgs/products/${product.imageUrl[1]}" alt="">
+                            </a>
                         </div>
-                        <div class="product-content-wrap">
-                            <div class="product-category">
-                                <a href="shop-grid-right.html">${product.category.category}</a>
-                            </div>
-                            <h2><a href="/productDetails/${product._id}">${product.name}</a></h2>
-                            <div class="rating-result" title="90%">
-                                <span><span>90%</span></span>
-                            </div>
-                            <div class="product-price">
-                                ${product.discountPrice ? `<span>₹${product.discountPrice}</span><span class="old-price">₹${product.price}</span>` : `<span>₹${product.price}</span>`}
-                            </div>
-                            <div class="product-action-1 show">
-                                <span>
-                                    <a data-id="${product._id}" aria-label="Add To Wishlist" class="wish action-btn hover-up" href="#">
-                                        <i class="fi-rs-heart"></i>
-                                    </a>
-                                </span>
-                            </div>
+                        <div class="product-action-1">
+                            <a aria-label="Quick view" class="action-btn hover-up" href="/productDetails/${product._id}" data-bs-target="#quickViewModal">
+                                <i class="fi-rs-search"></i>
+                            </a>
+                            <a data-id="${product._id}" class="wish action-btn hover-up" href="#"><i class="fi-rs-heart"></i></a>
+                        </div>
+                        <div class="product-badges product-badges-position product-badges-mrg">
+                            ${product.stock == 0 ? '<span class="hot">Out of stock</span>' : '<span class="hot">Hot</span>'}
                         </div>
                     </div>
-                </div>`;
-            
-            productList.append(productHtml);
-        });
-    };
+                    <div class="product-content-wrap">
+                        <div class="product-category">
+                            <a href="#">${product.category.category}</a>
+                        </div>
+                        <h2><a href="/productDetails/${product._id}">${product.name}</a></h2>
+                        <div class="product-price">
+                            <span>₹${product.price}</span>
+                        </div>
+                        <div class="product-action-1 show">
+                            <a data-id="${product._id}" class="wish action-btn hover-up" href="#"><i class="fi-rs-heart"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        productList.append(productHtml);
+    });
+};
 
-    // Handle wishlist addition
-    $(document).ready(function () {
-        const userId = "";
-
-        $('#productList').on('click', '.wish.action-btn', function (event) {
-            event.preventDefault();
-            var $button = $(this);
-            var id = $button.data('id');
-
-            $.ajax({
-                type: 'POST',
-                url: '/addtowishlist',
-                contentType: 'application/json',
-                data: JSON.stringify({ id: id, userId: userId }),
-                success: function () {
-                    Swal.fire({
-                        title: 'Success!',
-                        text: 'Product Successfully added to Wishlist!',
-                        icon: 'success',
-                        confirmButtonText: 'Cool'
-                    });
-                },
-                error: function (error) {
-                    Swal.fire({
-                        title: 'Error!',
-                        text: 'Failed to add product to Wishlist!',
-                        icon: 'error',
-                        confirmButtonText: 'Cool'
-                    });
-                    console.error(error);
-                }
-            });
+$(document).ready(function () {
+    const userId = $('#userId').val() || localStorage.getItem('userId') || "";
+    
+    $('#productList').on('click', '.wish.action-btn', function (event) {
+        event.preventDefault();
+        var id = $(this).data('id');
+        
+        $.ajax({
+            type: 'POST',
+            url: '/addtowishlist',
+            contentType: 'application/json',
+            data: JSON.stringify({ id: id, userId: userId }),
+            success: () => Swal.fire('Success!', 'Product added to Wishlist!', 'success'),
+            error: () => Swal.fire('Error!', 'Failed to add product to Wishlist!', 'error')
         });
     });
-
-    // Update pagination
-    const updatePagination = (totalProducts) => {
-        const paginationList = $('#paginationList');
-        paginationList.empty();
-        const totalPages = Math.ceil(totalProducts / limit);
-
-        for (let i = 1; i <= totalPages; i++) {
-            const activeClass = i === currentPage ? 'active' : '';
-            const pageItem = `<li class="page-item ${activeClass}"><a class="page-link" href="javascript:goToPage(${i});">${i}</a></li>`;
-            paginationList.append(pageItem);
+    
+    $('.sort-by-dropdown ul li a').on('click', function (event) {
+        event.preventDefault();
+        const sortType = $(this).data('sort');
+        if (sortType && typeof window[sortType] === 'function') {
+            window[sortType]();
         }
-    };
+    });
+});
 
-    // Update product count display
-    const updateProductCount = (totalProducts) => {
-        $('#count').text(totalProducts);
-    };
+const updatePagination = (totalProducts) => {
+    const paginationList = $('#paginationList');
+    paginationList.empty();
+    const totalPages = Math.ceil(totalProducts / limit);
 
-    // Navigate to selected page
-    const goToPage = (page) => {
-        currentPage = page;
-        fetchProducts();
-    };
+    for (let i = 1; i <= totalPages; i++) {
+        paginationList.append(`<li class="page-item ${i === currentPage ? 'active' : ''}">
+            <a class="page-link" href="javascript:void(0);" onclick="goToPage(${i})">${i}</a>
+        </li>`);
+    }
+};
 
-    // Search products based on input query
-    const searchProducts = () => {
-        searchQuery = $('#searchInput').val();
-        fetchProducts();
-    };
-
-    // Filter products by category
-    const filterByCategory = (categoryId) => {
-        currentCategory = categoryId;
-        fetchProducts();
-    };
-
-    // Set product limit per page
-    const limits = (ct) => {
-        limit = ct;
-        currentPage = 1;
-        fetchProducts();
-    };
-
-    // Clear all filters and reset to default
-    const clearfilter = () => {
-        currentPage = 1;
-        currentSort = '';
-        currentCategory = '';
-        searchQuery = '';
-        limit = 6;
-        fetchProducts();
-    };
-
-    // Initial fetch when page loads
+const updateProductCount = (totalProducts) => $('#count').text(totalProducts);
+const goToPage = (page) => { currentPage = page; fetchProducts(); };
+const searchProducts = () => { searchQuery = $('#searchInput').val(); fetchProducts(); };
+const sortLowToHigh = () => { currentSort = 'priceAsc'; fetchProducts(); };
+const sortHighToLow = () => { currentSort = 'priceDesc'; fetchProducts(); };
+const sortAZ = () => { currentSort = 'nameAsc'; fetchProducts(); };
+const sortZA = () => { currentSort = 'nameDesc'; fetchProducts(); };
+const newArrivals = () => { currentSort = 'newArrivals'; fetchProducts(); };
+const popularity = () => { currentSort = 'popularity'; fetchProducts(); };
+const filterByCategory = (categoryId) => { currentCategory = categoryId; fetchProducts(); };
+const limits = (ct) => { limit = ct; currentPage = 1; fetchProducts(); };
+const clearfilter = () => {
+    currentPage = 1;
+    currentSort = '';
+    currentCategory = '';
+    searchQuery = '';
+    limit = 6;
     fetchProducts();
+};
+
+fetchProducts();
+
 </script>

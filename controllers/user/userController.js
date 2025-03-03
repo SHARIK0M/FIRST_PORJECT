@@ -72,6 +72,7 @@ const getHome = async (req, res) => {
           },
         },
       },
+      { $limit: 4 }, // Only fetch 4 products
     ]);
 
     console.log(Products);

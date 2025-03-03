@@ -61,157 +61,6 @@
 
 </main>
 
-<!-- OTP Timer and Resend Functionality -->
-{{!-- <script>
-    let countdown = 60; // Countdown timer in seconds
-    let timerElement = document.getElementById('timer');
-    let resendButton = document.getElementById('resendButton');
-    let resendMessage = document.getElementById('resendMessage');
-    let countdownInterval;
-
-    // Function to update the countdown timer
-    function updateTimer() {
-        timerElement.textContent = countdown;
-        countdown--;
-        resendButton.disabled = true;
-
-        if (countdown < 0) {
-            clearInterval(countdownInterval);
-            timerElement.textContent = '0 seconds';
-            resendButton.disabled = false;
-        }
-    }
-
-    // Function to resend OTP
-    function resendOTP() {
-        fetch('/resend_OTP', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                resendMessage.textContent = "OTP has been resent!";
-                resendMessage.style.color = "green";
-
-                // Restart the timer if OTP is successfully sent
-                countdown = 60;
-                timerElement.textContent = countdown;
-                resendButton.disabled = true;
-                clearInterval(countdownInterval);
-                countdownInterval = setInterval(updateTimer, 1000);
-            } else {
-                resendMessage.textContent = data.error || "Error resending OTP.";
-                resendMessage.style.color = "red";
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            resendMessage.textContent = "Network error, please try again.";
-            resendMessage.style.color = "red";
-        });
-    }
-
-    // Start the initial countdown timer
-    countdownInterval = setInterval(updateTimer, 1000);
-</script> --}}
-{{!-- 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-    const otpForm = document.querySelector("form"); // OTP form
-    const otpInput = document.getElementById("otp"); // OTP input field
-    const otpError = document.querySelector(".text-center.mb-3.mt-3"); // Error message
-    const resendButton = document.getElementById("resendButton");
-    const resendMessage = document.getElementById("resendMessage");
-    const timerElement = document.getElementById("timer");
-    let countdown = 60;
-    let countdownInterval;
-
-    // **Function to Start Countdown Timer**
-    function startCountdown() {
-        resendButton.disabled = true;
-        resendButton.classList.add("not-allowed");
-        countdown = 60;
-        timerElement.textContent = countdown;
-        resendMessage.textContent = "";
-
-        countdownInterval = setInterval(() => {
-            countdown--;
-            timerElement.textContent = countdown;
-
-            if (countdown <= 0) {
-                clearInterval(countdownInterval);
-                resendButton.disabled = false;
-                resendButton.classList.remove("not-allowed");
-            }
-        }, 1000);
-    }
-
-    // **Start Countdown on Page Load**
-    startCountdown();
-
-    // **OTP Form Submission**
-    otpForm.addEventListener("submit", async function (event) {
-        event.preventDefault(); // Prevent form submission
-
-        const otp = otpInput.value.trim();
-
-        if (!otp) {
-            otpError.textContent = "Please enter OTP.";
-            otpError.style.color = "red";
-            return;
-        }
-
-        try {
-            const response = await fetch("/otp", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ otp }),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) throw new Error(data.error || "Invalid OTP!");
-
-            // **Redirect on success**
-            window.location.href = "/resetPassword";
-        } catch (error) {
-            otpError.textContent = error.message;
-            otpError.style.color = "red";
-        }
-    });
-
-    // **Resend OTP Function**
-    resendButton.addEventListener("click", async function (event) {
-        event.preventDefault(); // Prevent default behavior
-
-        try {
-            resendButton.disabled = true;
-            resendMessage.textContent = "Resending OTP...";
-            resendMessage.style.color = "blue";
-
-            const response = await fetch("/resend_OTP", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) throw new Error(data.error || "Failed to resend OTP.");
-
-            resendMessage.textContent = "OTP has been resent!";
-            resendMessage.style.color = "green";
-
-            startCountdown(); // Restart countdown
-        } catch (error) {
-            resendMessage.textContent = error.message;
-            resendMessage.style.color = "red";
-            resendButton.disabled = false;
-        }
-    });
-});
-
-</script> --}}
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -248,35 +97,41 @@
     // **Start Timer on Page Load**
     startCountdown();
 
-    // **OTP Form Submission**
-    otpForm.addEventListener("submit", async function (event) {
-        event.preventDefault();
+otpForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
 
-        const otp = otpInput.value.trim();
+    const otp = otpInput.value.trim();
 
-        if (!otp) {
-            otpError.textContent = "Please enter OTP.";
-            otpError.style.color = "red";
+    if (!otp) {
+        otpError.textContent = "Please enter OTP.";
+        otpError.style.color = "red";
+        return;
+    }
+
+    try {
+        const response = await fetch("/otp", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ otp }),
+        });
+
+        if (response.redirected) {
+            window.location.href = response.url; // Handle redirect properly
             return;
         }
 
-        try {
-            const response = await fetch("/otp", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ otp }),
-            });
+        const data = await response.json();
 
-            const data = await response.json();
-
-
-            // **Redirect based on server response**
-            window.location.href = data.redirect || "/resetPassword";
-        } catch (error) {
-            otpError.textContent = error.message;
-            otpError.style.color = "red";
+        if (!response.ok) {
+            throw new Error(data.error || "Invalid OTP. Please try again.");
         }
-    });
+
+        window.location.href = "/resetPassword"; // Redirect only on success
+    } catch (error) {
+        otpError.textContent = error.message;
+        otpError.style.color = "red";
+    }
+});
 
     // **Resend OTP Function**
     resendButton.addEventListener("click", async function (event) {

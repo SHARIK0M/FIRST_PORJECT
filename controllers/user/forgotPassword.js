@@ -51,26 +51,26 @@ const forgotOtppage = async (req, res) => {
 // Handle OTP Submission
 const forgotOtpSubmit = async (req, res) => {
   try {
-    const enteredOtp = req.body.otp;
+    const { otp } = req.body;
     const storedOtp = req.session.otp;
 
     if (!storedOtp) {
-      req.session.otpErr = true;
       return res.status(400).json({ error: "Session expired. Please request a new OTP." });
     }
 
-    if (enteredOtp.trim() === storedOtp.toString().trim()) {
-      req.session.otp = null;
-      return res.json({ success: true, redirect: "/resetPassword" });
+    if (otp.trim() === storedOtp.toString().trim()) {
+      req.session.otp = null; // Clear OTP after successful verification
+      return res.status(200).json({ redirect: "/resetPassword" });
     } else {
-      req.session.otpErr = true;
       return res.status(400).json({ error: "Invalid OTP. Please try again." });
     }
   } catch (error) {
-    console.error(error.message);
+    console.error("OTP Verification Error:", error);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+
 
 // Resend OTP for Forgot Password
 const resendOTP = async (req, res) => {
