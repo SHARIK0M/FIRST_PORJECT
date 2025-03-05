@@ -13,10 +13,11 @@ const nocache = require("nocache");
 const passport = require("passport");
 const MongoStore = require("connect-mongo");
 const cookieParser = require("cookie-parser");
+const cors = require('cors');
 
 // 🔹 Connect to Database
 connectDB();
-
+app.use(cors());
 // 🔹 Static files middleware
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -43,6 +44,10 @@ app.engine(
       subtract: function (a, b) {
         return a - b;
       },
+    },
+    runtimeOptions: {
+      allowProtoPropertiesByDefault: true, // Allow prototype property access
+      allowProtoMethodsByDefault: true, // Allow prototype method access (optional)
     },
   })
 );

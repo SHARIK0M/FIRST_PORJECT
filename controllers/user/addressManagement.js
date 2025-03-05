@@ -101,20 +101,6 @@ const manageAddress = async (req, res) => {
   }
 };
 
-// Render edit address page
-const editAddress = async (req, res) => {
-  try {
-    // Fetching address data by address id
-    const addressId = req.params.id;
-    const address = await Address.findById(addressId).lean();
-
-    // Rendering edit address page with address data
-    res.render("user/editAddress", { address });
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).send("Internal Server Error");
-  }
-};
 
 // Handle address update
 const editAddressPost = async (req, res) => {
@@ -138,34 +124,46 @@ const editAddressPost = async (req, res) => {
       { new: true }
     );
 
-    // Redirecting to the addresses page
-    res.redirect("/addresses");
+    // Send success response for the AJAX request
+    res.json({ success: true });
   } catch (error) {
     console.log(error.message);
     res.status(500).send("Internal Server Error");
   }
 };
+
 
 // Handle address deletion
 const deleteAddress = async (req, res) => {
   try {
     const addressId = req.params.id;
 
+    // Check if the address exists before deleting
+    const address = await Address.findById(addressId);
+    if (!address) {
+      return res.status(404).send("Address not found");
+    }
+
     // Deleting the address from the database
-    await Address.findByIdAndDelete(addressId);
-    res.redirect("/addresses");
+    const deletedAddress = await Address.findByIdAndDelete(addressId);
+
+    // Log to confirm the address was deleted
+    console.log("Deleted Address: ", deletedAddress);
+
+    // Send a success response
+    res.status(200).json({ message: "Address deleted successfully" });
   } catch (error) {
     console.log(error.message);
-    res.status(500).send("Internal Server Error");
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 
 // Exporting functions for routing
 module.exports = {
   addAddress,
   addAddressPost,
   manageAddress,
-  editAddress,
   editAddressPost,
   deleteAddress,
   checkAddressPost

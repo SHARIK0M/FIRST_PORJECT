@@ -1,3 +1,5 @@
+
+
 <main class="main">
     <div class="page-header breadcrumb-wrap">
         <div class="container">
@@ -32,7 +34,8 @@
                                                         <p class="text-muted mb-2">{{this.mobile}}</p>
                                                         <p class="text-muted">{{this.addressLine1}},<br> {{this.city}}, {{this.state}} - {{this.pin}}</p>
                                                         <div class="d-flex justify-content-between mt-3">
-                                                            <a href="/edit_address/{{this._id}}" class="btn btn-outline-primary btn-sm">Edit</a>
+                                                            <!-- Edit Button to Trigger Modal -->
+                                                            <button class="btn btn-outline-primary btn-sm edit-address" data-id="{{this._id}}" data-name="{{this.name}}" data-mobile="{{this.mobile}}" data-address="{{this.addressLine1}}" data-city="{{this.city}}" data-state="{{this.state}}" data-pin="{{this.pin}}">Edit</button>
                                                             <a href="#" class="btn btn-outline-danger btn-sm delete-address" data-id="{{this._id}}">Delete</a>
                                                         </div>
                                                     </div>
@@ -59,10 +62,264 @@
     </section>
 </main>
 
+<!-- Modal for editing address -->
+<div class="modal" tabindex="-1" id="editAddressModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Address</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- Modal Body with Form -->
+      <div class="modal-body">
+        <form id="editAddressForm">
+          <!-- Hidden field for Address ID -->
+          <input type="hidden" id="addressId" name="addressId">
+
+          <!-- Name Input Field -->
+          <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+          </div>
+
+          <!-- Mobile Input Field -->
+          <div class="mb-3">
+            <label for="mobile" class="form-label">Mobile</label>
+            <input type="text" class="form-control" id="mobile" name="mobile" required>
+          </div>
+
+          <!-- Address Line 1 Input Field -->
+          <div class="mb-3">
+            <label for="addressLine1" class="form-label">Address Line 1</label>
+            <input type="text" class="form-control" id="addressLine1" name="addressLine1" required>
+          </div>
+
+          <!-- City Input Field -->
+          <div class="mb-3">
+            <label for="city" class="form-label">City</label>
+            <input type="text" class="form-control" id="city" name="city" required>
+          </div>
+
+          <!-- State Input Field -->
+          <div class="mb-3">
+            <label for="state" class="form-label">State</label>
+            <input type="text" class="form-control" id="state" name="state" required>
+          </div>
+
+          <!-- Pin Code Input Field -->
+          <div class="mb-3">
+            <label for="pin" class="form-label">Pin Code</label>
+            <input type="text" class="form-control" id="pin" name="pin" required>
+          </div>
+
+          <!-- Save Changes Button -->
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add custom CSS if needed for styling -->
+<style>
+  .modal {
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  }
+
+  .modal-dialog {
+    max-width: 600px;
+  }
+
+  .modal-content {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for the modal */
+    border: none;
+  }
+
+  .modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+
+  .modal-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .btn-close {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: #333;
+  }
+
+  .modal-body {
+    padding: 2rem;
+  }
+
+  .form-label {
+    font-weight: bold;
+    font-size: 1rem;
+  }
+
+  .form-control {
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Soft shadow for inputs */
+    transition: border-color 0.3s ease;
+  }
+
+  .form-control:focus {
+    border-color: #007bff; /* Highlight input on focus */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.25); /* Highlight on focus */
+  }
+
+  .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 0.375rem;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+  }
+
+  .btn-primary:focus {
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+
+  /* Optional: Add a hover effect for form fields */
+  .form-control:hover {
+    border-color: #007bff;
+  }
+</style>
+
+
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     $(document).ready(function () {
+        // Open the modal and populate the form with current address data
+        $('.edit-address').on('click', function () {
+            const addressId = $(this).data('id');
+            const name = $(this).data('name');
+            const mobile = $(this).data('mobile');
+            const addressLine1 = $(this).data('address');
+            const city = $(this).data('city');
+            const state = $(this).data('state');
+            const pin = $(this).data('pin');
+            
+            // Set values in the modal form
+            $('#addressId').val(addressId);
+            $('#name').val(name);
+            $('#mobile').val(mobile);
+            $('#addressLine1').val(addressLine1);
+            $('#city').val(city);
+            $('#state').val(state);
+            $('#pin').val(pin);
+
+            // Show the modal
+            $('#editAddressModal').modal('show');
+        });
+
+        // Handle form submission
+        $('#editAddressForm').on('submit', function (e) {
+            e.preventDefault();
+
+            // Form field values
+            const addressId = $('#addressId').val();
+            const name = $('#name').val();
+            const mobile = $('#mobile').val();
+            const addressLine1 = $('#addressLine1').val();
+            const city = $('#city').val();
+            const state = $('#state').val();
+            const pin = $('#pin').val();
+
+            // Validation
+            if (!name || !mobile || !addressLine1 || !city || !state || !pin) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'All fields are required.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            // Validate name (only alphabetic characters)
+            if (!/^[A-Za-z]+$/.test(name)) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Name must contain only letters (no spaces, numbers, or special characters).',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            // Validate mobile number (10 digits)
+            if (!/^\d{10}$/.test(mobile)) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Please enter a valid 10-digit mobile number.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            // Validate pin (6 digits)
+            if (!/^\d{6}$/.test(pin)) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Please enter a valid 6-digit PIN code.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            const data = {
+                name: name,
+                mobile: mobile,
+                addressLine1: addressLine1,
+                city: city,
+                state: state,
+                pin: pin,
+            };
+
+            $.ajax({
+                url: '/edit_address/' + addressId,
+                type: 'POST',
+                data: data,
+                success: function (response) {
+                    // Close the modal and reload the page to reflect the changes
+                    $('#editAddressModal').modal('hide');
+                    location.reload();
+                },
+                error: function (xhr) {
+                    Swal.fire(
+                        'Error!',
+                        'An error occurred while updating the address. Please try again.',
+                        'error'
+                    );
+                }
+            });
+        });
+
+        // Delete address logic
         $('.delete-address').on('click', function (e) {
             e.preventDefault();
             const addressId = $(this).data('id');
@@ -80,13 +337,21 @@
                         url: '/delete_address/' + addressId,
                         type: 'DELETE',
                         success: function (response) {
-                            Swal.fire(
-                                'Deleted!',
-                                'Your address has been deleted.',
-                                'success'
-                            ).then(() => {
-                                location.reload();
-                            });
+                            if (response.message === "Address deleted successfully") {
+                                Swal.fire(
+                                    'Deleted!',
+                                    'Your address has been deleted.',
+                                    'success'
+                                ).then(() => {
+                                    location.reload();  // Reload the page to see the changes
+                                });
+                            } else {
+                                Swal.fire(
+                                    'Error!',
+                                    'An error occurred while deleting the address. Please try again.',
+                                    'error'
+                                );
+                            }
                         },
                         error: function (xhr) {
                             Swal.fire(

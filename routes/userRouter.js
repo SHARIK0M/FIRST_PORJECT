@@ -35,7 +35,7 @@ const {
 } = require('../controllers/user/profile');
 
 const { 
-  addAddress, addAddressPost, manageAddress, editAddress, editAddressPost, deleteAddress ,checkAddressPost
+  addAddress, addAddressPost, manageAddress,  editAddressPost, deleteAddress ,checkAddressPost
 } = require('../controllers/user/addressManagement');
 
 const { 
@@ -100,9 +100,8 @@ router.post('/updatePassword', isBlocked, logedin, updatePassword);
 router.get('/add_address', isBlocked, logedin, addAddress);
 router.get('/addresses', isBlocked, logedin, manageAddress);
 router.post('/add_address', isBlocked, logedin, addAddressPost);
-router.get('/edit_address/:id', isBlocked, logedin, editAddress);
 router.post('/edit_address/:id', isBlocked, logedin, editAddressPost);
-router.get('/delete_address/:id', isBlocked, logedin, deleteAddress);
+router.delete('/delete_address/:id', isBlocked, logedin, deleteAddress);
 
 // 🔹 Order Management
 router.get('/myOrders', isBlocked, logedin, my_Orders);
