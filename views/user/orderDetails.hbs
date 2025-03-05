@@ -1,0 +1,424 @@
+<main class="main">
+    <!-- Breadcrumb navigation for user navigation -->
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html" rel="nofollow">Home</a>
+                <span></span> Pages
+                <span></span> Account
+            </div>
+        </div>
+    </div>
+    
+<section class="pt-50 pb-150 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="row shadow-lg bg-white p-4 rounded-3">
+                    <!-- Profile Header -->
+                    {{> profileHeader}}
+                    
+                    <div class="col-md-9">
+                        <section class="content-body p-4">
+                            <div class="content-header d-flex justify-content-between align-items-center mb-4">
+                                <h2 class="content-title">Order Details</h2>
+                                <span class="badge bg-info text-white">Order ID: {{myOrderDetails._id}}</span>
+                            </div>
+                            
+                            <div class="card border-0 shadow-sm">
+                                <header class="card-header bg-primary text-white p-3 rounded-top">
+                                    <div class="row align-items-center">
+                                        <div class="col-lg-6 col-md-6">
+                                            <i class="material-icons md-calendar_today"></i>
+                                            <b>{{myOrderDetails.date}}</b>
+                                            <br>
+                                            <small>Order ID: {{myOrderDetails._id}}</small>
+                                        </div>
+                                    </div>
+                                </header>
+                                
+                                 <div class="table-responsive mt-3">
+                                        <table class="table table-striped">
+                                            <thead class="bg-dark text-white">
+                                                <tr>
+                                                    <th>Product</th>
+                                                    <th>Unit Price</th>
+                                                    <th>Quantity</th>
+                                                    <th>Total</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                             <tbody>
+                                                            {{#each orderedProDet}}
+                                                            <tr>
+                                                                <td>
+                                                                    <a class="itemside" href="#">
+                                                                        <div class="left">
+                                                                            <img src="/assets/imgs/products/{{this.product.image}}"
+                                                                                width="40" height="40" class="img-xs"
+                                                                                alt="Item">
+                                                                        </div>
+                                                                        <div class="info">{{this.product.name}}</div>
+                                                                    </a>
+                                                                </td>
+                                                                <td> ₹{{this.product.price}} </td>
+                                                                <td>{{this.product.quantity}} </td>
+                                                                <td>₹{{multiply this.product.quantity
+                                                                    this.product.price }}</td>
+                                                                
+
+                                                                <td class="text-end">                                                                    
+                                                                    {{#singlestatuchecker this.product}}
+                                                                        {{#ifCond ../myOrderDetails.status '==' 'Delivered'}}
+                                                                            <button id="returnnow-btn" class="btn btn-primary btn-sm return-btn" data-order-id="{{../myOrderDetails._id}}" data-prod-id="{{this.product._id}}">Return</button>
+                                                                        {{else ifCond ../myOrderDetails.status '==' 'Payment Failed'}}
+                                                                            <button id="retryPayment" class="btn btn-primary btn-sm retry-btn" data-order-id="{{../myOrderDetails._id}}" data-prod-id="{{this.product._id}}" style="background-color: #d6d6d6; border-color: #c0c0c0; color: #808080; cursor: not-allowed;" disabled>Retry Payment</button>
+                                                                            
+                                                                        {{else}}
+                                                                            <button id="cancel-btn" class="btn btn-primary btn-sm cancel-btn" data-order-id="{{../myOrderDetails._id}}" data-prod-id="{{this.product._id}}">Cancel</button>
+                                                                        {{/ifCond}}
+                                                                    {{/singlestatuchecker}}
+                                                                </td>
+                                                            </tr>
+                                                            {{/each}}
+                                                          
+                                                        </tbody>
+                                        </table>
+                                        <tbody>
+    <tr>
+        <td colspan="5">
+            <article class="float-center">
+                <dl class="dlist text-center">
+                    <dt>Delivery:</dt>
+                    <dd>
+                        <span class="text-danger">+₹50</span>
+                    </dd>
+                </dl>
+                <dl class="dlist text-center">
+                    <dt>Grand Total:</dt>
+                    <dd>
+                        <b id="grandTotal" class="h5">₹{{add myOrderDetails.total 0}}</b>
+                    </dd>
+                </dl>
+                <dl class="dlist text-center">
+                    <dt class="text-muted">Status:</dt>
+                    <dd>
+                        <span class="badge rounded-pill alert-success text-success">{{myOrderDetails.status}}</span>
+                    </dd>
+                </dl>
+                {{#statuchecker myOrderDetails}}
+                {{else}}
+                {{/statuchecker}}
+            </article>
+        </td>
+    </tr>
+</tbody>
+
+                                    </div>
+
+                                <div class="card-body">
+                                    <div class="row mb-4">
+                                        <div class="col-md-4">
+                                            <div class="card p-3 shadow-sm">
+                                                <h6 class="text-muted">Customer</h6>
+                                                <p class="fw-bold">{{address.name}}</p>
+                                                <p>{{address.mobile}}</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card p-3 shadow-sm">
+                                                <h6 class="text-muted">Order Info</h6>
+                                                <p><b>Shipping:</b> Fargo Express</p>
+                                                <p><b>Payment:</b> {{myOrderDetails.paymentMethod}}</p>
+                                                <p><b>Status:</b> {{myOrderDetails.status}}</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card p-3 shadow-sm">
+                                                <h6 class="text-muted">Deliver To</h6>
+                                                <p>{{address.city}}, {{address.state}}</p>
+                                                <p>{{address.addressLine1}}</p>
+                                                <p><b>Pin:</b> {{address.pin}}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                   
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+{{!-- <script>
+// Extract grand total amount, removing currency symbols and commas
+var grandTotalText = document.getElementById("grandTotal").innerText;
+const amount = parseInt(grandTotalText.replace(/[^\d]/g, '')) * 100;
+console.log('Grand Total:', amount);
+
+$(document).ready(function () {
+    // Check if all products in the order are canceled
+    function areAllProductsCancelled() {
+        let allCancelled = true;
+        $('.product-row').each(function () {
+            if (!$(this).data('is-cancelled')) {
+                allCancelled = false;
+                return false; // Stop checking if any product is not canceled
+            }
+        });
+        return allCancelled;
+    }
+
+    // Cancel a single product
+    $('body').on('click', '.cancel-btn', function () {
+        const orderId = $(this).data('order-id');
+        const productId = $(this).data('prod-id');
+
+        if (orderId && productId) {
+            $.ajax({
+                type: 'PUT',
+                url: '/cancel-one-product',
+                contentType: 'application/json',
+                data: JSON.stringify({ id: orderId, prodId: productId }),
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Product Canceled',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => { window.location.reload(); });
+                    }
+                },
+                error: function () {
+                    alert('An error occurred. Please try again.');
+                }
+            });
+        } else {
+            alert('Invalid order or product ID.');
+        }
+    });
+
+    // Cancel the entire order
+    $('#cancelOrder').on('click', function () {
+        const orderId = $(this).data('order-id');
+
+        if (orderId) {
+            $.ajax({
+                type: 'PUT',
+                url: `/cancel-order/${orderId}`,
+                contentType: 'application/json',
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Order Canceled',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => { window.location.reload(); });
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function () {
+                    alert('An error occurred. Please try again.');
+                }
+            });
+        } else {
+            alert('Invalid order ID.');
+        }
+    });
+
+    // Return a single product
+    $('body').on('click', '.return-btn', function () {
+        const orderId = $(this).data('order-id');
+        const productId = $(this).data('prod-id');
+
+        if (orderId && productId) {
+            $.ajax({
+                type: 'PUT',
+                url: '/return-one-product',
+                contentType: 'application/json',
+                data: JSON.stringify({ id: orderId, prodId: productId }),
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Product Returned',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => { window.location.reload(); });
+                    }
+                },
+                error: function () {
+                    alert('An error occurred. Please try again.');
+                }
+            });
+        } else {
+            alert('Invalid order or product ID.');
+        }
+    });
+
+    // Return the entire order
+    $('#returnOrder').on('click', function () {
+        const orderId = $(this).data('order-id');
+
+        if (orderId) {
+            $.ajax({
+                type: 'PUT',
+                url: `/return-order/${orderId}`,
+                contentType: 'application/json',
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Order Returned',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => { window.location.reload(); });
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function () {
+                    alert('An error occurred. Please try again.');
+                }
+            });
+        } else {
+            alert('Invalid order ID.');
+        }
+    });
+});
+
+</script> --}}
+<script>
+    // Extract grand total amount, removing currency symbols and commas
+var grandTotalText = document.getElementById("grandTotal").innerText;
+const amount = parseInt(grandTotalText.replace(/[^\d]/g, '')) * 100;
+console.log('Grand Total:', amount);
+
+$(document).ready(function () {
+    function showReasonPrompt(action, orderId, productId = null) {
+        Swal.fire({
+            title: `Why do you want to ${action}?`,
+            input: 'textarea',
+            inputPlaceholder: 'Enter your reason...',
+            inputAttributes: {
+                'aria-label': 'Enter your reason'
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Submit',
+            cancelButtonText: 'Cancel',
+            preConfirm: (reason) => {
+                if (!reason) {
+                    Swal.showValidationMessage('Reason is required');
+                }
+                return reason;
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const reason = result.value;
+                if (action === 'cancel') {
+                    cancelProductOrOrder(orderId, productId, reason);
+                } else if (action === 'return') {
+                    returnProductOrOrder(orderId, productId, reason);
+                }
+            }
+        });
+    }
+
+    function cancelProductOrOrder(orderId, productId, reason) {
+        let url = productId ? '/cancel-one-product' : `/cancel-order/${orderId}`;
+        let data = productId ? { id: orderId, prodId: productId, reason: reason } : { reason: reason };
+
+        $.ajax({
+            type: 'PUT',
+            url: url,
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function (response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: productId ? 'Product Canceled' : 'Order Canceled',
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => { window.location.reload(); });
+                }
+            },
+            error: function () {
+                alert('An error occurred. Please try again.');
+            }
+        });
+    }
+
+    function returnProductOrOrder(orderId, productId, reason) {
+        let url = productId ? '/return-one-product' : `/return-order/${orderId}`;
+        let data = productId ? { id: orderId, prodId: productId, reason: reason } : { reason: reason };
+
+        $.ajax({
+            type: 'PUT',
+            url: url,
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function (response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: productId ? 'Product Returned' : 'Order Returned',
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => { window.location.reload(); });
+                }
+            },
+            error: function () {
+                alert('An error occurred. Please try again.');
+            }
+        });
+    }
+
+    // Cancel a single product
+    $('body').on('click', '.cancel-btn', function () {
+        const orderId = $(this).data('order-id');
+        const productId = $(this).data('prod-id');
+        showReasonPrompt('cancel', orderId, productId);
+    });
+
+    // Cancel the entire order
+    $('#cancelOrder').on('click', function () {
+        const orderId = $(this).data('order-id');
+        showReasonPrompt('cancel', orderId);
+    });
+
+    // Return a single product
+    $('body').on('click', '.return-btn', function () {
+        const orderId = $(this).data('order-id');
+        const productId = $(this).data('prod-id');
+        showReasonPrompt('return', orderId, productId);
+    });
+
+    // Return the entire order
+    $('#returnOrder').on('click', function () {
+        const orderId = $(this).data('order-id');
+        showReasonPrompt('return', orderId);
+    });
+});
+
+</script>

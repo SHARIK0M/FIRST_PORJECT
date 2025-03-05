@@ -1,0 +1,99 @@
+ <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .card {
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .card-header {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background-color: #f2a6a6;
+            color: white;
+            border-radius: 10px 10px 0 0;
+            padding: 15px;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+        }
+        .order-summary {
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary {
+            background-color: #f2a6a6;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #f2a6a6;
+        }
+    </style>
+
+<main class="main-wrap">
+    <section class="content-main">
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-xl-8">
+                    <!-- Order Details Card -->
+                    <div class="card mb-4">
+                        <div class="card-header text-center">Order Details</div>
+                        <div class="card-body">
+                            <table class="table table-hover text-center">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Price</th>
+                                        <th scope="col">Quantity</th>
+                                        <th scope="col">Image</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each orderedProDet}}
+                                    <tr>
+                                        <td>{{this.product.name}}</td>
+                                        <td>₹{{this.product.price}}</td>
+                                        <td>{{this.product.quantity}}</td>
+                                        <td>
+                                            <img src="/assets/imgs/products/{{this.product.image}}" alt="product image" width="50">
+                                        </td>
+                                    </tr>
+                                    {{/each}}
+                                </tbody>
+                            </table>
+
+                            <!-- Order Summary -->
+                            <div class="order-summary d-flex justify-content-between mt-4 p-4">
+                                <div>
+                                    <p><strong>Total Amount:</strong> ₹{{myOrderDetails.total}}</p>
+                                    <p><strong>Payment Method:</strong> {{myOrderDetails.paymentMethod}}</p>
+                                    <p><strong>Order Status:</strong> {{myOrderDetails.status}}</p>
+                                </div>
+                                <div>
+                                    <h5 class="border-bottom pb-2 mb-3">Delivery Address</h5>
+                                    <p>{{address.name}}</p>
+                                    <p><strong>Mobile:</strong> {{address.mobile}}</p>
+                                    <p>{{address.addressLine1}}</p>
+                                    <p>{{address.addressLine2}}</p>
+                                    <p>{{address.city}}, {{address.state}}</p>
+                                    <p><strong>Pin:</strong> {{address.pin}}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Back to Orders Button -->
+                        <div class="text-center p-3">
+                            <a href="/admin/orders" class="btn btn-primary">Back to Orders</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>

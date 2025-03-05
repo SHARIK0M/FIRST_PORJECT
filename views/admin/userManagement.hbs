@@ -23,7 +23,7 @@
                                     <td width="30%">
                                         <a href="#" class="itemside">
                                             <div class="left mt-5">
-                                                <img src="/assets/imgs/products/{{this.imageUrl.[0]}}" class="img-sm img-avatar" alt="Userpic" onerror="src='/assetsAdmin/imgs/people/UserImage.png'">
+                                                <img src="/assets/imgs/products/{{imageUrl}}" class="img-sm img-avatar" alt="Userpic" onerror="src='/assetsAdmin/imgs/people/UserImage.png'">
                                             </div>
                                             <div class="info pl-3">
                                                 <h6 class="mb-0 title">{{name}}</h6>
@@ -83,6 +83,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
+
     // Block User Functionality
     $(document).ready(function () {
         $(document).on('click', '#blockuser', function (e) {

@@ -1,3 +1,4 @@
+const fs = require("fs");
 const multer = require("multer");
 const path = require("path");
 
@@ -9,36 +10,40 @@ const FILE_TYPE_MAP = {
   "image/avif": "avif",
 };
 
-// Storage configuration for uploaded files
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const isValid = FILE_TYPE_MAP[file.mimetype];
-    const uploadError = isValid ? null : new Error("Invalid image type");
+// Function to configure storage for different upload types
+const configureStorage = (folderName) => {
+  return multer.diskStorage({
+    destination: function (req, file, cb) {
+      const isValid = FILE_TYPE_MAP[file.mimetype];
+      const uploadError = isValid ? null : new Error("Invalid image type");
 
-    cb(uploadError, path.join(__dirname, "../public/assets/imgs/products"));
-  },
-  filename: function (req, file, cb) {
-    const fileName = Date.now() + "_" + file.originalname;
-    cb(null, fileName);
-  },
-});
+      const uploadPath = path.join(__dirname, `../public/assets/imgs/${folderName}`);
 
-// Multer instance for handling both single and multiple uploads
-const store = multer({
-  storage,
-  fileFilter: (req, file, cb) => {
-    if (FILE_TYPE_MAP[file.mimetype]) {
-      cb(null, true);
-    } else {
-      cb(new Error("Invalid file type"), false);
-    }
-  },
-});
+      // Ensure the folder exists before saving
+      fs.mkdir(uploadPath, { recursive: true }, (err) => {
+        if (err) {
+          console.error("Error creating upload directory:", err);
+          return cb(err);
+        }
+        cb(uploadError, uploadPath);
+      });
+    },
+    filename: function (req, file, cb) {
+      const fileName = `${Date.now()}_${file.originalname}`;
+      cb(null, fileName);
+    },
+  });
+};
 
-// Middleware to handle various image upload scenarios
+// Multer instances for different upload types
+const profileStorage = configureStorage("profiles");
+const productStorage = configureStorage("products");
+
+// Middleware for different image upload scenarios
 const uploadImages = {
-  categoryImage: store.single("image"), // For categories (single image)
-  productImages: store.array("image", 5), // For products (multiple images)
+  profileImage: multer({ storage: profileStorage }).single("image"), // For profile pictures (single image)
+  categoryImage: multer({ storage: productStorage }).single("image"), // For categories (single image)
+  productImages: multer({ storage: productStorage }).array("image", 5), // For products (multiple images)
 };
 
 module.exports = uploadImages;

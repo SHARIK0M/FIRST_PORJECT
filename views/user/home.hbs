@@ -59,19 +59,11 @@
               <img src="assets/imgs/products/{{this.imageUrl.[1]}}" alt="Hover Image" class="hover-img img-fluid"/>
             </a>
             <span class="label badge badge-primary">{{#if discountPrice}}Sale{{else}}New{{/if}}</span>
-            <ul class="product__hover">
-              <li><a href="#"><img src="img/icon/heart.png" alt="Wishlist" /></a></li>
-              <li><a href="#"><img src="img/icon/compare.png" alt="Compare" /> <span>Compare</span></a></li>
-              <li><a href="#"><img src="img/icon/search.png" alt="Search" /></a></li>
-            </ul>
           </div>
           
           <!-- Product Details -->
           <div class="product__item__text text-center">
-            <div class="product-category mb-1">
-              <a href="#">{{this.category.category}}</a>
-            </div>
-            <h6 class="product-title"><a href="/productDetails/{{this._id}}">{{this.name}}</a></h6>
+          
             
             <!-- Product Rating -->
             <div class="rating mb-2">
@@ -87,13 +79,6 @@
               {{else}}
                 <span class="font-weight-bold">₹{{price}}</span>
               {{/if}}
-            </div>
-            
-            <!-- Add to Cart Button -->
-            <div class="product-action">
-              <a aria-label="Add To Cart" class="btn btn-primary btn-sm" href="/addToCart/{{this._id}}">
-                <i class="fi-rs-shopping-bag-add"></i> Add to Cart
-              </a>
             </div>
           </div>
         </div>

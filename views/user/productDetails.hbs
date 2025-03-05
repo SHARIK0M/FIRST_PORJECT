@@ -1,4 +1,4 @@
-<main class="main">
+<main class="main " >
       <div class="page-header breadcrumb-wrap">
         <div class="container">
             <div class="breadcrumb">
@@ -8,19 +8,17 @@
             </div>
         </div>
     </div>
-    <section class="mt-50 mb-50 mr-100">
+    <section class="mt-50 mb-50 mr-1000">
         <div class="container">
             <div class="row">
                 <div class="col-lg-9">
                     <div class="product-detail accordion-detail mt">
                         <div class="row mb-50">
                             
-                            <!-- Left Section: Product Images -->
                             <div class="col-md-6 col-sm-12 col-xs-12">
                                 <div class="detail-gallery">
                                     <span class="zoom-icon"><i class="fi-rs-search"></i></span>
                                     
-                                    <!-- Main Product Image Slider -->
                                     <div class="product-image-slider">
                                         {{#each product.imageUrl}}
                                         <figure class="border-radius-10">
@@ -29,7 +27,6 @@
                                         {{/each}}
                                     </div>
 
-                                    <!-- Thumbnail Image Slider -->
                                     <div class="slider-nav-thumbnails pl-15 pr-15">
                                         {{#each product.imageUrl}}
                                         <div>
@@ -40,21 +37,11 @@
                                 </div>
                             </div>
                             
-                            <!-- Right Section: Product Details -->
                             <div class="col-md-6 col-sm-12 col-xs-12">
                                 <div class="detail-info">
                                     
-                                    <!-- Product Name -->
                                     <h2 class="title-detail">{{product.name}}</h2>
                                     
-                                    <!-- Brand Information -->
-                                    <div class="product-detail-rating d-flex align-items-center">
-                                        <div class="pro-details-brand">
-                                            <span>Brand: <a href="#">{{product.brand}}</a></span>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Pricing Section -->
                                     <div class="clearfix product-price-cover mt-3">
                                         <div class="product-price primary-color float-left">
                                             {{#if product.productOffer.discountPrice}}
@@ -69,30 +56,102 @@
                                     
                                     <div class="bt-1 border-color-1 mt-15 mb-15"></div>
                                     
-                                    <!-- Product Description -->
                                     <div class="short-desc mb-30">
                                         <p>{{product.description}}</p>
                                     </div>
                                     
-                                    <!-- Key Features & Policies -->
                                     <div class="product_sort_info font-xs mb-30">
                                         <ul>
                                             <li class="mb-10"><i class="fi-rs-crown mr-5"></i> 1 Year Brand Warranty</li>
                                             <li class="mb-10"><i class="fi-rs-refresh mr-5"></i> Return available for damaged products</li>
                                             <li class="mb-10"><i class="fi-rs-credit-card mr-5"></i> Cash on Delivery Available</li>
                                             <li class="mb-10 text-success"><i class="fi-rs-truck mr-5"></i>  Express Delivery Available</li>
+                                             {{#if product.stock}}       
+                                        <li>Availability: <span class="in-stock text-success ml-5 " style="font-weight: bold !important; font-size: 15px;">{{product.stock}} Items In Stock</span></li>
+						                {{else}}
+                                        <li>Availability:<span class="in-stock text-danger ml-5">Out of Stock</span></li>
+                                        {{/if}}
                                         </ul>
                                     </div>
+                                      {{#if outOfStock}}
+                                      <span id="outofstock">
+                                          <button id="outofstock-btn" class="btn btn-md " style="background-color: #dc3545;">Out of stock</button>
+                                      </span>
+                                      {{else}}
+                                      {{#if productexistInCart}}
+                                      <span id="gocart">
+                                          <button id="addcart-btn" onclick="window.location.href='/cart'" class="btn btn-md">Go to cart</button>
+                                      </span>
+                                      {{else}}
+                                      <span id="addcart">
+                                          <button id="addcart-btn" data-product-id="{{product._id}}" class="button button-add-to-cart">Add to cart</button>
+                                      </span>
+                                      {{/if}}
+                                      {{/if}}
 
                                     <div class="bt-1 border-color-1 mt-30 mb-30"></div>
-
                                 </div>
                             </div>
 
-                        </div> <!-- End of Row -->
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 </main>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    $(document).ready(function () {
+        $('.button.button-add-to-cart').on('click', function (e) {
+            var prodId = $(this).data('product-id');
+            var quantity = 1;
+
+            $.ajax({
+                url: '/addtocart/' + prodId,
+                method: 'POST',
+                data: { prodId: prodId, quantity: quantity },
+                success: function (result) {
+                    if (result.success) {
+                        Swal.fire({
+                            icon: 'success', 
+                            title: 'Added to cart',
+                            text: result.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        $('#addcart').html('<button id="addcart-btn" onclick="window.location.href=\'/cart\'" class="button button-add-to-cart">Go to cart</button>');
+                    } else {
+                        if (result.message) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: result.message,
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Login Required',
+                                showCancelButton: true,
+                                confirmButtonText: 'Login',
+                                confirmButtonColor: "#088178",
+                                cancelButtonColor: "#d33",
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = '/login';
+                                }
+                            });
+                        }
+                    }
+                },
+                error: function (error) {
+                    console.log('Error adding to cart', error);
+                }
+            });
+        });
+    });
+</script>

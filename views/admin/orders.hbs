@@ -1,0 +1,149 @@
+<main class="main-wrap">
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Order List </h2>
+            </div>
+            <div>
+                <input type="text" placeholder="Search order ID" class="form-control bg-white">
+            </div>
+        </div>
+        <div class="card mb-4"  style="background-color: #f2a6a6;">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="text-center">Date - Time</th>
+                                <th scope="col" class="text-center">#ID</th>
+                                <th scope="col" class="text-center">Payment Method</th>
+                                <th scope="col" class="text-center">Status</th>
+                                <th scope="col" class="text-center">Change Order Status</th>
+                                <th scope="col" class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each ordersData}}
+                            <tr>
+                                <td class="text-center">{{formatDate this.date}}</td>
+                                <td class="text-center"><b>#{{this.orderId}}</b></td>
+                                <td class="text-center">
+                                    <i class="material-icons md-payment font-xxl text-muted mr-5"></i>
+                                    {{this.paymentMethod}}
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-primary">{{this.status}}</span>
+                                </td>
+                               <td class="text-center">
+    {{#if (or (eq this.status "Cancelled") (eq this.status "Returned") (eq this.status "Delivered"))}}
+        <span class="badge bg-secondary">{{this.status}}</span>
+    {{else}}
+        <form action="/admin/change_status/{{this._id}}" method="post"
+            onsubmit="return submitform(this);" class="order-status-form">
+            <div class="d-flex w-50 ml-30">
+                <div class="col-lg-2 col-6 col-md-3 w-100 mr-15">
+                    <select name="status" class="form-select" aria-label="Select Order Status">
+                        <option selected disabled hidden>Change order status</option>
+                        <option value="Shipped" {{#if (or (eq this.status "Shipped") (eq this.status "Returned") (eq this.status "Delivered"))}}disabled{{/if}}>
+                            Shipped
+                        </option>
+                        <option value="Delivered" {{#if (or (eq this.status "Delivered") (eq this.status "Cancelled") (eq this.status "Returned"))}}disabled{{/if}}>
+                            Delivered
+                        </option>
+                    </select>
+                </div>
+                <div>
+                    <button type="submit" id="submitstatus" class="btn btn-primary btn-sm w-100">
+                        Submit
+                    </button>
+                </div>
+            </div>
+        </form>
+    {{/if}}
+</td>
+
+                                <td class="text-center">
+                                    <div>
+                                        <span>
+                                            <a href="/admin/order_details/{{this._id}}" class="btn btn-primary btn-sm">View Detail</a>
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div> 
+            </div> 
+        </div> 
+        <div class="pagination-area mt-15 mb-50">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-start">
+                    {{#each pages}}
+                        <li class="page-item active"><a class="page-link" href="?page={{this}}">{{this}}</a></li>
+                    {{/each}}
+                </ul>
+            </nav>
+        </div>
+    </section> 
+</main>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.querySelector('.form-control.bg-white');
+    const tableRows = document.querySelectorAll("tbody tr");
+    const tableBody = document.querySelector("tbody");
+
+    // Create and style the "No orders found" message
+    const noOrdersMessage = document.createElement("tr");
+    noOrdersMessage.innerHTML = `<td colspan="6" class="text-center"><b>No orders found</b></td>`;
+    noOrdersMessage.style.display = "none"; // Initially hidden
+    tableBody.appendChild(noOrdersMessage);
+
+    searchInput.addEventListener("keyup", function () {
+        const searchValue = searchInput.value.trim().toLowerCase();
+        let matchFound = false;
+
+        tableRows.forEach(row => {
+            const orderIdCell = row.querySelector("td:nth-child(2) b");
+            if (orderIdCell) {
+                const orderId = orderIdCell.textContent.trim().toLowerCase();
+                if (orderId.includes(searchValue)) {
+                    row.style.display = "";
+                    matchFound = true;
+                } else {
+                    row.style.display = "none";
+                }
+            }
+        });
+
+        // Show "No orders found" if no match is found
+        noOrdersMessage.style.display = matchFound ? "none" : "";
+    });
+});
+</script>
+
+<script>
+    function submitform(form) {
+        event.preventDefault()
+        
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to change the order status??",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#088178",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, change it!"
+        }).then((isOkay) => {
+            if (isOkay) {
+                form.submit()
+            }
+        });
+    }
+</script>

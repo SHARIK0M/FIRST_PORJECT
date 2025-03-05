@@ -1,0 +1,112 @@
+<main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="index.html">Home</a>
+                <span> / </span>
+                <a href="#">Account</a>
+                <span> / </span>
+                <span class="active">Edit Profile</span>
+            </nav>
+        </div>
+    </div>
+    
+    <section class="profile-section pt-50 pb-150">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 m-auto">
+                    <div class="row">
+                        {{> profileHeader}}
+                        <div class="col-md-9">
+                            <div class="dashboard-content card p-4">
+                                <div class="card-header bg-primary text-white text-center">
+                                    <h4>Edit Profile</h4>
+                                </div>
+                                <div class="card-body">
+                                    <form method="post" action="/edit_profile/{{userData._id}}" enctype="multipart/form-data" onsubmit="return validateForm()">
+                                        <div class="row">
+                                            <div class="col-lg-8">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Name</label>
+                                                    <input class="form-control" type="text" placeholder="Enter your name" value="{{userData.name}}" name="name" id="name" oninput="validateusername()">
+                                                    <small id="nameError" class="text-danger"></small>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Email</label>
+                                                    <input class="form-control" type="email" value="{{userData.email}}" name="email" id="email" disabled>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Phone</label>
+                                                    <input class="form-control" type="tel" placeholder="Enter your phone number" value="{{userData.mobile}}" name="mobile" id="phone" oninput="validatePhoneNumber()">
+                                                    <small id="phoneError" class="text-danger"></small>
+                                                </div>
+                                                <button class="btn btn-primary w-100" type="submit">Save Changes</button>
+                                            </div>
+                                            <div class="col-lg-4 text-center">
+                                                <label for="fileInput">
+                                                    <img class="rounded-circle img-thumbnail" src="/assets/imgs/profiles/{{userData.image}}" alt="User Image" onerror="this.src='/images/users/UserImage.png'">
+                                                    <input type="file" id="fileInput" class="visually-hidden" accept="image/*" onchange="previewImage(this)" name="image">
+                                                    <p class="mt-2 text-primary">Click to Change Photo</p>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.querySelector('img.rounded-circle').src = e.target.result;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function validateusername() {
+        var username = document.getElementById('name').value;
+        var userPattern = /^[a-zA-Z]{3,}$/;
+        var nameError = document.getElementById('nameError');
+        
+        if (!userPattern.test(username)) {
+            nameError.textContent = "Invalid username. Must be at least 3 letters and contain no numbers.";
+            return false;
+        } else {
+            nameError.textContent = "";
+            return true;
+        }
+    }
+
+    function validatePhoneNumber() {
+        var phoneNumber = document.getElementById('phone').value;
+        var phonePattern = /^\d{10}$/;
+        var phoneError = document.getElementById('phoneError');
+        
+        if (!phonePattern.test(phoneNumber)) {
+            phoneError.textContent = "Invalid phone number! Must be 10 digits.";
+            return false;
+        } else {
+            phoneError.textContent = "";
+            return true;
+        }
+    }
+
+    function validateForm() {
+        var isValidName = validateusername();
+        var isValidPhone = validatePhoneNumber();
+        
+        if (!isValidName || !isValidPhone) {
+            return false;
+        }
+        return true;
+    }
+</script>

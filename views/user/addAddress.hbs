@@ -1,0 +1,152 @@
+<main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="index.html" rel="nofollow">Home</a>
+                <span>&rsaquo;</span>
+                <a href="#">Account</a>
+                <span>&rsaquo;</span>
+                My Address
+            </nav>
+        </div>
+    </div>
+    <section class="pt-50 pb-150">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="row">
+                        {{> profileHeader}}
+                        <div class="col-md-9">
+                            <div class="dashboard-content card p-4 shadow-sm border-0">
+                                <h3 class="mb-4 text-center">Add New Address</h3>
+                                <form action="/add_address" method="post">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Name</label>
+                                            <input class="form-control" type="text" placeholder="Enter your name" name="name" id="name">
+                                            <p class="text-danger small" id="nameError"></p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Phone</label>
+                                            <input class="form-control" type="tel" placeholder="Enter your phone number" name="mobile" id="mobile">
+                                            <p class="text-danger small" id="mobileError"></p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label class="form-label">Address Line 1</label>
+                                            <input class="form-control" type="text" placeholder="Enter your address" name="address1" id="address1">
+                                            <p class="text-danger small" id="address1Error"></p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">City</label>
+                                            <input class="form-control" type="text" placeholder="Enter your City" name="city" id="city">
+                                            <p class="text-danger small" id="cityError"></p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">State</label>
+                                            <input class="form-control" type="text" placeholder="Enter your State" name="state" id="state">
+                                            <p class="text-danger small" id="stateError"></p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Pincode</label>
+                                            <input class="form-control" type="tel" placeholder="Enter your Pincode" name="pin" id="pincode">
+                                            <p class="text-danger small" id="pincodeError"></p>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 text-center">
+                                        <button class="btn btn-success me-2" type="submit" id="submitButton">Save Address</button>
+                                        <button type="button" class="btn btn-secondary" id="closeButton">Close</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form[action="/add_address"]');
+        const submitButton = document.getElementById('submitButton');
+        const nameField = document.getElementById('name');
+        const mobileField = document.getElementById('mobile');
+        const address1Field = document.getElementById('address1');
+        const cityField = document.getElementById('city');
+        const stateField = document.getElementById('state');
+        const pincodeField = document.getElementById('pincode');
+        const nameError = document.getElementById('nameError');
+        const mobileError = document.getElementById('mobileError');
+        const address1Error = document.getElementById('address1Error');
+        const cityError = document.getElementById('cityError');
+        const stateError = document.getElementById('stateError');
+        const pincodeError = document.getElementById('pincodeError');
+        const closeButton = document.getElementById('closeButton');
+
+        closeButton.addEventListener('click', function() {
+            window.location.href = '/addresses';
+        });
+
+        form.addEventListener('submit', function(event) {
+            let isValid = true;
+
+            // Clear previous error messages
+            clearErrors();
+
+            if (nameField.value.trim() === '') {
+                isValid = false;
+                showError(nameError, 'Name is required.');
+            }
+
+            if (mobileField.value.trim() === '') {
+                isValid = false;
+                showError(mobileError, 'Phone number is required.');
+            } else if (!/^\d{10}$/.test(mobileField.value.trim())) {
+                isValid = false;
+                showError(mobileError, 'Phone number must be 10 digits.');
+            }
+
+            if (address1Field.value.trim() === '') {
+                isValid = false;
+                showError(address1Error, 'Address line 1 is required.');
+            }
+
+            if (cityField.value.trim() === '') {
+                isValid = false;
+                showError(cityError, 'City is required.');
+            }
+
+            if (stateField.value.trim() === '') {
+                isValid = false;
+                showError(stateError, 'State is required.');
+            }
+
+            if (pincodeField.value.trim() === '') {
+                isValid = false;
+                showError(pincodeError, 'Pincode is required.');
+            } else if (!/^\d{6}$/.test(pincodeField.value.trim())) {
+                isValid = false;
+                showError(pincodeError, 'Pincode must be 6 digits.');
+            }
+
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+
+        function showError(element, message) {
+            element.innerText = message;
+            element.style.color = 'red';
+        }
+
+        function clearErrors() {
+            nameError.innerText = '';
+            mobileError.innerText = '';
+            address1Error.innerText = '';
+            cityError.innerText = '';
+            stateError.innerText = '';
+            pincodeError.innerText = '';
+        }
+    });
+</script>

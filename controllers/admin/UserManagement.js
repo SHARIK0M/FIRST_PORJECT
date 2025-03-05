@@ -36,28 +36,27 @@ const blockUser = async (req, res) => {
     const user = await User.findById(id);
 
     if (!user) {
-      return res.status(HttpStatus.NotFound).send("User not found");
+      return res.status(404).send("User not found");
     }
 
     const isBlocked = !user.isBlocked;
     await User.findByIdAndUpdate(id, { $set: { isBlocked } });
 
-    // If user is blocked and currently logged in, set session flag
-    if (
-      isBlocked &&
-      req.session.user &&
-      req.session.user._id.toString() === id
-    ) {
-      req.session.userBlocked = true; // Set flag to indicate user is blocked
-      delete req.session.user; // Remove user session
+    // If the blocked user is currently logged in, destroy only their session
+    if (isBlocked && req.session.user && req.session.user._id.toString() === id) {
+      req.sessionStore.destroy(req.session.id, (err) => {
+        if (err) console.error("Error destroying user session:", err);
+      });
+      delete req.session.user; // Remove only user session
     }
 
-    res.redirect("/admin/users");
+    res.redirect("/admin/users"); // Redirect to admin user list page
   } catch (error) {
     console.error("Error blocking user:", error.message);
-    res.status(HttpStatus.InternalServerError).send("Internal Server Error");
+    res.status(500).send("Internal Server Error");
   }
 };
+
 
 
 module.exports = {

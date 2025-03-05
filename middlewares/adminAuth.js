@@ -1,8 +1,7 @@
-// Middleware to check if the admin is logged in
 const isLogin = (req, res, next) => {
   try {
     if (!req.session.admin) {
-      return res.redirect("/admin/login"); // Redirect if admin is not logged in
+      return res.redirect("/admin/login");
     }
     next();
   } catch (error) {
@@ -11,11 +10,10 @@ const isLogin = (req, res, next) => {
   }
 };
 
-// Middleware to check if the admin is logged out
 const isLogout = (req, res, next) => {
   try {
     if (req.session.admin) {
-      return res.redirect("/admin/home"); // Redirect if admin is already logged in
+      return res.redirect("/admin/home");
     }
     next();
   } catch (error) {

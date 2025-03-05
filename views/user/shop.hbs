@@ -145,12 +145,7 @@ const updateProductList = (products) => {
                                 <img class="hover-img" src="/assets/imgs/products/${product.imageUrl[1]}" alt="">
                             </a>
                         </div>
-                        <div class="product-action-1">
-                            <a aria-label="Quick view" class="action-btn hover-up" href="/productDetails/${product._id}" data-bs-target="#quickViewModal">
-                                <i class="fi-rs-search"></i>
-                            </a>
-                            <a data-id="${product._id}" class="wish action-btn hover-up" href="#"><i class="fi-rs-heart"></i></a>
-                        </div>
+                        
                         <div class="product-badges product-badges-position product-badges-mrg">
                             ${product.stock == 0 ? '<span class="hot">Out of stock</span>' : '<span class="hot">Hot</span>'}
                         </div>

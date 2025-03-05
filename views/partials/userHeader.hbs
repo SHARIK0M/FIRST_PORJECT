@@ -5,8 +5,27 @@
       <div class="offcanvas__option">
         <div class="offcanvas__links">
           {{#if userData}}
-            <a href="/profile">Profile</a>
-            <a href="/logout" id="logoutbtn">Logout</a>
+             <div class="header-action-icon-2">
+                    <div class="dropdown nav-item">
+                        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount"
+                            aria-expanded="false">
+                           <img class="img-xs rounded-circle mr-2" style="width: 40px; object-fit: cover;"
+    src="{{#if userData.image}}/assets/imgs/profiles/{{userData.image}}{{else}}/images/users/default.png{{/if}}" 
+    alt="UserPhoto">
+
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount"
+                            style="background-color: black;">
+                            <ul class="dropdown-item-list">
+                                <li><a class="dropdown-item" href="/profile">Account</a></li>
+                                <li><a class="dropdown-item" href="/myOrders">Orders</a></li>
+                                <li><a class="dropdown-item" href="/addresses">Address</a></li>
+                                <div class="dropdown-divider"></div>
+                                <li><a class="dropdown-item text-danger logoutbtn" href="#">Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
           {{else}}
             <a href="/signup">Sign up</a>
             <a href="/login">Login</a>
@@ -16,7 +35,7 @@
       <div class="offcanvas__nav__option">
         <a href="#" class="search-switch"><img src="img/icon/search.png" alt="" /></a>
         <a href="#"><img src="img/icon/heart.png" alt="" /></a>
-        <a href="#"><img src="img/icon/cart.png" alt="" /> <span>0</span></a>
+        <a href="/cart"><img src="img/icon/cart.png" alt="" /> <span>0</span></a>
       </div>
       <div id="mobile-menu-wrap"></div>
       <div class="offcanvas__text">
@@ -39,14 +58,28 @@
               <div class="header__top__right">
                 <div class="header__top__links">
                   {{#if userData}}
-                    <a href="/profile">Profile</a>
-                    <a href="/logout" id="logoutbtn">Logout</a>
+                     <div class="header-action-icon-2">
+                    <div class="dropdown nav-item">
+                        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount"
+                            aria-expanded="false">
+                           <img class="img-xs rounded-circle mr-2" style="width: 40px; object-fit: cover;"
+    src="{{#if userData.image}}/assets/imgs/profiles/{{userData.image}}{{else}}/images/users/default.png{{/if}}" 
+    alt="UserPhoto">
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount"
+                            style="background-color: black;">
+                            <ul class="dropdown-item-list">
+                                <li><a class="dropdown-item" href="/profile">Account</a></li>
+                                <div class="dropdown-divider"></div>
+                                <li><a class="dropdown-item text-danger logoutbtn" href="/logout">Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                   {{else}}
                     <a href="/signup">Sign up</a>
                     <a href="/login">Login</a>
                   {{/if}}
-    
-                  <a href="#">FAQs</a>
                 </div>
               </div>
             </div>
@@ -72,11 +105,20 @@
           </div>
           <div class="col-lg-3 col-md-3">
             <div class="header__nav__option">
-              <a href="#" class="search-switch"><img src="img/icon/search.png" alt="" /></a>
+              <a href="#" id="searchIcon">
+                    <img src="img/icon/search.png" alt="" />
+              </a>
+
               <a href="#"><img src="img/icon/heart.png" alt="" /></a>
-              <a href="#"><img src="img/icon/cart.png" alt="" /> <span>0</span></a>
+              <a href="/cart"><img src="img/icon/cart.png" alt="" /> <span></span></a>
+          <div id="searchContainer" class="search-style-2 me-3 mt-1 mb-0" style="display: none;">
+             <input type="text" onkeyup="searchProducts()" id="searchInput" name="search"
+                class="form-control" placeholder="Search for items..." 
+             style="border: 2px solid #B0C4DE; border-radius: 5px; padding: 5px; outline: none; background-color: white;">
+          </div>
             </div>
           </div>
+
         </div>
         <div class="canvas__open"><i class="fa fa-bars"></i></div>
       </div>
@@ -86,6 +128,18 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     
+    <script>
+    document.getElementById("searchIcon").addEventListener("click", function (event) {
+        event.preventDefault();
+        var searchBox = document.getElementById("searchContainer");
+        if (searchBox.style.display === "none" || searchBox.style.display === "") {
+            searchBox.style.display = "block";
+        } else {
+            searchBox.style.display = "none";
+        }
+    });
+</script>
+
     <script>
         // Redirect to home page after login
         $(document).ready(function () {

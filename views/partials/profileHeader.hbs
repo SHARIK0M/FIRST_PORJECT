@@ -1,0 +1,84 @@
+<aside class="col-md-3">
+    <div class="dashboard-menu p-3 shadow-sm rounded" style="background-color:#00bfff;">
+        <ul class="nav flex-column" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center" href="/profile">
+                    <i class="fi-rs-settings-sliders mr-2"></i> <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center" href="/myOrders">
+                    <i class="fi-rs-shopping-bag mr-2"></i> <span>Orders</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center" href="/addresses">
+                    <i class="fi-rs-marker mr-2"></i> <span>My Address</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center" href="/edit_profile">
+                    <i class="fi-rs-user mr-2"></i> <span>Edit Profile</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center" href="/changePassword">
+                    <i class="fi-rs-lock mr-2"></i> <span>Change Password</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center text-danger" id="logoutbtn" href="/logout" data-logout>
+                    <i class="fi-rs-sign-out mr-2"></i> <span>Logout</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</aside>
+
+<style>
+
+    .dashboard-menu {
+        border-radius: 10px;
+        transition: all 0.3s ease-in-out;
+    }
+    .nav-link {
+        color: #333;
+        font-weight: 500;
+        padding: 10px 15px;
+        border-radius: 5px;
+        transition: background 0.3s ease;
+    }
+    .nav-link:hover, .nav-link.active {
+        background: #f8f9fa;
+        color: #088178;
+    }
+    .nav-link i {
+        font-size: 18px;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const logoutBtn = document.querySelector('a[data-logout]');
+        
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: "LOGOUT?",
+                    text: "Do you want to logout?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#088178",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "/logout";
+                    }
+                });
+            });
+        }
+    });
+</script>

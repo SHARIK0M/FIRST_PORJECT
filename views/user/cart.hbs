@@ -1,0 +1,395 @@
+<main class="main">
+    <!-- Breadcrumb Navigation -->
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="/" rel="nofollow">Home</a>
+                <span></span> Shop
+                <span></span> Cart
+            </div>
+        </div>
+    </div>
+
+    <section class="mt-50 mb-50">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <!-- Shopping Cart Table -->
+                   <div class="table-responsive cart-container">
+    <table class="table shopping-summery text-center clean">
+        <thead>
+            <tr class="main-heading">
+                <th scope="col">Image</th>
+                <th scope="col">Name</th>
+                <th scope="col">Price</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Subtotal</th>
+                <th scope="col">Remove</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each cartProd}}
+            <tr>
+                <!-- Product Image -->
+                <td class="image product-thumbnail">
+                    <img src="/assets/imgs/products/{{productImage.[0]}}" alt="Product Image" class="img-fluid">
+                </td>
+                
+                <!-- Product Name and Description -->
+                <td class="product-des product-name">
+                    <h5 class="product-name">
+                        <a href="shop-product-right.html">{{productName}}</a>
+                    </h5>
+                    {{#if outOfStock}}
+                    <p class="font-xs text-danger">Out of Stock</p>
+                    {{/if}}
+                </td>
+
+                <!-- Product Price -->
+                <td class="price" data-title="Price">
+                    <span>₹{{productPrice}}</span>
+                </td>
+
+                <!-- Quantity Controls -->
+                <td class="column-4">
+                    <div class="quantity-container d-flex align-items-center justify-content-center">
+                        
+                        <!-- Increase Quantity -->
+                        <button id="incButton" data-offer="" class="btn-quantity btn-increase">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                        
+                        <!-- Display Current Quantity -->
+                        <input disabled class="num-product text-center" type="number"
+                            name="num-product{{this._id}}" id="{{this._id}}" value="{{this.quantity}}">
+                        
+                        <!-- Decrease Quantity -->
+                        <button class="btn-quantity btn-decrease">
+                            <i class="fa-solid fa-minus"></i>
+                        </button>
+                        
+                    </div>
+                </td>
+
+                <!-- Subtotal Calculation -->
+                <td class="text-right" data-title="Cart">
+                    <span id="totalPerItem-{{this._id}}">₹{{multiply this.quantity this.productPrice}}</span>
+                </td>
+
+                <!-- Remove Item Button -->
+                <td class="action" data-product-id="{{_id}}" data-title="Remove">
+                    <a href="#" class="remove-item">
+                        <i class="fi-rs-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+
+<!-- Cart Actions -->
+<div class="cart-action text-end">
+    <a class="btn btn-shopping" href="/shop">
+        <i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping
+    </a>
+</div>
+
+<div class="divider center_icon mt-50 mb-50">
+                       
+                    </div>
+
+                    <div class="row mb-50">
+    <div class="col-lg-12 col-md-12">
+        <div class="cart-totals border p-md-4 p-30 border-radius">
+            <!-- Cart Header -->
+            <div class="heading_s1 mb-3">
+                <h4>Cart Totals</h4>
+            </div>
+
+            <!-- Cart Summary Table -->
+            <div class="table-responsive">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <td class="cart_total_label">Cart Subtotal</td>
+                            <td class="cart_total_amount">
+                                <span id="Subtotal" class="font-lg fw-900 text-brand">₹{{subTotal}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="cart_total_label">Shipping</td>
+                            <td class="cart_total_amount">
+                                <span class="font-lg fw-900 text-brand">₹50</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="cart_total_label">Total</td>
+                            <td class="cart_total_amount">
+                                <strong>
+                                    <span id="total" class="font-xl fw-900 text-brand">₹{{add Total 0}}</span>
+                                </strong>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Proceed to Checkout Button -->
+            <a href="javascript:void(0)" class="btn checkout-btn" id="proceedToCheckoutBtn">
+                <i class="fi-rs-box-alt mr-10"></i> Proceed To Checkout
+            </a>
+        </div>
+    </div>
+</div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<style>
+    .cart-container {
+        padding: 20px;
+    }
+    .product-thumbnail img {
+        width: 80px;
+        height: auto;
+        border-radius: 5px;
+    }
+    .quantity-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .btn-quantity {
+        border: none;
+        background: #f5f5f5;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .btn-quantity:hover {
+        background: #ddd;
+    }
+    .num-product {
+        width: 50px;
+        border: none;
+        background: transparent;
+        text-align: center;
+    }
+    .remove-item {
+        color: red;
+        font-size: 18px;
+    }
+    .remove-item:hover {
+        color: darkred;
+    }
+    .btn-shopping {
+        background: #ff6f61;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+    }
+    .btn-shopping:hover {
+        background: #e63946;
+    }
+    .cart-totals {
+        background: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    .cart_total_label {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .cart_total_amount span {
+        color: #e63946;
+    }
+
+    .checkout-btn {
+        display: inline-block;
+        background: #ff6f61;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-align: center;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+    .checkout-btn:hover {
+        background: #e63946;
+    }
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        // Remove item from cart and update subtotal dynamically
+        $('.action').click(function () {
+            var id = $(this).data('product-id');
+            var $row = $(this).closest('tr');
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#088178",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/removeFromCart',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ id: id }),
+                        success: function (response) {
+                            console.log("Product removed from Cart successfully");
+
+                            // Smoothly fade out row and remove it
+                            $row.fadeOut(500, function () {
+                                $(this).remove();
+                                updateCartTotal(); // Recalculate subtotal
+                            });
+
+                            Swal.fire({
+                                title: 'Removed!',
+                                text: 'Product successfully removed from cart!',
+                                icon: 'success',
+                                confirmButtonText: 'Cool'
+                            });
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error removing product from cart:", error);
+                            Swal.fire("Error", "Something went wrong. Please try again later.", "error");
+                        }
+                    });
+                }
+            });
+        });
+
+        // Handle quantity increment and decrement
+        $('.fa-plus, .fa-minus').click(function () {
+            let cartId = $(this).closest('tr').find('.num-product').attr('id');
+            let currentValue = parseInt($(`#${cartId}`).val());
+
+            if ($(this).hasClass('fa-plus')) {
+                if (currentValue >= 5) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Limit Reached',
+                        text: 'You cannot add more than 5 items per product!',
+                    });
+                    return;
+                }
+                currentValue++;
+            } else {
+                if (currentValue > 1) {
+                    currentValue--;
+                }
+            }
+
+            $(`#${cartId}`).val(currentValue);
+            updateCartItemQuantity(cartId, currentValue);
+        });
+
+        // Update cart item quantity in the backend
+       function updateCartItemQuantity(cartId, newValue) {
+    $.ajax({
+        url: '/updatecart',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ cartIdForUpdate: cartId, newValue: newValue }),
+        success: function (data) {
+            console.log("Response from server:", data);
+
+            if (data.success) {
+                // ✅ Update the total per item
+                $(`#totalPerItem-${cartId}`).text(data.updatedItem.totalAmount);
+
+                // ✅ Update subtotal dynamically
+                $('#Subtotal').text(data.subTotal);
+
+                // ✅ Update grand total dynamically
+                let shipping = 50;
+                let grandTotal = parseFloat(data.subTotal.replace("₹", "")) + shipping;
+                $('#total').text(`₹${grandTotal}`);
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: data.message,
+                }).then(() => window.location.reload());
+            }
+        },
+        error: function (error) {
+            console.log("Error updating quantity:", error);
+        },
+    });
+}
+
+
+        // Function to update cart subtotal and total dynamically
+        function updateCartTotal() {
+            let subtotal = 0;
+            
+            $('.shopping-summery tbody tr').each(function () {
+                const itemTotal = parseFloat($(this).find('td[data-title="Cart"] span').text().replace('₹', ''));
+                if (!isNaN(itemTotal)) {
+                    subtotal += itemTotal;
+                }
+            });
+
+            $('#Subtotal').text(`₹${subtotal}`);
+
+            // Add shipping cost
+            const shipping = 50;
+            const total = subtotal + shipping;
+            $('#total').text(`₹${total}`);
+        }
+
+        // Initial cart total calculation
+        updateCartTotal();
+
+        // Proceed to checkout after checking stock availability
+        $('#proceedToCheckoutBtn').on('click', function() {
+            $.ajax({
+                url: '/checkOutOfStock',
+                method: 'POST',
+                contentType: 'application/json',
+                success: function(data) {
+                    console.log("Response from server:", data);
+                    if (!data.success) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: data.message,
+                        });
+                    } else {
+                        window.location.href = "/cart/checkout";
+                    }
+                },
+                error: function(error) {
+                    console.log("Error:", error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Something went wrong, please try again.',
+                    });
+                }
+            });
+        });
+
+    });
+</script>

@@ -5,9 +5,11 @@ const {
   doLogin,
   doLogout,
 } = require("../controllers/admin/adminController");
+
 const { isLogin, isLogout } = require("../middlewares/adminAuth");
 const { usersPage, blockUser } = require("../controllers/admin/UserManagement");
-const uploadImages = require("../middlewares/multer"); // Import updated multer middleware
+const uploadImages = require("../middlewares/multer");
+
 const {
   addCategoryPage,
   addNewCategory,
@@ -16,6 +18,7 @@ const {
   showEditCategory,
   updateCategory,
 } = require("../controllers/admin/categoryManagement");
+
 const {
   showProduct,
   addProductPage,
@@ -26,21 +29,23 @@ const {
   deleteProdImage,
 } = require("../controllers/admin/productManagement");
 
-// Admin Authentication Routes
+const { ordersPage, orderDetails, changeStatus } = require("../controllers/admin/ordersManagement");
+
+// 🔹 Admin Authentication Routes
 router.get("/login", isLogout, getLogin);
 router.post("/login", isLogout, doLogin);
-router.get("/logout", doLogout);
+router.get("/logout", isLogin, doLogout);  // 🔹 Ensure only logged-in admins can log out
 
-// Admin Home Route
+// 🔹 Admin Dashboard
 router.get("/home", isLogin, (req, res) => {
   res.render("admin/home", { layout: "adminLayout" });
 });
 
-// User Management Routes
+// 🔹 User Management
 router.get("/users", isLogin, usersPage);
 router.put("/blockuser", isLogin, blockUser);
 
-// Product Management Routes
+// 🔹 Product Management
 router.get("/product", isLogin, showProduct);
 router.get("/addProduct", isLogin, addProductPage);
 router.post("/addProduct", isLogin, uploadImages.productImages, addProduct);
@@ -50,11 +55,16 @@ router.get("/editProduct/:id", isLogin, showeditProduct);
 router.post("/updateProduct/:id", isLogin, uploadImages.productImages, updateProduct);
 router.delete("/product_img_delete", isLogin, deleteProdImage);
 
-// Category Management Routes
+// 🔹 Category Management
 router.get("/addCategory", isLogin, addCategoryPage);
 router.post("/addCategory", isLogin, uploadImages.categoryImage, addNewCategory);
 router.get("/category", isLogin, showCategoryPage);
 router.get("/editCategory/:id", isLogin, showEditCategory);
 router.post("/updateCategory/:id", isLogin, uploadImages.categoryImage, updateCategory);
+
+// 🔹 Orders Page
+router.get('/orders', isLogin, ordersPage);
+router.get('/order_details/:id', isLogin, orderDetails);
+router.post('/change_status/:id', isLogin, changeStatus);
 
 module.exports = router;

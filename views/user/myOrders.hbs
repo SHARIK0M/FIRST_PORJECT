@@ -1,0 +1,74 @@
+<main class="main">
+    <div class="page-header breadcrumb-wrap bg-light py-3">
+        <div class="container">
+            <div class="breadcrumb d-flex align-items-center">
+                <a href="/" rel="nofollow" class="text-primary">Home</a>
+                <span class="mx-2 text-muted">&gt;</span>
+                <span class="text-secondary">Account</span>
+            </div>
+        </div>
+    </div>
+    <section class="pt-50 pb-150">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 m-auto">
+                    <div class="row">
+                        {{> profileHeader}}
+                        <div class="col-md-9">
+                            <div class="tab-content dashboard-content">
+                                <div class="tab-pane fade active show" id="orders" role="tabpanel">
+                                    <div class="card shadow-sm border-0">
+                                        <div class="card-header bg-primary text-white">
+                                            <h5 class="mb-0">Your Orders</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-hover align-middle">
+                                                    <thead class="bg-light">
+                                                        <tr>
+                                                            <th>Order</th>
+                                                            <th>Date</th>
+                                                            <th>Status</th>
+                                                            <th>Total</th>
+                                                            <th>Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {{#each myOrders}}
+                                                        <tr>
+                                                            <td class="fw-bold">#{{this.orderId}}</td>
+                                                            <td>{{formatDate this.date}}</td>
+                                                            <td>
+                                                                <span class="badge {{#ifEquals this.status 'Delivered'}}bg-success{{else}}bg-warning{{/ifEquals}}">
+                                                                    {{this.status}}
+                                                                </span>
+                                                            </td>
+                                                            <td class="text-success fw-bold">₹{{this.total}}</td>
+                                                            <td>
+                                                                <a href="/orderDetails/{{this._id}}" class="btn btn-sm btn-outline-primary">View</a>
+                                                            </td>
+                                                        </tr>
+                                                        {{/each}}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="pagination-area mt-4 d-flex justify-content-center">
+                                                <nav aria-label="Page navigation">
+                                                    <ul class="pagination">
+                                                        {{#each pages}}
+                                                        <li class="page-item"><a class="page-link" href="?page={{this}}">{{this}}</a></li>
+                                                        {{/each}}
+                                                    </ul>
+                                                </nav>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>

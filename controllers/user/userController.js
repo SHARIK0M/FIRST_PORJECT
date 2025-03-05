@@ -5,6 +5,8 @@ const mongoose = require("mongoose");
 const HttpStatus = require("../../httpStatus");
 const Category = require("../../models/categorySchema");
 const Product = require("../../models/productSchema");
+const Cart = require("../../models/cartSchema");
+
 
 let otp, userOtp, userEmail, hashedPassword, userRegData, userData;
 
@@ -113,30 +115,37 @@ const getLogin = async (req, res) => {
 const doLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    userData = await User.findOne({ email });
+    const userData = await User.findOne({ email });
 
     if (userData && (await argon2.verify(userData.password, password))) {
       if (!userData.isBlocked) {
-        req.session.LoggedIn = true;
-        req.session.user = userData;
-        return res.redirect("/");
+        req.session.regenerate((err) => {
+          if (err) return res.redirect("/login");
+          
+          req.session.user = userData;
+          req.session.admin = null; // ✅ Ensure admin session is cleared
+          req.session.save(() => res.redirect("/"));
+        });
+      } else {
+        req.session.blockMsg = true;
+        res.redirect("/login");
       }
-      req.session.blockMsg = true;
     } else {
       req.session.mailErr = true;
+      res.redirect("/login");
     }
-    res.redirect("/login");
   } catch (error) {
     console.error("Error during login:", error.message);
   }
 };
 
+
 //Handles user logout.
 const doLogout = async (req, res) => {
   try {
-    req.session.user = null;
-    userData = null;
-    res.redirect("/login");
+    req.session.destroy(() => {
+      res.redirect("/login");
+    });
   } catch (error) {
     console.error("Error during logout:", error.message);
   }
@@ -308,8 +317,22 @@ const productDetails = async (req, res) => {
       return res.status(404).send("Product not found");
     }
 
+    // Check if product is in cart
+    let productexistInCart = false;
+    const userData = req.session.user; // Get user session
+
+    if (userData) {
+      const existingCartItem = await Cart.findOne({
+        userId: userData._id,
+        product_Id: productID,
+      });
+
+      productexistInCart = !!existingCartItem; // Convert to boolean
+    }
+
     res.render("user/productDetails", {
       product,
+      productexistInCart, // Pass this to the template
       layout: "layout",
     });
   } catch (error) {

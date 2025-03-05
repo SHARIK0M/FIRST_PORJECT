@@ -38,6 +38,7 @@ const userSchema = new mongoose.Schema(
     history: {
       type: Array,
     },
+    image: { type: String, default: "default.jpg" },
   },
   { timestamps: true }
 );
