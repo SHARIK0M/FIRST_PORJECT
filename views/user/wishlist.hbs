@@ -1,0 +1,241 @@
+<main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="/" rel="nofollow">Home</a>
+                <span> > </span> 
+                <a href="/shop">Shop</a>
+                <span> > </span> Wishlist
+            </div>
+        </div>
+    </div>
+
+    <section class="wishlist-section mt-50 mb-50">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="wishlist-table">
+                        <table class="table shopping-summery text-center">
+                            <thead>
+                                <tr class="main-heading">
+                                    <th scope="col" colspan="2">Product</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Action</th>
+                                    <th scope="col">Remove</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each WishListProd}}
+                                <tr>
+                                    <td class="image product-thumbnail">
+                                        <a href="/productDetails/{{this.productId}}">
+                                            <img src="/assets/imgs/products/{{this.productImage.[0]}}" alt="Product Image">
+                                        </a>
+                                    </td>
+                                    <td class="product-des product-name">
+                                        <h5><a href="/productDetails/{{this.productId}}">{{this.productName}}</a></h5>
+                                    </td>
+                                    <td class="price" data-title="Price">
+                                        <span>₹{{this.productPrice}}</span>
+                                    </td>
+                                    <td class="text-right" data-title="Cart">
+                                        {{#if this.outOfStock}}
+                                            <span id="outofstock">
+                                                <button id="outofstock-btn" class="btn out-of-stock">Out of stock</button>
+                                            </span>
+                                        {{else}}
+                                            {{#if this.ProductExistInCart}}
+                                            <span id="gocart">
+                                                <button id="addcart-btn" onclick="window.location.href='/cart'" class="btn go-to-cart">Go to cart</button>
+                                            </span>
+                                            {{else}}
+                                            <span id="addcart">
+                                                <button id="addcart-btn" data-product-id="{{this.productId}}"  class="button button-add-to-cart">Add to cart</button>
+                                            </span>
+                                            {{/if}}
+                                        {{/if}}
+                                    </td>
+                                    <td class="rem action" data-whishlist-id="{{this._id}}" data-product-id="{{this.productId}}" data-title="Remove">
+                                        <a href="#"><i class="fi-rs-trash"></i></a>
+                                    </td>
+                                </tr>
+                                {{/each}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<style>
+    /* Wishlist Page Styling */
+    .breadcrumb-wrap {
+        background: #f8f9fa;
+        padding: 15px 0;
+        border-bottom: 1px solid #ddd;
+    }
+    .breadcrumb a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .breadcrumb span {
+        color: #6c757d;
+        font-size: 14px;
+        margin: 0 5px;
+    }
+    .wishlist-section {
+        background: #fff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .wishlist-table table {
+        width: 100%;
+        border-collapse: collapse;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .wishlist-table th {
+        background: #e63946;
+        color: white;
+        padding: 12px;
+        text-transform: uppercase;
+    }
+    .wishlist-table td {
+        padding: 15px;
+        border-bottom: 1px solid #ddd;
+    }
+    .product-thumbnail img {
+        width: 80px;
+        height: auto;
+        border-radius: 5px;
+    }
+    .price span {
+        font-weight: bold;
+        color: #333;
+    }
+    .btn {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 5px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    .btn:hover {
+        opacity: 0.8;
+    }
+    .out-of-stock {
+        background-color: #dc3545;
+        color: white;
+    }
+    .go-to-cart {
+        background-color: #28a745;
+        color: white;
+    }
+  
+    .rem a {
+        color: #dc3545;
+        font-size: 18px;
+    }
+    .rem a:hover {
+        color: #b02a37;
+    }
+</style>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+<script>
+    $(document).ready(function () {
+        // Remove from Wishlist
+        $(document).on('click', '.rem', function () {
+            let prodId = $(this).data('product-id');
+            let wishId = $(this).data('whishlist-id');
+            let $this = $(this);
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#088178",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/removeFromWishList',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ id: prodId, wishId: wishId }),
+                        success: function (response) {
+                            $this.closest('tr').remove(); 
+                            Swal.fire("Removed!", "Product successfully removed from wishlist!", "success");
+                        },
+                        error: function () {
+                            Swal.fire("Error", "Something went wrong. Try again later.", "error");
+                        }
+                    });
+                }
+            });
+        });
+
+        // Add to Cart
+        $(document).on('click', '.button-add-to-cart', function () {
+            let prodId = $(this).data('product-id');
+            let $button = $(this);
+
+            $.ajax({
+                url: '/addtocart/' + prodId,
+                method: 'POST',
+                data: { prodId: prodId, quantity: 1 },
+                success: function (result) {
+                    if (result.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Added to cart',
+                            text: result.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+
+                        // Update the button to "Go to Cart"
+                        $button.closest('span').html(`<button class="button button-add-to-cart" onclick="window.location.href='/cart'">Go to cart</button>`);
+                    } else {
+                        Swal.fire("Oops...", result.message, "error");
+                    }
+                },
+                error: function () {
+                    console.log('Error adding to cart');
+                }
+            });
+        });
+
+        // Ensure buttons are updated correctly after refresh
+        function updateWishlistUI() {
+            $.ajax({
+                url: '/getCartItems',  // API to fetch cart items
+                method: 'GET',
+                success: function (cartItems) {
+                    $('.button-add-to-cart').each(function () {
+                        let prodId = $(this).data('product-id');
+                        if (cartItems.includes(prodId)) {
+                            $(this).closest('span').html(`<button class="button button-add-to-cart" onclick="window.location.href='/cart'">Go to cart</button>`);
+                        }
+                    });
+                },
+                error: function () {
+                    console.log("Failed to load cart items");
+                }
+            });
+        }
+
+        updateWishlistUI();  // Call on page load
+    });
+</script>
+

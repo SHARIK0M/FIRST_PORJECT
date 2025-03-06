@@ -16,8 +16,10 @@ const orderSchema = new Schema({
       price: { type: Number },
       quantity: { type: Number },
       image: { type: String },
-      isCancelled:{type:Boolean , default:false},
-      isReturned:{type:Boolean , default:false}
+      isCancelled: { type: Boolean, default: false }, // Add this
+      isReturned: { type: Boolean, default: false }, // Add this
+      cancelReason: { type: String, default: null },  // Store cancel reason
+      returnReason: { type: String, default: null }   // Store return reason
      
     },
   ],
@@ -60,6 +62,8 @@ const orderSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  cancelReason: { type: String, default: null },  // Store reason for entire order cancellation
+  returnReason: { type: String, default: null }   // Store reason for entire order return
 });
 
 const Order = mongoose.model("Order", orderSchema);

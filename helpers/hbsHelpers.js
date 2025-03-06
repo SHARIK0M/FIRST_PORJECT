@@ -25,7 +25,11 @@ function orHelper(Handlebars) {
   });
 }
 
-  
+function registerGtHelper(Handlebars) {
+  Handlebars.registerHelper('gt', function(a, b, options) {
+    return a > b ? options.fn(this) : options.inverse(this);
+  });
+}
 
 // Helper to multiply two values
 function mulHelper(Handlebars) {

@@ -29,6 +29,7 @@
     "passport": "^0.7.0",
     "passport-google-oauth2": "^0.2.0",
     "razorpay": "^2.9.6",
+    "sweetalert2": "^11.17.2",
     "v": "^0.3.0"
   }
 }

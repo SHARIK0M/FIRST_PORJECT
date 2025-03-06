@@ -50,6 +50,9 @@ const {
   payment_failed, cancelOrder, returnOrder, cancelOneProduct, returnOneProduct 
 } = require('../controllers/user/orderManagement');
 
+const { showWishlistPage, addToWishList, removeFromWishList } = require('../controllers/user/wishlistManagement')
+
+
 const uploadImages = require("../middlewares/multer"); // Import updated multer middleware
 
 // 🔹 Google authentication
@@ -126,5 +129,12 @@ router.put('/cancel-order/:id', isBlocked, logedin, cancelOrder);
 router.put('/return-order/:id', isBlocked, logedin, returnOrder);
 router.put('/cancel-one-product', isBlocked, logedin, cancelOneProduct);
 router.put('/return-one-product', isBlocked, logedin, returnOneProduct);
+
+// Wishlist Page
+
+router.get('/wishlist', logedin, isBlocked, showWishlistPage)
+router.post('/addtowishlist', logedin, isBlocked, addToWishList)
+router.post('/removeFromWishList', logedin, isBlocked, removeFromWishList)
+
 
 module.exports = router;

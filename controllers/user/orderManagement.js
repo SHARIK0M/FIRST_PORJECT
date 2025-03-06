@@ -29,33 +29,35 @@ const payment_failed = (req, res) => {
     }
 };
 
-// Cancel the entire order
+// Cancel the entire order with reason
 const cancelOrder = async (req, res) => {
     try {
         const id = req.params.id;  // Get order ID from the route parameters
+        const { reason } = req.body; // Get cancellation reason from request body
+
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ error: 'Invalid order ID' });  // Validate order ID
+            return res.status(400).json({ error: 'Invalid order ID' });
         }
 
-        const ID = new mongoose.Types.ObjectId(id);  // Convert to ObjectId
-        let canceledOrder = await Order.findOne({ _id: ID });  // Find the order by ID
+        const ID = new mongoose.Types.ObjectId(id);
+        let canceledOrder = await Order.findOne({ _id: ID });
 
         if (!canceledOrder) {
-            return res.status(404).json({ error: 'Order not found' });  // If order not found
+            return res.status(404).json({ error: 'Order not found' });
         }
 
-        // Update order status to 'Cancelled'
-        await Order.updateOne({ _id: ID }, { $set: { status: 'Cancelled' } });
+        // Update order status and store cancel reason (only at the order level)
+        await Order.updateOne({ _id: ID }, { $set: { status: 'Cancelled', cancelReason: reason } });
 
-        // Update product stock and cancel product
+        // Update product stock and mark products as cancelled (without storing reason at the product level)
         for (const product of canceledOrder.product) {
             if (!product.isCancelled) {
                 await Product.updateOne(
-                    { _id: product._id },
-                    { $inc: { stock: product.quantity }, $set: { isCancelled: true } }
+                    { _id: product.id },
+                    { $inc: { stock: product.quantity } }
                 );
                 await Order.updateOne(
-                    { _id: ID, 'product._id': product._id },
+                    { _id: ID, 'product.id': product.id },
                     { $set: { 'product.$.isCancelled': true } }
                 );
             }
@@ -71,29 +73,35 @@ const cancelOrder = async (req, res) => {
     }
 };
 
-// Return the entire order
+// Return the entire order with reason
 const returnOrder = async (req, res) => {
     try {
         const id = req.params.id;  // Get order ID from route parameters
+        const { reason } = req.body; // Get return reason from request body
+
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ error: 'Invalid order ID' });  // Validate order ID
+            return res.status(400).json({ error: 'Invalid order ID' });
         }
 
         const ID = new mongoose.Types.ObjectId(id);
-        let returnedOrder = await Order.findOne({ _id: ID }).lean();  // Find order by ID
+        let returnedOrder = await Order.findOne({ _id: ID });
 
-        // Update order status to 'Returned'
-        const returnedorder = await Order.findByIdAndUpdate(ID, { $set: { status: 'Returned' } }, { new: true });
+        if (!returnedOrder) {
+            return res.status(404).json({ error: 'Order not found' });
+        }
 
-        // Update product stock and set 'isReturned' flag
-        for (const product of returnedorder.product) {
-            if (!product.isCancelled) {
+        // Update order status and store return reason (only at the order level)
+        await Order.updateOne({ _id: ID }, { $set: { status: 'Returned', returnReason: reason } });
+
+        // Update product stock and mark products as returned (without storing reason at the product level)
+        for (const product of returnedOrder.product) {
+            if (!product.isReturned) {
                 await Product.updateOne(
-                    { _id: product._id },
+                    { _id: product.id },
                     { $inc: { stock: product.quantity } }
                 );
                 await Order.updateOne(
-                    { _id: ID, 'product._id': product._id },
+                    { _id: ID, 'product.id': product.id },
                     { $set: { 'product.$.isReturned': true } }
                 );
             }
@@ -101,30 +109,35 @@ const returnOrder = async (req, res) => {
 
         res.json({
             success: true,
-            message: 'Successfully Returned Order'
+            message: 'Successfully returned Order'
         });
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Internal Server Error');
-    
     }
 };
 
-// Cancel a single product in the order
+
+
 const cancelOneProduct = async (req, res) => {
     try {
-        const { id, prodId } = req.body;  // Get order and product IDs from request body
+        const { id, prodId, reason } = req.body;  // Get reason from request body
         if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(prodId)) {
-            return res.status(400).json({ error: 'Invalid order or product ID' });  // Validate IDs
+            return res.status(400).json({ error: 'Invalid order or product ID' });
         }
 
         const ID = new mongoose.Types.ObjectId(id);
         const PRODID = new mongoose.Types.ObjectId(prodId);
 
-        // Update product's 'isCancelled' status in order
         const updatedOrder = await Order.findOneAndUpdate(
             { _id: ID, 'product._id': PRODID },
-            { $set: { 'product.$.isCancelled': true } },
+            { 
+                $set: { 
+                    'product.$.isCancelled': true, 
+                    'product.$.status': "Canceled", 
+                    'product.$.cancelReason': reason 
+                } 
+            },
             { new: true }
         ).lean();
 
@@ -132,23 +145,49 @@ const cancelOneProduct = async (req, res) => {
             return res.status(404).json({ error: 'Order or product not found' });
         }
 
-        const result = await Order.findOne({ _id: ID, 'product._id': PRODID }, { 'product.$': 1 }).lean();
+        // Verify if status is updated
+        console.log("Updated Order:", updatedOrder);
+
+        // Fetch the updated product details
+        const result = await Order.findOne(
+            { _id: ID, 'product._id': PRODID }, 
+            { 'product.$': 1 }
+        ).lean();
+
+        console.log("Product after update:", result);
+
         const productQuantity = result.product[0].quantity;
         const productPrice = result.product[0].price * productQuantity;
 
-        // Update product stock and user wallet
-        await Product.findOneAndUpdate({ _id: PRODID }, { $inc: { stock: productQuantity } });
-        await User.updateOne({ _id: req.session.user._id }, { $inc: { wallet: productPrice } });
-        
-        // Add refund history for the user
+        // Update product stock
+        await Product.findOneAndUpdate(
+            { _id: PRODID },
+            { $inc: { stock: productQuantity } }
+        );
+
+        // Refund user
         await User.updateOne(
             { _id: req.session.user._id },
-            { $push: { history: { amount: productPrice, status: `refund of: ${result.product[0].name}`, date: Date.now() } } }
+            { $inc: { wallet: productPrice } }
+        );
+
+        // Add refund history
+        await User.updateOne(
+            { _id: req.session.user._id },
+            { 
+                $push: { 
+                    history: { 
+                        amount: productPrice, 
+                        status: `Refund of: ${result.product[0].name}`, 
+                        date: Date.now() 
+                    } 
+                } 
+            }
         );
 
         res.json({
             success: true,
-            message: 'Successfully removed product'
+            message: 'Successfully canceled product'
         });
     } catch (error) {
         console.log(error.message);
@@ -159,18 +198,23 @@ const cancelOneProduct = async (req, res) => {
 // Return a single product in the order
 const returnOneProduct = async (req, res) => {
     try {
-        const { id, prodId } = req.body;  // Get order and product IDs from request body
+        const { id, prodId, reason } = req.body;  // Get reason from request body
         if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(prodId)) {
-            return res.status(400).json({ error: 'Invalid order or product ID' });  // Validate IDs
+            return res.status(400).json({ error: 'Invalid order or product ID' });
         }
 
         const ID = new mongoose.Types.ObjectId(id);
         const PRODID = new mongoose.Types.ObjectId(prodId);
 
-        // Update product's 'isReturned' status in order
         const updatedOrder = await Order.findOneAndUpdate(
             { _id: ID, 'product._id': PRODID },
-            { $set: { 'product.$.isReturned': true } },
+            { 
+                $set: { 
+                    'product.$.isReturned': true, 
+                    'product.$.status': "Returned", 
+                    'product.$.returnReason': reason 
+                } 
+            },
             { new: true }
         ).lean();
 
@@ -178,15 +222,37 @@ const returnOneProduct = async (req, res) => {
             return res.status(404).json({ error: 'Order or product not found' });
         }
 
-        const result = await Order.findOne({ _id: ID, 'product._id': PRODID }, { 'product.$': 1 }).lean();
+        console.log("Updated Order:", updatedOrder);
+
+        // Fetch the updated product details
+        const result = await Order.findOne(
+            { _id: ID, 'product._id': PRODID }, 
+            { 'product.$': 1 }
+        ).lean();
+
+        console.log("Product after update:", result);
+
         const productQuantity = result.product[0].quantity;
         const productPrice = result.product[0].price * productQuantity;
 
-        // Update product stock and add return history for the user
-        await Product.findOneAndUpdate({ _id: PRODID }, { $inc: { stock: productQuantity } });
+        // Update product stock
+        await Product.findOneAndUpdate(
+            { _id: PRODID },
+            { $inc: { stock: productQuantity } }
+        );
+
+        // Add refund history
         await User.updateOne(
             { _id: req.session.user._id },
-            { $push: { history: { amount: productPrice, status: `[return]refund of: ${result.product[0].name}`, date: Date.now() } } }
+            { 
+                $push: { 
+                    history: { 
+                        amount: productPrice, 
+                        status: `[return] Refund of: ${result.product[0].name}`, 
+                        date: Date.now() 
+                    } 
+                } 
+            }
         );
 
         res.json({
