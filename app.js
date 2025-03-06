@@ -75,10 +75,11 @@ app.use((req, res, next) => {
   }
 });
 
+
 // 🔹 Admin Session Middleware (Exclusive to Admin Routes)
 const adminSession = session({
   name: "adminSessionID", // ✅ Unique session name for admins
-  secret: process.env.SECRET_KEY + "_admin",
+  secret: process.env.SECRET_KEYY + "_admin",
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({ mongoUrl: process.env.MONGO_URI, collectionName: "adminSessions" }),

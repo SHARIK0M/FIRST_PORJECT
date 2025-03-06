@@ -25,42 +25,52 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {{#each WishListProd}}
-                                <tr>
-                                    <td class="image product-thumbnail">
-                                        <a href="/productDetails/{{this.productId}}">
-                                            <img src="/assets/imgs/products/{{this.productImage.[0]}}" alt="Product Image">
-                                        </a>
-                                    </td>
-                                    <td class="product-des product-name">
-                                        <h5><a href="/productDetails/{{this.productId}}">{{this.productName}}</a></h5>
-                                    </td>
-                                    <td class="price" data-title="Price">
-                                        <span>₹{{this.productPrice}}</span>
-                                    </td>
-                                    <td class="text-right" data-title="Cart">
-                                        {{#if this.outOfStock}}
-                                            <span id="outofstock">
-                                                <button id="outofstock-btn" class="btn out-of-stock">Out of stock</button>
-                                            </span>
-                                        {{else}}
-                                            {{#if this.ProductExistInCart}}
-                                            <span id="gocart">
-                                                <button id="addcart-btn" onclick="window.location.href='/cart'" class="btn go-to-cart">Go to cart</button>
-                                            </span>
-                                            {{else}}
-                                            <span id="addcart">
-                                                <button id="addcart-btn" data-product-id="{{this.productId}}"  class="button button-add-to-cart">Add to cart</button>
-                                            </span>
-                                            {{/if}}
-                                        {{/if}}
-                                    </td>
-                                    <td class="rem action" data-whishlist-id="{{this._id}}" data-product-id="{{this.productId}}" data-title="Remove">
-                                        <a href="#"><i class="fi-rs-trash"></i></a>
-                                    </td>
-                                </tr>
-                                {{/each}}
-                            </tbody>
+    {{#if isWishlistEmpty}}
+        <tr>
+            <td colspan="5" class="text-center">
+                <h4>Your wishlist is empty</h4>
+                <a href="/shop" class="btn mt-2" style="background-color: #e63946;">Go to Shop</a>
+            </td>
+        </tr>
+    {{else}}
+        {{#each WishListProd}}
+        <tr>
+            <td class="image product-thumbnail">
+                <a href="/productDetails/{{this.productId}}">
+                    <img src="/assets/imgs/products/{{this.productImage.[0]}}" alt="Product Image">
+                </a>
+            </td>
+            <td class="product-des product-name">
+                <h5><a href="/productDetails/{{this.productId}}">{{this.productName}}</a></h5>
+            </td>
+            <td class="price" data-title="Price">
+                <span>₹{{this.productPrice}}</span>
+            </td>
+            <td class="text-right" data-title="Cart">
+                {{#if this.outOfStock}}
+                    <span id="outofstock">
+                        <button id="outofstock-btn" class="btn out-of-stock">Out of stock</button>
+                    </span>
+                {{else}}
+                    {{#if this.ProductExistInCart}}
+                    <span id="gocart">
+                        <button id="addcart-btn" onclick="window.location.href='/cart'" class="btn go-to-cart">Go to cart</button>
+                    </span>
+                    {{else}}
+                    <span id="addcart">
+                        <button id="addcart-btn" data-product-id="{{this.productId}}"  class="button button-add-to-cart">Add to cart</button>
+                    </span>
+                    {{/if}}
+                {{/if}}
+            </td>
+            <td class="rem action" data-whishlist-id="{{this._id}}" data-product-id="{{this.productId}}" data-title="Remove">
+                <a href="#"><i class="fi-rs-trash"></i></a>
+            </td>
+        </tr>
+        {{/each}}
+    {{/if}}
+</tbody>
+
                         </table>
                     </div>
                 </div>

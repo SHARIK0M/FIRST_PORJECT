@@ -75,10 +75,10 @@ const showWishlistPage = async (req, res) => {
       console.log(WishListProd, "WishListProd");
 
       if (WishListProd.length > 0) {
-          res.render('user/wishlist', { userData, WishListProd, wishCt: wishlistCount });
-      } else {
-          res.render('user/emptyWishlist', { userData });
-      }
+        res.render('user/wishlist', { userData, WishListProd, wishCt: wishlistCount, isWishlistEmpty: false });
+    } else {
+        res.render('user/wishlist', { userData, isWishlistEmpty: true });
+    }
   } catch (error) {
       console.log(error.message);
       res.status(500).send("Internal Server Error");

@@ -334,6 +334,7 @@ const productDetails = async (req, res) => {
       product,
       productexistInCart, // Pass this to the template
       layout: "layout",
+      userData
     });
   } catch (error) {
     console.error(error);

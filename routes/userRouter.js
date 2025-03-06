@@ -47,7 +47,7 @@ const {
 } = require('../controllers/user/checkoutManagement');
 
 const { 
-  payment_failed, cancelOrder, returnOrder, cancelOneProduct, returnOneProduct 
+  payment_failed, cancelOrder, returnOrder, cancelOneProduct, returnOneProduct ,generateInvoice
 } = require('../controllers/user/orderManagement');
 
 const { showWishlistPage, addToWishList, removeFromWishList } = require('../controllers/user/wishlistManagement')
@@ -90,7 +90,7 @@ router.get('/shop', getProduct);
 router.post('/search', searchAndSort);
 
 // 🔹 Product Detail Page
-router.get('/productDetails/:id', productDetails);
+router.get('/productDetails/:id',logedin, productDetails);
 
 // 🔹 User Profile Page (Ensure blocked users can't access)
 router.get('/profile', isBlocked, logedin, viewUserProfile);
@@ -135,6 +135,8 @@ router.put('/return-one-product', isBlocked, logedin, returnOneProduct);
 router.get('/wishlist', logedin, isBlocked, showWishlistPage)
 router.post('/addtowishlist', logedin, isBlocked, addToWishList)
 router.post('/removeFromWishList', logedin, isBlocked, removeFromWishList)
+
+router.get('/get_invoice', logedin, isBlocked, generateInvoice)
 
 
 module.exports = router;
