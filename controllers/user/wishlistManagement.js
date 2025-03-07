@@ -1,7 +1,4 @@
 const Cart = require("../../models/cartSchema");
-const Product = require("../../models/productSchema");
-const Category = require("../../models/categorySchema");
-const User = require("../../models/userSchema");
 const Wishlist = require('../../models/wishlistSchema')
 const HttpStatus = require('../../httpStatus');
 

@@ -1,9 +1,5 @@
-const Category = require("../../models/categorySchema");
-const Product = require("../../models/productSchema");
 const User = require("../../models/userSchema");
 const { Address } = require("../../models/addressSchema");
-const userHelper = require("../../helpers/user.helper");
-const Cart = require("../../models/cartSchema");
 const Order = require("../../models/orderSchema");
 const argon2 = require("argon2");
 const mongoose = require("mongoose");
@@ -199,6 +195,7 @@ const orderDetails = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+
 
 module.exports = {
   viewUserProfile,

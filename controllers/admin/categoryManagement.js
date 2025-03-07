@@ -1,7 +1,4 @@
 const Category = require("../../models/categorySchema");
-const fs = require("fs");
-const path = require("path");
-const Product = require("../../models/productSchema");
 const productModel = require("../../models/productSchema");
 const HttpStatus = require("../../httpStatus");
 

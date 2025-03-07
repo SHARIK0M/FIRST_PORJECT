@@ -4,10 +4,9 @@ const Category = require("../../models/categorySchema");
 const User = require("../../models/userSchema");
 const { Address } = require("../../models/addressSchema");
 const Order = require("../../models/orderSchema");
-const Razorpay = require('razorpay');
 
 const mongoose = require("mongoose");
-const ObjectId = require("mongoose");
+
 
 const loadCheckoutPage = async (req, res) => {
   try {
@@ -150,7 +149,7 @@ const placeorder = async (req, res) => {
 
     // Apply coupon if present
     let finalTotal = totalamount;
-    let discountAmt = 0;
+
 
     const DELIVERY_CHARGE = 50;
     const grandTotal = finalTotal + DELIVERY_CHARGE;
@@ -209,8 +208,6 @@ const placeorder = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
-
-
 
 
 const orderSuccess = async (req, res) => {

@@ -5,9 +5,6 @@ const HttpStatus = require('../../httpStatus');
 
 
 
-
-
-
 const getProduct = async (req, res) => {
   try {
     const userData = req.session.user;
@@ -42,7 +39,7 @@ const getProduct = async (req, res) => {
 
 const searchAndSort = async (req, res) => {
   const { searchQuery, sortOption, categoryFilter, page, limit } = req.body;
-
+console.log(sortOption)
   const matchStage = { $match: {isBlocked: false} };
   if (searchQuery) {
     matchStage.$match.name = { $regex: searchQuery, $options: "i" };
@@ -95,20 +92,8 @@ const searchAndSort = async (req, res) => {
         preserveNullAndEmptyArrays: true, 
       },
     },
-    {
-      $lookup: {
-        from: "productoffers",  
-        localField: "_id",  
-        foreignField: "productId",  
-        as: "productOffer",
-      },
-    },
-    {
-      $unwind: {
-        path: "$productOffer",
-        preserveNullAndEmptyArrays: true, 
-      },
-    },
+    
+    
     {
       $project: {
         _id: 1,

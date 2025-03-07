@@ -1,7 +1,6 @@
 const userHelper = require("../../helpers/user.helper");
 const User = require("../../models/userSchema");
-const argon = require("argon2");
-const HttpStatus = require("../../httpStatus");
+
 
 // Render Email Submission Page for Forgot Password
 const submitMail = async (req, res) => {
@@ -41,9 +40,6 @@ const submitMailPost = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
-
-
-
 
 // Render OTP Submission Page
 const forgotOtppage = async (req, res) => {
@@ -91,9 +87,6 @@ const forgotOtpSubmit = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
-
-
 
 // Resend OTP for Forgot Password
 const resendOTP = async (req, res) => {

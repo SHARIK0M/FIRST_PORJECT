@@ -1,7 +1,3 @@
-// Import necessary models
-const Cart = require("../../models/cartSchema");
-const Product = require("../../models/productSchema");
-const Category = require("../../models/categorySchema");
 const User = require("../../models/userSchema");
 const { Address } = require("../../models/addressSchema");
 const Order = require("../../models/orderSchema");

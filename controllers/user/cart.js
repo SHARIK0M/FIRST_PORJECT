@@ -172,7 +172,6 @@ const updateCart = async (req, res) => {
 };
 
 
-
 // Check if any product in the cart is out of stock
 const checkOutOfStock = async (req, res) => {
   try {
