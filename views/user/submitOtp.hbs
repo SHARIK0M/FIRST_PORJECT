@@ -100,22 +100,28 @@
 
   // Start Countdown Function
   function startCountdown() {
-    clearInterval(countdownInterval);
-    countdown = 60;
-    timerElement.textContent = countdown;
-    timerText.style.display = "block";
-    disableResendButton();
+  clearInterval(countdownInterval);
+  countdown = 60;
+  timerElement.textContent = countdown;
+  timerText.style.display = "block";
+  disableResendButton();
 
-    countdownInterval = setInterval(() => {
-      countdown--;
-      timerElement.textContent = countdown;
-      if (countdown <= 0) {
-        clearInterval(countdownInterval);
-        timerText.style.display = "none";
-        enableResendButton();
-      }
-    }, 1000);
-  }
+  countdownInterval = setInterval(() => {
+    countdown--;
+    timerElement.textContent = countdown;
+    
+    if (countdown <= 0) {
+      clearInterval(countdownInterval);
+      timerText.style.display = "none";
+      enableResendButton();
+
+      // Show OTP expiration message
+      const otpError = document.getElementById("otp-error");
+      otpError.textContent = "OTP expired. Please request a new OTP.";
+      otpError.style.color = "red";
+    }
+  }, 1000);
+}
 
   // Disable Resend Button
   function disableResendButton() {

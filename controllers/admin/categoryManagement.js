@@ -55,10 +55,14 @@ const addCategoryPage = (req, res) => {
 // Add New Category
 const addNewCategory = async (req, res) => {
   try {
+    if (!req.file) {
+      return res.status(400).json({ error: "Invalid image type. Please upload a valid JPG, PNG, or GIF." });
+    }
+
     const catName = req.body.name;
     const image = req.file;
     const catExist = await Category.findOne({ category: { $regex: new RegExp(`^${catName}$`, "i") } });
-    
+
     if (!catExist) {
       const category = new Category({ category: catName, imageUrl: image.filename });
       await category.save();
@@ -66,12 +70,14 @@ const addNewCategory = async (req, res) => {
     } else {
       req.session.catExist = true;
     }
+
     res.redirect("/admin/addCategory");
   } catch (error) {
     console.error("Error adding category:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
 
 // Toggle Category Listing Status
 const unListCategory = async (req, res) => {

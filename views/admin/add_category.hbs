@@ -38,7 +38,8 @@
                             <!-- Category Image Upload -->
                             <div class="mb-4">
                                 <label for="categoryImage" class="form-label">Category Image:</label>
-                                <input type="file" class="form-control-file" name="image" accept="image/*" id="category_image" />
+                               <input type="file" class="form-control-file" name="image" id="productImage" onchange="validateFile()">
+                                <div class="error" style="color: red;" id="fileError"></div>
                             </div>
                             
                             <!-- Action Buttons -->
@@ -64,13 +65,16 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
+
 <script>
+    // Handle back button click with a confirmation alert
     $(document).ready(function () {
         $('#backbutton').click(function (e) {
             e.preventDefault();
+
             Swal.fire({
                 title: "Leave the page?",
-                text: "The Data will not be saved",
+                text: "Unsaved data will be lost.",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#088178",
@@ -82,5 +86,43 @@
                 }
             });
         });
-    })
+    });
+</script>
+
+<script>
+    // Validate category name input
+    function Validation() {
+        let errors = [];
+
+        var name = document.getElementById('productName').value;
+        var nameError = document.getElementById('nameError');
+        var categoryPattern = /^[a-zA-Z]{4,}(?: [a-zA-Z]+)*$/; // At least 4 letters, spaces allowed
+
+        if (!name.match(categoryPattern)) {
+            errors.push("Invalid name format");
+        }
+
+        if (errors.length > 0) {
+            nameError.innerHTML = errors.includes("Invalid name format") ? "Invalid name format" : "";
+            return false; // Prevent form submission
+        }
+        return true;
+    }
+
+    // Validate file upload (only image formats allowed)
+    function validateFile() {
+        const fileInput = document.getElementById('productImage');
+        const fileError = document.getElementById('fileError');
+        const filePath = fileInput.value;
+        const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
+
+        if (!allowedExtensions.exec(filePath)) {
+            fileError.innerHTML = "Invalid file type. Upload JPG, JPEG, PNG, or GIF.";
+            fileInput.value = ''; // Clear file input
+            return false;
+        } else {
+            fileError.innerHTML = ""; // Clear error message
+            return true;
+        }
+    }
 </script>

@@ -19,14 +19,26 @@ const loadCheckoutPage = async (req, res) => {
 
     const subTotal = await Cart.aggregate([
       {
-        $match: {
-          userId: ID,
+        $match: { userId: ID },
+      },
+      {
+        $lookup: {
+          from: "products",
+          foreignField: "_id",
+          localField: "product_Id",
+          as: "productData",
+        },
+      },
+      {
+        $project: {
+          productPrice: { $arrayElemAt: ["$productData.price", 0] }, 
+          quantity: 1,
         },
       },
       {
         $group: {
           _id: null,
-          total: { $sum: "$value" },
+          total: { $sum: { $multiply: ["$productPrice", "$quantity"] } },
         },
       },
       {
@@ -36,6 +48,7 @@ const loadCheckoutPage = async (req, res) => {
         },
       },
     ]);
+    
     let cart = await Cart.aggregate([
       {
         $match: {

@@ -22,9 +22,15 @@ const submitMailPost = async (req, res) => {
     const userData = await User.findOne({ email }).lean();
 
     if (userData) {
-      const otp = await userHelper.verifyEmail(email);
+      const otpResponse = await userHelper.verifyEmail(email);
+      const otp = otpResponse.otp || otpResponse; // Extract OTP value if it's inside an object
+
+      console.log("Generated OTP:", otp);
+
       req.session.userResetData = { email };
-      req.session.otp = otp;
+      req.session.otp = String(otp); // Store only the OTP as a string
+      req.session.otpTimestamp = Date.now() + 60 * 1000; // OTP expires in 60 seconds
+
       res.redirect("/otp");
     } else {
       req.session.mailError = true;
@@ -35,6 +41,9 @@ const submitMailPost = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+
+
+
 
 // Render OTP Submission Page
 const forgotOtppage = async (req, res) => {
@@ -52,16 +61,29 @@ const forgotOtppage = async (req, res) => {
 const forgotOtpSubmit = async (req, res) => {
   try {
     const { otp } = req.body;
-    const storedOtp = req.session.otp;
+    let storedOtp = req.session.otp;
+    const otpTimestamp = req.session.otpTimestamp;
 
-    if (!storedOtp) {
+
+    if (!storedOtp || !otpTimestamp) {
+      console.log("Error: OTP session expired or not found.");
       return res.status(400).json({ error: "Session expired. Please request a new OTP." });
     }
 
-    if (otp.trim() === storedOtp.toString().trim()) {
-      req.session.otp = null; // Clear OTP after successful verification
-      return res.status(200).json({ redirect: "/resetPassword" });
+    if (Date.now() > otpTimestamp) {
+      console.log("Error: OTP expired.");
+      req.session.otp = null;
+      req.session.otpTimestamp = null;
+      return res.status(400).json({ error: "OTP expired. Please request a new one." });
+    }
+
+    storedOtp = String(storedOtp); // Convert stored OTP to a string
+    if (otp.trim() === storedOtp.trim()) {
+      req.session.otp = null;
+      req.session.otpTimestamp = null;
+      return res.json({ redirect: "/resetPassword" });
     } else {
+      console.log("❌ Error: Invalid OTP entered.");
       return res.status(400).json({ error: "Invalid OTP. Please try again." });
     }
   } catch (error) {
@@ -72,29 +94,32 @@ const forgotOtpSubmit = async (req, res) => {
 
 
 
+
 // Resend OTP for Forgot Password
 const resendOTP = async (req, res) => {
   try {
     const email = req.session.userResetData?.email;
     if (!email) {
-      return res
-        .status(400)
-        .json({
-          error: "No email found in session. Please submit your email first.",
-        });
+      console.log("Error: No email found in session.");
+      return res.status(400).json({ error: "No email found in session. Please submit your email first." });
     }
 
-    const otp = await userHelper.verifyEmail(email);
-    req.session.otp = otp;
-    req.session.otpTimestamp = Date.now();
+    const otpResponse = await userHelper.verifyEmail(email);
+    const otp = otpResponse.otp || otpResponse; // Extract OTP value if it's inside an object
+
+    console.log("Generated Resend OTP:", otp);
+
+    req.session.otp = String(otp); // Store only the OTP as a string
+    req.session.otpTimestamp = Date.now() + 60 * 1000; // Reset OTP expiry
+
+
     return res.json({ success: true, message: "OTP resent successfully" });
   } catch (error) {
     console.error("Error resending OTP:", error);
-    return res
-      .status(500)
-      .json({ error: "Error resending OTP. Please try again later." });
+    return res.status(500).json({ error: "Error resending OTP. Please try again later." });
   }
 };
+
 
 // Render Reset Password Page
 const resetPasswordPage = async (req, res) => {

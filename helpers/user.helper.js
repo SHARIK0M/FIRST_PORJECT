@@ -1,45 +1,40 @@
 const nodemailer = require("nodemailer");
 const argon2 = require("argon2");
 
-// Function to send an OTP to the provided email
+// Function to send an OTP to the provided email and store it in session
 const verifyEmail = async (email) => {
   try {
-    const otp = generateOtp();
-    console.log("Sending OTP to:", email);
+    if (!email) {
+      console.error("❌ Email is required for OTP verification.");
+      return { otp: null, otpTimestamp: null };
+    }
 
-    // Email transporter configuration
+    const otp = generateOtp();
+    const otpTimestamp = Date.now();
+    console.log("✅ Sending OTP to:", email);
+
     const transporter = nodemailer.createTransport({
       service: "gmail",
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      requireTLS: true,
       auth: {
         user: process.env.USER_MAIL,
         pass: process.env.USER_PASS,
       },
     });
 
-    // Email content
     const mailOptions = {
       from: process.env.USER_MAIL,
-      to: email,
+      to: email, // Ensure email is correctly passed
       subject: "OTP Verification",
-      text: `Welcome to Floritta! Your OTP is: ${otp}`,
+      text: `Your OTP for Floritta is: ${otp}`,
     };
 
-    // Send OTP email
-    transporter.sendMail(mailOptions, (error) => {
-      if (error) {
-        console.error("Error sending email:", error);
-      } else {
-        console.log("OTP email has been sent successfully:", otp);
-      }
-    });
+    await transporter.sendMail(mailOptions);
+    console.log("✅ OTP email sent successfully:", otp);
 
-    return otp;
+    return { otp, otpTimestamp };
   } catch (error) {
-    console.error("Error in verifyEmail function:", error);
+    console.error("❌ Error in verifyEmail function:", error);
+    return { otp: null, otpTimestamp: null }; // Return null values on failure
   }
 };
 

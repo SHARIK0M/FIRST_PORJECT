@@ -133,8 +133,7 @@ router.put('/return-order/:id', isBlocked, logedin, returnOrder);
 router.put('/cancel-one-product', isBlocked, logedin, cancelOneProduct);
 router.put('/return-one-product', isBlocked, logedin, returnOneProduct);
 
-// Wishlist Page
-
+// 🔹 Wishlist Page
 router.get('/wishlist', logedin, isBlocked, showWishlistPage)
 router.post('/addtowishlist', logedin, isBlocked, addToWishList)
 router.post('/removeFromWishList', logedin, isBlocked, removeFromWishList)

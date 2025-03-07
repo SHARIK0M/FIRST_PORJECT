@@ -171,32 +171,30 @@ const doSignup = async (req, res) => {
     const mobileExist = await User.findOne({ mobile: userMobile }).lean();
 
     if (!userExist && !mobileExist) {
-      const otp = await userHelper.verifyEmail(userEmail); // Generate OTP
+      const { otp, otpTimestamp } = await userHelper.verifyEmail(userEmail);
 
-      // Store important user data in session
+      if (!otp) {
+        return res.render("user/signup", { message: "Error generating OTP. Try again." });
+      }
+
       req.session.userEmail = userEmail;
       req.session.userRegData = userRegData;
       req.session.hashedPassword = hashedPassword;
-      req.session.otp = otp; // Store OTP for verification
+      req.session.otp = otp;
+      req.session.otpTimestamp = otpTimestamp;
 
-      console.log("OTP Sent:", otp);
       return res.render("user/submitOtp");
     }
 
-    // Error messages for existing users
-    const messages = {
-      message: userExist ? "!!User Already Exist!!" : "",
-      message1: mobileExist ? "!!Mobile Number Already Exist!!" : "",
-    };
-
-    res.render("user/signup", messages);
-  } catch (error) {
-    console.error("Error during signup:", error.message);
     res.render("user/signup", {
-      message: "An error occurred. Please try again.",
+      message: userExist ? "!!User Already Exists!!" : "",
+      message1: mobileExist ? "!!Mobile Number Already Exists!!" : "",
     });
+  } catch (error) {
+    res.render("user/signup", { message: "An error occurred. Please try again." });
   }
 };
+
 
 
 //Renders the OTP submission page
@@ -213,13 +211,23 @@ const submitOtp = async (req, res) => {
   try {
     let userOtp = req.body.otp;
 
-    if (!req.session.otp) {
+    if (!req.session.otp || !req.session.otpTimestamp) {
       return res.status(400).json({ error: "Session expired. Please request a new OTP." });
+    }
+
+    if (Date.now() - req.session.otpTimestamp > 60000) {
+      req.session.otp = null;
+      req.session.otpTimestamp = null;
+      return res.status(400).json({ error: "OTP expired. Please request a new OTP." });
     }
 
     userOtp = Array.isArray(userOtp) ? userOtp.join("") : userOtp.toString().trim();
 
     if (userOtp === req.session.otp.toString().trim()) {
+      if (!req.session.userRegData) {
+        return res.status(400).json({ error: "Session expired. Please start the registration process again." });
+      }
+
       const newUser = new User({
         name: req.session.userRegData.name,
         email: req.session.userRegData.email,
@@ -231,12 +239,12 @@ const submitOtp = async (req, res) => {
 
       await newUser.save();
       req.session.regSuccessMsg = true;
-
       req.session.otp = null;
+      req.session.otpTimestamp = null;
       req.session.userRegData = null;
       req.session.hashedPassword = null;
 
-      return res.status(200).json({ success: true, redirectUrl: "/login" }); 
+      return res.status(200).json({ success: true, redirectUrl: "/login" });
     } else {
       return res.status(400).json({ error: "Incorrect OTP" });
     }
@@ -245,29 +253,35 @@ const submitOtp = async (req, res) => {
   }
 };
 
-//Resends OTP to the user.
+// Resends OTP to the user.
 const resendOtp = async (req, res) => {
   try {
     if (!req.session.userRegData || !req.session.userRegData.email) {
-      return res
-        .status(400)
-        .json({ error: "User email not found in session." });
+      return res.status(400).json({ error: "User email not found in session." });
     }
 
-    const userEmail = req.session.userRegData.email;
+    const userEmail = req.session.userRegData.email.trim();
+    if (!userEmail) {
+      return res.status(400).json({ error: "Invalid email address." });
+    }
 
-    // Generate new OTP and update session
-    const newOtp = await userHelper.verifyEmail(userEmail);
-    req.session.otp = newOtp;
+    const { otp, otpTimestamp } = await userHelper.verifyEmail(userEmail);
+    if (!otp) {
+      return res.status(500).json({ error: "Failed to generate OTP. Try again." });
+    }
 
-    console.log("New OTP sent to:", userEmail, newOtp);
+    req.session.otp = otp;
+    req.session.otpTimestamp = otpTimestamp;
 
     return res.json({ success: true, message: "OTP resent successfully" });
   } catch (error) {
-    console.error("Error resending OTP:", error.message);
     return res.status(500).json({ error: "Failed to resend OTP" });
   }
 };
+
+
+
+
 
 
 //Handles Google authentication callback.

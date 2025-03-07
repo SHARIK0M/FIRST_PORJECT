@@ -17,7 +17,10 @@ const cors = require('cors');
 
 // 🔹 Connect to Database
 connectDB();
-app.use(cors());
+app.use(cors({
+  origin: process.env.CLIENT_URL || "http://localhost:2000",
+  credentials: true,
+}));
 // 🔹 Static files middleware
 app.use(express.static(path.join(__dirname, "public")));
 
