@@ -142,7 +142,7 @@ otpForm.addEventListener("submit", async function (event) {
             resendMessage.textContent = "Resending OTP...";
             resendMessage.style.color = "blue";
 
-            const response = await fetch("/resend_OTP", {
+            const response = await fetch("/otp/resend", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
             });

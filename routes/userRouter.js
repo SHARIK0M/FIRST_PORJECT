@@ -25,6 +25,8 @@ const {
   forgotOtpSubmit,
   resetPasswordPage,
   resetPassword,
+  resendOTP
+ 
 } = require("../controllers/user/forgotPassword");
 
 const { getProduct, searchAndSort } = require("../controllers/user/shopManagement");
@@ -50,7 +52,7 @@ const {
   payment_failed, cancelOrder, returnOrder, cancelOneProduct, returnOneProduct ,generateInvoice
 } = require('../controllers/user/orderManagement');
 
-const { showWishlistPage, addToWishList, removeFromWishList } = require('../controllers/user/wishlistManagement')
+const { showWishlistPage, addToWishList, removeFromWishList,checkWishlist } = require('../controllers/user/wishlistManagement')
 
 
 const uploadImages = require("../middlewares/multer"); // Import updated multer middleware
@@ -75,13 +77,14 @@ router.post('/signup', logedout, doSignup);
 // 🔹 OTP Verification
 router.get('/submit_otp', logedout, getOtp);
 router.post('/submit_otp', logedout, submitOtp);
-router.get('/resend_otp', logedout, resendOtp);
+router.get('/resend_Otp', logedout, resendOtp);
 
 // 🔹 Forgot Password
 router.get('/forgotPassword', logedout, submitMail);
 router.post('/forgotPassword', logedout, submitMailPost);
 router.get('/otp', logedout, forgotOtppage);
 router.post('/otp', forgotOtpSubmit);
+router.post('/otp/resend', resendOTP);
 router.get('/resetPassword', logedout, resetPasswordPage);
 router.post('/resetPassword', logedout, resetPassword);
 
@@ -90,7 +93,7 @@ router.get('/shop', getProduct);
 router.post('/search', searchAndSort);
 
 // 🔹 Product Detail Page
-router.get('/productDetails/:id',logedin, productDetails);
+router.get('/productDetails/:id', productDetails);
 
 // 🔹 User Profile Page (Ensure blocked users can't access)
 router.get('/profile', isBlocked, logedin, viewUserProfile);
@@ -135,6 +138,8 @@ router.put('/return-one-product', isBlocked, logedin, returnOneProduct);
 router.get('/wishlist', logedin, isBlocked, showWishlistPage)
 router.post('/addtowishlist', logedin, isBlocked, addToWishList)
 router.post('/removeFromWishList', logedin, isBlocked, removeFromWishList)
+router.post('/checkwishlist', checkWishlist);
+
 
 router.get('/get_invoice', logedin, isBlocked, generateInvoice)
 

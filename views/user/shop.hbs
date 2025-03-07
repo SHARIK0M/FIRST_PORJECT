@@ -171,21 +171,39 @@ const updateProductList = (products) => {
 
 $(document).ready(function () {
     const userId = $('#userId').val() || localStorage.getItem('userId') || "";
-    
+
     $('#productList').on('click', '.wish.action-btn', function (event) {
         event.preventDefault();
         var id = $(this).data('id');
-        
+        var wishButton = $(this);
+
         $.ajax({
             type: 'POST',
-            url: '/addtowishlist',
+            url: '/checkwishlist', // API to check if product exists in wishlist
             contentType: 'application/json',
             data: JSON.stringify({ id: id, userId: userId }),
-            success: () => Swal.fire('Success!', 'Product added to Wishlist!', 'success'),
-            error: () => Swal.fire('Error!', 'Failed to add product to Wishlist!', 'error')
+            success: (response) => {
+                if (response.exists) {
+                    Swal.fire('Info!', 'Product is already in your Wishlist!', 'info');
+                } else {
+                    // If not in wishlist, add to wishlist
+                    $.ajax({
+                        type: 'POST',
+                        url: '/addtowishlist',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ id: id, userId: userId }),
+                        success: () => {
+                            Swal.fire('Success!', 'Product added to Wishlist!', 'success');
+                            wishButton.addClass('wishlist-added'); // Optional: Add a class to indicate it's added
+                        },
+                        error: () => Swal.fire('Error!', 'Failed to add product to Wishlist!', 'error')
+                    });
+                }
+            },
+            error: () => Swal.fire('Error!', 'Failed to check Wishlist!', 'error')
         });
     });
-    
+
     $('.sort-by-dropdown ul li a').on('click', function (event) {
         event.preventDefault();
         const sortType = $(this).data('sort');

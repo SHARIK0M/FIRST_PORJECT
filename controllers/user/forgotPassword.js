@@ -137,5 +137,5 @@ module.exports = {
   forgotOtpSubmit,
   resetPassword,
   resetPasswordPage,
-  resendOTP,
+  resendOTP
 };

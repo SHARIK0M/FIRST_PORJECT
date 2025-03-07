@@ -33,90 +33,180 @@ const payment_failed = (req, res) => {
 // Cancel the entire order with reason
 const cancelOrder = async (req, res) => {
     try {
-        const id = req.params.id;  // Get order ID from the route parameters
-        const { reason } = req.body; // Get cancellation reason from request body
+        const id = req.params.id;  // Get order ID from request params
+        const { reason } = req.body; // Get cancellation reason
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ error: 'Invalid order ID' });
         }
 
-        const ID = new mongoose.Types.ObjectId(id);
-        let canceledOrder = await Order.findOne({ _id: ID });
+        let order = await Order.findById(id);
 
-        if (!canceledOrder) {
+        if (!order) {
             return res.status(404).json({ error: 'Order not found' });
         }
 
-        // Update order status and store cancel reason (only at the order level)
-        await Order.updateOne({ _id: ID }, { $set: { status: 'Cancelled', cancelReason: reason } });
+        // Check if order is already cancelled
+        if (order.status === 'Cancelled') {
+            return res.status(400).json({ error: 'Order is already cancelled' });
+        }
 
-        // Update product stock and mark products as cancelled (without storing reason at the product level)
-        for (const product of canceledOrder.product) {
+        // **Step 1: Cancel all products**
+        let allProductsCancelled = true;
+        
+        for (let product of order.product) {
             if (!product.isCancelled) {
-                await Product.updateOne(
-                    { _id: product.id },
-                    { $inc: { stock: product.quantity } }
-                );
-                await Order.updateOne(
-                    { _id: ID, 'product.id': product.id },
-                    { $set: { 'product.$.isCancelled': true } }
-                );
+                product.isCancelled = true;
+                product.status = "Cancelled";
             }
+
+            if (!product.isCancelled) {
+                allProductsCancelled = false;
+            }
+        }
+
+        // **Step 2: Set cancelReason only for entire order**
+        if (allProductsCancelled) {
+            order.status = "Cancelled";
+            order.cancelReason = reason; // Store reason only in main order
+        } else {
+            order.status = "Partially Cancelled";
+        }
+
+        await order.save(); // Save updated order details
+
+        // **Step 3: Restore stock for all cancelled products**
+        for (const product of order.product) {
+            await Product.updateOne(
+                { _id: product.id },
+                { $inc: { stock: product.quantity } }
+            );
+        }
+
+        // **Step 4: Refund full amount (if fully cancelled)**
+        if (order.status === "Cancelled") {
+            await User.updateOne(
+                { _id: req.session.user._id },
+                { $inc: { wallet: order.total } }
+            );
+
+            // Add refund history
+            await User.updateOne(
+                { _id: req.session.user._id },
+                { 
+                    $push: { 
+                        history: { 
+                            amount: order.total, 
+                            status: `Refund for Order ID: ${id}`, 
+                            date: Date.now() 
+                        } 
+                    } 
+                }
+            );
         }
 
         res.json({
             success: true,
-            message: 'Successfully cancelled Order'
+            message: order.status === "Cancelled" 
+                ? 'Successfully cancelled the entire order' 
+                : 'Partially cancelled the order'
         });
+
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Internal Server Error');
     }
 };
 
+
+
 // Return the entire order with reason
 const returnOrder = async (req, res) => {
     try {
-        const id = req.params.id;  // Get order ID from route parameters
+        const id = req.params.id;  // Get order ID from request parameters
         const { reason } = req.body; // Get return reason from request body
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ error: 'Invalid order ID' });
         }
 
-        const ID = new mongoose.Types.ObjectId(id);
-        let returnedOrder = await Order.findOne({ _id: ID });
+        let order = await Order.findById(id);
 
-        if (!returnedOrder) {
+        if (!order) {
             return res.status(404).json({ error: 'Order not found' });
         }
 
-        // Update order status and store return reason (only at the order level)
-        await Order.updateOne({ _id: ID }, { $set: { status: 'Returned', returnReason: reason } });
+        // Check if order is already returned
+        if (order.status === 'Returned') {
+            return res.status(400).json({ error: 'Order is already returned' });
+        }
 
-        // Update product stock and mark products as returned (without storing reason at the product level)
-        for (const product of returnedOrder.product) {
+        // **Step 1: Mark all products as returned**
+        let allProductsReturned = true;
+
+        for (let product of order.product) {
             if (!product.isReturned) {
-                await Product.updateOne(
-                    { _id: product.id },
-                    { $inc: { stock: product.quantity } }
-                );
-                await Order.updateOne(
-                    { _id: ID, 'product.id': product.id },
-                    { $set: { 'product.$.isReturned': true } }
-                );
+                product.isReturned = true;
             }
+
+            if (!product.isReturned) {
+                allProductsReturned = false;
+            }
+        }
+
+        // **Step 2: Store return reason only for the entire order**
+        if (allProductsReturned) {
+            order.status = "Returned";
+            order.returnReason = reason; // Store return reason at the order level
+        } else {
+            order.status = "Partially Returned"; // If some products remain, mark as partial return
+        }
+
+        await order.save(); // Save updated order details
+
+        // **Step 3: Restore stock for all returned products**
+        for (const product of order.product) {
+            await Product.updateOne(
+                { _id: product.id },
+                { $inc: { stock: product.quantity } }
+            );
+        }
+
+        // **Step 4: Refund full amount (if fully returned)**
+        if (order.status === "Returned") {
+            await User.updateOne(
+                { _id: req.session.user._id },
+                { $inc: { wallet: order.total } }
+            );
+
+            // Add refund history
+            await User.updateOne(
+                { _id: req.session.user._id },
+                { 
+                    $push: { 
+                        history: { 
+                            amount: order.total, 
+                            status: `Refund for Order ID: ${id}`, 
+                            date: Date.now() 
+                        } 
+                    } 
+                }
+            );
         }
 
         res.json({
             success: true,
-            message: 'Successfully returned Order'
+            message: order.status === "Returned" 
+                ? 'Successfully returned the entire order' 
+                : 'Partially returned the order'
         });
+
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Internal Server Error');
     }
 };
+
 
 
 

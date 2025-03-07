@@ -143,23 +143,53 @@
                                             <td>{{this.product.quantity}} </td>
                                             <td>₹{{multiply this.product.quantity this.product.price }}</td>
                                            <td class="status-section">
-    {{#if (eq ../orderedProDet.length 1)}}
-        <span class="badge alert-success">{{../myOrderDetails.status}}</span>
+    {{#if myOrderDetails.cancelReason}}
+        <span class="badge alert-danger">Cancelled</span>
+        <br>
+        <div class="reason-box text-danger">
+            Reason: {{myOrderDetails.cancelReason}}
+        </div>
+    {{else if myOrderDetails.returnReason}}
+        <span class="badge alert-info">Returned</span>
+        <br>
+        <div class="reason-box text-primary">
+            Reason: {{myOrderDetails.returnReason}}
+        </div>
     {{else}}
-        {{#if this.product.cancelReason}}
-            <span class="badge alert-warning">Partially Canceled</span>
-            <br>
-            <div class="reason-box text-danger">
-                Reason: {{this.product.cancelReason}}
-            </div>
-        {{else if this.product.returnReason}}
-            <span class="badge alert-info">Partially Returned</span>
-            <br>
-            <div class="reason-box text-primary">
-                Reason: {{this.product.returnReason}}
-            </div>
+        {{#if (eq orderedProDet.length 1)}}
+            {{#with orderedProDet.[0].product}}
+                {{#if cancelReason}}
+                    <span class="badge alert-danger">Cancelled</span>
+                    <br>
+                    <div class="reason-box text-danger">
+                        Reason: {{cancelReason}}
+                    </div>
+                {{else if returnReason}}
+                    <span class="badge alert-info">Returned</span>
+                    <br>
+                    <div class="reason-box text-primary">
+                        Reason: {{returnReason}}
+                    </div>
+                {{else}}
+                    <span class="badge alert-success">{{../myOrderDetails.status}}</span>
+                {{/if}}
+            {{/with}}
         {{else}}
-            <span class="badge alert-success">{{../myOrderDetails.status}}</span>
+            {{#if this.product.cancelReason}}
+                <span class="badge alert-warning">Partially Canceled</span>
+                <br>
+                <div class="reason-box text-danger">
+                    Reason: {{this.product.cancelReason}}
+                </div>
+            {{else if this.product.returnReason}}
+                <span class="badge alert-info">Partially Returned</span>
+                <br>
+                <div class="reason-box text-primary">
+                    Reason: {{this.product.returnReason}}
+                </div>
+            {{else}}
+                <span class="badge alert-success">{{../myOrderDetails.status}}</span>
+            {{/if}}
         {{/if}}
     {{/if}}
 </td>

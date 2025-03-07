@@ -87,27 +87,36 @@ const showWishlistPage = async (req, res) => {
 
 
 const addToWishList = async (req, res) => {
-  try {
-      let { id } = req.body;
-      const userId = new mongoose.Types.ObjectId(req.session.user._id);
-      let productId = new mongoose.Types.ObjectId(id);
-
-      let wishlistData = await Wishlist.findOneAndUpdate(
-          { user: userId },
-          { $addToSet: { productId: productId } },
-          { upsert: true, new: true }
-      );
-
-      if (wishlistData) {
-          res.json({ success: true });
-      } else {
-          res.json({ success: false });
-      }
-  } catch (error) {
-      console.log(error.message);
-      res.status(500).send("Internal Server Error");
-  }
-};
+    try {
+        let { id } = req.body;
+        const userId = new mongoose.Types.ObjectId(req.session.user._id);
+        let productId = new mongoose.Types.ObjectId(id);
+  
+        // Check if the product already exists in the wishlist
+        let existingWishlist = await Wishlist.findOne({ user: userId, productId: productId });
+  
+        if (existingWishlist) {
+            return res.json({ success: false, message: "Already in wishlist" });
+        }
+  
+        // Add the product if not already in wishlist
+        let wishlistData = await Wishlist.findOneAndUpdate(
+            { user: userId },
+            { $addToSet: { productId: productId } },
+            { upsert: true, new: true }
+        );
+  
+        if (wishlistData) {
+            res.json({ success: true, message: "Added to wishlist" });
+        } else {
+            res.json({ success: false, message: "Failed to add to wishlist" });
+        }
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send("Internal Server Error");
+    }
+  };
+  
 
 const removeFromWishList = async (req, res) => {
   try {
@@ -131,10 +140,29 @@ const removeFromWishList = async (req, res) => {
   }
 };
 
+const checkWishlist = async (req, res) => {
+    try {
+        let { id } = req.body;
+        const userId = new mongoose.Types.ObjectId(req.session.user._id);
+        let productId = new mongoose.Types.ObjectId(id);
+
+        let existingWishlist = await Wishlist.findOne({ user: userId, productId: productId });
+
+        if (existingWishlist) {
+            return res.json({ exists: true });
+        }
+        res.json({ exists: false });
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send("Internal Server Error");
+    }
+};
+
 
 
 module.exports = {
     showWishlistPage,
     addToWishList,
-    removeFromWishList
+    removeFromWishList,
+    checkWishlist
 }

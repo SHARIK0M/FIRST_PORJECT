@@ -108,7 +108,7 @@ function Validation() {
 
     let productNameRegex = /^[a-zA-Z0-9\s\(\)\-\+]{4,}$/; // Product name validation (min 4 chars, alphanumeric & special chars allowed)
     let number = /^[0-9]\d*$/; // Number validation (only digits, no negative values)
-    let descriptionRegex = /^(?!\s*$)[\s\S]{1,100}$/; // Description validation (1-100 chars, no empty values)
+     let descriptionRegex = /^(?!\s*$)[\s\S]{1,1000}$/;// Description validation (1-100 chars, no empty values)
     let priceRegex = /^(?!0(\.0+)?$)(\d+(\.\d{1,2})?)$/; // Price validation (positive number, up to 2 decimal places)
 
     let productNameAlert = document.getElementById("productNameAlert");
