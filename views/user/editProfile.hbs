@@ -31,10 +31,24 @@
                                                     <input class="form-control" type="text" placeholder="Enter your name" value="{{userData.name}}" name="name" id="name" oninput="validateusername()">
                                                     <small id="nameError" class="text-danger"></small>
                                                 </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label">Email</label>
-                                                    <input class="form-control" type="email" value="{{userData.email}}" name="email" id="email" disabled>
-                                                </div>
+                                              <div class="mb-3">
+    <label class="form-label">Email</label>
+    <input class="form-control" type="email" value="{{userData.email}}" name="email" id="email" disabled>
+    <button type="button" class="btn btn-secondary mt-2" onclick="sendOTP()">Edit Email</button>
+</div>
+
+<!-- OTP Input Section -->
+<div id="otpSection" class="mb-3 d-none">
+    <label class="form-label">Enter OTP</label>
+    <input class="form-control" type="text" placeholder="Enter OTP" id="otp">
+    <small id="otpError" class="text-danger"></small>
+    <button type="button" class="btn btn-primary mt-2" onclick="verifyOTP()">Verify OTP</button>
+</div>
+
+<!-- Success Message -->
+<small id="emailSuccess" class="text-success"></small>
+
+
                                                 <div class="mb-3">
                                                     <label class="form-label">Phone</label>
                                                     <input class="form-control" type="tel" placeholder="Enter your phone number" value="{{userData.mobile}}" name="mobile" id="phone" oninput="validatePhoneNumber()">
@@ -60,6 +74,75 @@
         </div>
     </section>
 </main>
+<script>
+    function sendOTP() {
+    const emailInput = document.getElementById("email");
+    emailInput.disabled = false;
+    document.getElementById("otpSection").classList.remove("d-none");
+    document.getElementById("otpError").textContent = "";
+    
+    const newEmail = emailInput.value.trim();
+    
+    if (!newEmail) {
+        alert("❌ Please enter a valid email.");
+        return;
+    }
+
+    fetch("/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: newEmail })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+           console.log("OTP send Succes")
+        } else {
+            alert("❌ " + data.message);
+        }
+    })
+    .catch(error => {
+        alert("❌ An error occurred: " + error.message);
+    });
+}
+
+function verifyOTP() {
+    const otp = document.getElementById("otp").value.trim();
+    const newEmail = document.getElementById("email").value.trim();
+
+    fetch("/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ otp, email: newEmail })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById("email").setAttribute("data-verified", "true");
+            document.getElementById("otpSection").classList.add("d-none");
+            document.getElementById("emailSuccess").textContent = "Email verified!";
+        } else {
+            document.getElementById("otpError").textContent = data.message;
+        }
+    })
+    .catch(error => {
+        alert("❌ An error occurred: " + error.message);
+    });
+}
+
+function validateForm() {
+    var isValidName = validateusername();
+    var isValidPhone = validatePhoneNumber();
+    var emailField = document.getElementById("email");
+
+    if (!emailField.hasAttribute("data-verified")) {
+        alert("❌ Please verify your email before saving changes.");
+        return false;
+    }
+    return isValidName && isValidPhone;
+}
+
+</script>
 
 <script>
     function previewImage(input) {

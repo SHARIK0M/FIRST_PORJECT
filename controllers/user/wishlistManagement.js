@@ -156,7 +156,6 @@ const checkWishlist = async (req, res) => {
 };
 
 
-
 module.exports = {
     showWishlistPage,
     addToWishList,

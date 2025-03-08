@@ -141,38 +141,49 @@ const returnOrder = async (req, res) => {
             return res.status(400).json({ error: 'Order is already returned' });
         }
 
-        // **Step 1: Mark all products as returned**
         let allProductsReturned = true;
+        let anyProductReturned = false;
 
         for (let product of order.product) {
+            // Skip canceled products (they cannot be returned)
+            if (product.isCancelled) continue;
+
+            // If not already returned, mark it as returned
             if (!product.isReturned) {
                 product.isReturned = true;
+                product.returnReason = reason;
+                anyProductReturned = true;
             }
 
+            // If any product is not returned, mark order as partially returned
             if (!product.isReturned) {
                 allProductsReturned = false;
             }
         }
 
-        // **Step 2: Store return reason only for the entire order**
-        if (allProductsReturned) {
-            order.status = "Returned";
-            order.returnReason = reason; // Store return reason at the order level
-        } else {
-            order.status = "Partially Returned"; // If some products remain, mark as partial return
+        // If at least one non-canceled product was returned, update the order status
+        if (anyProductReturned) {
+            if (allProductsReturned) {
+                order.status = "Returned";
+                order.returnReason = reason;
+            } else {
+                order.status = "Partially Returned";
+            }
         }
 
-        await order.save(); // Save updated order details
+        await order.save();
 
-        // **Step 3: Restore stock for all returned products**
+        // Restore stock for returned products
         for (const product of order.product) {
-            await Product.updateOne(
-                { _id: product.id },
-                { $inc: { stock: product.quantity } }
-            );
+            if (product.isReturned && !product.isCancelled) {
+                await Product.updateOne(
+                    { _id: product.id },
+                    { $inc: { stock: product.quantity } }
+                );
+            }
         }
 
-        // **Step 4: Refund full amount (if fully returned)**
+        // Refund full amount if fully returned
         if (order.status === "Returned") {
             await User.updateOne(
                 { _id: req.session.user._id },
@@ -206,8 +217,6 @@ const returnOrder = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
-
-
 
 
 const cancelOneProduct = async (req, res) => {

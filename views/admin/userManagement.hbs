@@ -1,82 +1,83 @@
-  <main class="main-wrap">
-        <section class="content-main" >
-            <div class="content-header">
-                <h2 class="content-title">Users list</h2>
-            </div>
-            <div class="card mb-4" style="background-color: #f2a6a6;">                
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>User</th>
-                                    <th>Email</th>
-                                    <th>Status</th>
-                                    <th>Registered</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            {{#each users}}
-                            <tbody>
-                                <tr>
-                                    <!-- User profile section -->
-                                    <td width="30%">
-                                        <a href="#" class="itemside">
-                                            <div class="left mt-5">
-                                                <img src="/assets/imgs/products/{{imageUrl}}" class="img-sm img-avatar" alt="Userpic" onerror="src='/assetsAdmin/imgs/people/UserImage.png'">
-                                            </div>
-                                            <div class="info pl-3">
-                                                <h6 class="mb-0 title">{{name}}</h6>
-                                                <small class="text-muted">{{mobile}}</small>
-                                            </div>
-                                        </a>
-                                    </td>
-                                    
-                                    <!-- User email -->
-                                    <td width="20%">{{email}}</td>
-                                    
-                                    <!-- User status (Blocked or Active) -->
+<main class="main-wrap">
+    <section class="content-main">
+        <div class="content-header">
+            <h2 class="content-title text-center">Users List</h2>
+        </div>
+        <div class="card mb-4 shadow-sm border-0" style="background-color: #fff;">
+            <div class="card-body p-4">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>User</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Registered</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        {{#each users}}
+                        <tbody>
+                            <tr>
+                                <!-- User profile section -->
+                                <td>
+                                    <a href="#" class="d-flex align-items-center">
+                                        <img src="/assets/imgs/products/{{imageUrl}}" class="img-sm img-avatar rounded-circle me-2" 
+                                             alt="Userpic" onerror="this.src='/assetsAdmin/imgs/people/UserImage.png'">
+                                        <div>
+                                            <h6 class="mb-0 fw-semibold">{{name}}</h6>
+                                            <small class="text-muted">{{mobile}}</small>
+                                        </div>
+                                    </a>
+                                </td>
+                                
+                                <!-- User email -->
+                                <td>{{email}}</td>
+                                
+                                <!-- User status (Blocked or Active) -->
+                                <td>
                                     {{#if isBlocked}}
-                                    <td width="20%"><span class="badge rounded-pill alert-danger">Blocked</span></td>
+                                    <span class="badge bg-danger">Blocked</span>
                                     {{else}}
-                                    <td width="20%"><span class="badge rounded-pill alert-success">Active</span></td>
+                                    <span class="badge bg-success">Active</span>
                                     {{/if}}
-                                    
-                                    <!-- Registration date -->
-                                    <td width="20%">24.12.2024</td>
-                                    
-                                    <!-- Block/Unblock button -->
-                                    <td width="20%">
-                                        {{#if this.isBlocked}}
-                                        <a id="blockuser" data-user-id="{{this._id}}" class="btn btn-sm font-sm btn-primary" href="/admin/blockuser">
-                                            Unblock
-                                        </a>
-                                        {{else}}
-                                        <a id="blockuser" data-user-id="{{this._id}}" class="btn btn-sm font-sm btn-primary" href="/admin/blockuser">
-                                            Block
-                                        </a>
-                                        {{/if}}
-                                    </td>
-                                </tr>
-                            </tbody>
-                            {{/each}}
-                        </table> 
-                    </div>
-                </div>
-            </div> 
-            
-            <!-- Pagination section -->
-            <div class="pagination-area mt-15 mb-50">
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination justify-content-start">
-                        {{#each pages}}
-                        <li class="page-item active"><a class="page-link" href="?page={{this}}">{{this}}</a></li>
+                                </td>
+                                
+                                <!-- Registration date -->
+                                <td>24.12.2024</td>
+                                
+                                <!-- Block/Unblock button -->
+                                <td>
+                                    {{#if this.isBlocked}}
+                                    <a id="blockuser" data-user-id="{{this._id}}" class="btn btn-sm btn-outline-primary" href="/admin/blockuser">
+                                        Unblock
+                                    </a>
+                                    {{else}}
+                                    <a id="blockuser" data-user-id="{{this._id}}" class="btn btn-sm btn-outline-danger" href="/admin/blockuser">
+                                        Block
+                                    </a>
+                                    {{/if}}
+                                </td>
+                            </tr>
+                        </tbody>
                         {{/each}}
-                    </ul>
-                </nav>
+                    </table> 
+                </div>
             </div>
-        </section> 
-    </main>
+        </div> 
+        
+        <!-- Pagination section -->
+        <div class="pagination-area d-flex justify-content-center mt-4">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    {{#each pages}}
+                    <li class="page-item"><a class="page-link" href="?page={{this}}">{{this}}</a></li>
+                    {{/each}}
+                </ul>
+            </nav>
+        </div>
+    </section> 
+</main>
 
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

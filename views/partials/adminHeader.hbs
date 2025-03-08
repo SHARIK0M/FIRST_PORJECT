@@ -1,53 +1,141 @@
-<aside class="navbar-aside" style="background-color: #f2a6a6;">
-        <div class="aside-top">
-            <a href="/admin/home" class="brand-wrap">
-                <img src="/assetsAdmin/logo.png" class="logo" alt="Evara Dashboard">
-            </a>
-            <div>
-                <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
-            </div>
-        </div>
-        <nav>
+<aside class="navbar-aside">
+    <div class="aside-top">
+        <a href="/admin/home" class="brand-wrap">
+            <img src="/assetsAdmin/logo.png" class="logo" alt="Evara Dashboard">
+        </a>
+        <button class="btn btn-icon btn-aside-minimize">
+            <i class="material-icons md-menu_open"></i>
+        </button>
+    </div>
+
+    <nav>
         <ul class="menu-aside">
             <li class="menu-item">
-                <a class="menu-link" href="/admin/home"> <i class="icon material-icons md-home"></i>
+                <a class="menu-link" href="/admin/home">
+                    <i class="icon material-icons md-home"></i>
                     <span class="text">Dashboard</span>
                 </a>
             </li>
-              <li class="menu-item ">
-                <a class="menu-link" href="/admin/Users"> <i class="icon material-icons md-category"></i>
+            <li class="menu-item">
+                <a class="menu-link" href="/admin/Users">
+                    <i class="icon material-icons md-person"></i>
                     <span class="text">Users</span>
                 </a>
             </li>
             <li class="menu-item">
-                <a class="menu-link" href="/admin/product"> <i class="icon material-icons md-shopping_bag"></i>
+                <a class="menu-link" href="/admin/product">
+                    <i class="icon material-icons md-shopping_bag"></i>
                     <span class="text">Products</span>
                 </a>
             </li>
-            <li class="menu-item ">
-                <a class="menu-link" href="/admin/category"> <i class="icon material-icons md-category"></i>
+            <li class="menu-item">
+                <a class="menu-link" href="/admin/category">
+                    <i class="icon material-icons md-category"></i>
                     <span class="text">Categories</span>
                 </a>
             </li>
-             <li class="menu-item ">
-                <a class="menu-link" href="/admin/orders"> <i class="icon material-icons md-shopping_cart"></i>
+            <li class="menu-item">
+                <a class="menu-link" href="/admin/orders">
+                    <i class="icon material-icons md-shopping_cart"></i>
                     <span class="text">Orders</span>
                 </a>
-
             </li>
         </ul>
+
         <hr>
+
         <ul class="menu-aside">
             <li class="menu-item">
-                <a class="menu-link" id="logoutbtn" href="/admin/logout"> <i class="icon material-icons md-exit_to_app"></i>
+                <a class="menu-link logout-btn" id="logoutbtn" href="/admin/logout">
+                    <i class="icon material-icons md-exit_to_app"></i>
                     <span class="text"> Logout </span>
                 </a>
             </li>
         </ul>
-        <br>
-        <br>
     </nav>
-    </aside>
+</aside>
+
+<style>
+    /* Sidebar Styling */
+    .navbar-aside {
+        background-color: #f8f9fa; /* Light background */
+        width: 260px;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        padding: 15px;
+        position: fixed;
+        border-right: 2px solid #dee2e6; /* Light border */
+    }
+
+    /* Top Section */
+    .aside-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .brand-wrap .logo {
+        width: 120px;
+    }
+
+    /* Menu Styling */
+    .menu-aside {
+        list-style: none;
+        padding: 0;
+        margin-top: 20px;
+    }
+
+    .menu-item {
+        margin: 12px 0;
+    }
+
+    .menu-link {
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
+        text-decoration: none;
+        color: #333;
+        font-size: 16px;
+        border-radius: 6px;
+        transition: background 0.3s, color 0.3s;
+    }
+
+    .menu-link:hover {
+        background: #d1e7ff; /* Light blue hover effect */
+        color: #0d6efd; /* Dark blue text */
+    }
+
+    .icon {
+        margin-right: 12px;
+        font-size: 22px;
+        color: #6c757d; /* Subtle gray icon */
+    }
+
+    /* Logout Button */
+    .logout-btn {
+        background: #ff6b6b;
+        color: white;
+        font-weight: bold;
+        padding: 12px 15px;
+        border-radius: 6px;
+        text-align: center;
+    }
+
+    .logout-btn:hover {
+        background: #e63946;
+    }
+
+    /* Divider */
+    hr {
+        border: none;
+        height: 1px;
+        background: #dee2e6;
+        margin: 20px 0;
+    }
+</style>
 
 
 

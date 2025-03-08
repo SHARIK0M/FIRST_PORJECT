@@ -4,6 +4,8 @@ const Order = require("../../models/orderSchema");
 const argon2 = require("argon2");
 const mongoose = require("mongoose");
 const { Types: { ObjectId } } = mongoose;
+const userHelper = require("../../helpers/user.helper");
+
 
 // View User Profile
 const viewUserProfile = async (req, res) => {
@@ -44,10 +46,17 @@ const updateUserProfile = async (req, res) => {
     const user = req.session.user;
     const id = user._id;
 
+    // Collect the data to update
     const updatedData = {
       name: req.body.name,
       mobile: req.body.mobile,
     };
+
+    // Check if email is being updated and if it is verified
+    if (req.body.email && req.session.otpVerified) {
+      updatedData.email = req.body.email; // Update email if verified
+      req.session.otpVerified = false; // Reset OTP verified flag after saving
+    }
 
     // Check if a new image was uploaded
     if (req.file) {
@@ -61,12 +70,14 @@ const updateUserProfile = async (req, res) => {
       return res.status(404).send("User not found");
     }
 
+    // After successful update, redirect to the profile page
     res.redirect("/edit_profile");
   } catch (error) {
     console.log("Error updating user profile:", error.message);
     res.status(500).send("Internal Server Error");
   }
 };
+
 
 // Change User Password
 const changePassword = async (req, res) => {
@@ -196,6 +207,64 @@ const orderDetails = async (req, res) => {
   }
 };
 
+// Store OTP and timestamp in session
+const sendOTP = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.json({ success: false, message: "Email is required." });
+  }
+
+  try {
+    const { otp, otpTimestamp } = await userHelper.verifyEmail(email); // Fix: Call from userHelper
+
+    if (!otp) {
+      return res.json({ success: false, message: "Failed to generate OTP." });
+    }
+
+    req.session.otp = otp; // Store OTP in session
+    req.session.otpTimestamp = otpTimestamp;
+    req.session.tempEmail = email; // Store email temporarily
+
+    res.json({ success: true, message: "OTP sent successfully!" });
+  } catch (error) {
+    res.json({ success: false, message: "Error sending OTP: " + error.message });
+  }
+};
+
+
+// Verify OTP and update email
+const verifyOTP = async (req, res) => {
+  const { otp } = req.body;
+
+  if (!req.session.otp || !req.session.tempEmail) {
+      return res.json({ success: false, message: "OTP expired or not requested." });
+  }
+
+  // OTP Expiry Check (5 minutes)
+  if (Date.now() - req.session.otpTimestamp > 5 * 60 * 1000) {
+      req.session.otp = null;
+      return res.json({ success: false, message: "OTP expired." });
+  }
+
+  // Verify OTP
+  if (otp !== req.session.otp) {
+      return res.json({ success: false, message: "Invalid OTP." });
+  }
+
+  try {
+      // Email is now verified
+      req.session.otpVerified = true;
+
+      // Update Email in Database (if not already updated)
+      req.session.tempEmail = req.session.tempEmail || req.body.email;
+
+      res.json({ success: true, message: "Email verified successfully!" });
+  } catch (error) {
+      res.json({ success: false, message: "Error verifying OTP." });
+  }
+};
+
+
 
 module.exports = {
   viewUserProfile,
@@ -205,4 +274,6 @@ module.exports = {
   updatePassword,
   my_Orders,
   orderDetails,
+  verifyOTP,
+  sendOTP
 };

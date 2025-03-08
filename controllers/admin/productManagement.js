@@ -98,16 +98,22 @@ const showeditProduct = async (req, res) => {
   }
 };
 
-// Update Product Details
 const updateProduct = async (req, res) => {
   try {
     const proId = req.params.id;
     const product = await Product.findById(proId);
     let updImages = product.imageUrl;
 
-    if (req.files && req.files.length > 0) {
-      const newImages = req.files.map((file) => file.filename);
-      updImages = [...updImages, ...newImages];
+    // Check if a cropped image was uploaded
+    if (req.body.croppedImage) {
+      const base64Data = req.body.croppedImage.replace(/^data:image\/\w+;base64,/, "");
+      const buffer = Buffer.from(base64Data, "base64");
+
+      const filename = `cropped-${Date.now()}.png`;
+      const filepath = `./public/assets/imgs/products/${filename}`;
+      require("fs").writeFileSync(filepath, buffer);
+
+      updImages.push(filename);
     }
 
     const { name, price, description, category, stock } = req.body;
@@ -125,6 +131,7 @@ const updateProduct = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+
 
 // Delete Product Image
 const deleteProdImage = async (req, res) => {

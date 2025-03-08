@@ -33,7 +33,7 @@ const { getProduct, searchAndSort } = require("../controllers/user/shopManagemen
 
 const { 
   viewUserProfile, EditUserProfile, updateUserProfile, changePassword, updatePassword, 
-  my_Orders, orderDetails 
+  my_Orders, orderDetails ,sendOTP,verifyOTP
 } = require('../controllers/user/profile');
 
 const { 
@@ -101,6 +101,8 @@ router.get('/edit_profile', isBlocked, logedin, EditUserProfile);
 router.post('/edit_profile/:id', isBlocked, logedin, uploadImages.profileImage, updateUserProfile);
 router.get('/changePassword', isBlocked, logedin, changePassword);
 router.post('/updatePassword', isBlocked, logedin, updatePassword);
+router.post("/send-otp", logedin, sendOTP);
+router.post("/verify-otp", logedin, verifyOTP);
 
 // 🔹 Address Management
 router.get('/add_address', isBlocked, logedin, addAddress);
