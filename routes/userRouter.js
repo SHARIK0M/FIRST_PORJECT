@@ -75,65 +75,65 @@ router.get("/signup", logedout, getSignup);
 router.post('/signup', logedout, doSignup);
 
 // 🔹 OTP Verification
-router.get('/submit_otp', logedout, getOtp);
-router.post('/submit_otp', logedout, submitOtp);
-router.get('/resend_Otp', logedout, resendOtp);
+router.get('/otp/submit', logedout, getOtp);
+router.post('/otp/submit', logedout, submitOtp);
+router.get('/otp/resend', logedout, resendOtp);
 
 // 🔹 Forgot Password
-router.get('/forgotPassword', logedout, submitMail);
-router.post('/forgotPassword', logedout, submitMailPost);
-router.get('/otp', logedout, forgotOtppage);
-router.post('/otp', forgotOtpSubmit);
-router.post('/otp/resend', resendOTP);
-router.get('/resetPassword', logedout, resetPasswordPage);
-router.post('/resetPassword', logedout, resetPassword);
+router.get('/password/forgot', logedout, submitMail);
+router.post('/password/forgot', logedout, submitMailPost);
+router.get('/password/otp', logedout, forgotOtppage);
+router.post('/password/otp', forgotOtpSubmit);
+router.post('/password/otp/resend', resendOTP);
+router.get('/password/reset', logedout, resetPasswordPage);
+router.post('/password/reset', logedout, resetPassword);
 
 // 🔹 Shop Page
 router.get('/shop', getProduct);
 router.post('/search', searchAndSort);
 
 // 🔹 Product Detail Page
-router.get('/productDetails/:id', productDetails);
+router.get('/product/:id', productDetails);
 
 // 🔹 User Profile Page (Ensure blocked users can't access)
 router.get('/profile', isBlocked, logedin, viewUserProfile);
-router.get('/edit_profile', isBlocked, logedin, EditUserProfile);
-router.post('/edit_profile/:id', isBlocked, logedin, uploadImages.profileImage, updateUserProfile);
-router.get('/changePassword', isBlocked, logedin, changePassword);
-router.post('/updatePassword', isBlocked, logedin, updatePassword);
-router.post("/send-otp", logedin, sendOTP);
-router.post("/verify-otp", logedin, verifyOTP);
+router.get('/profile/edit', isBlocked, logedin, EditUserProfile);
+router.post('/profile/edit/:id', isBlocked, logedin, uploadImages.profileImage, updateUserProfile);
+router.get('/profile/password', isBlocked, logedin, changePassword);
+router.post('/profile/password/update', isBlocked, logedin, updatePassword);
+router.post("/profile/otp/send", logedin, sendOTP);
+router.post("/profile/otp/verify", logedin, verifyOTP);
 
 // 🔹 Address Management
-router.get('/add_address', isBlocked, logedin, addAddress);
+router.get('/address/add', isBlocked, logedin, addAddress);
 router.get('/addresses', isBlocked, logedin, manageAddress);
-router.post('/add_address', isBlocked, logedin, addAddressPost);
-router.post('/edit_address/:id', isBlocked, logedin, editAddressPost);
-router.delete('/delete_address/:id', isBlocked, logedin, deleteAddress);
+router.post('/address/add', isBlocked, logedin, addAddressPost);
+router.post('/address/edit/:id', isBlocked, logedin, editAddressPost);
+router.delete('/address/delete/:id', isBlocked, logedin, deleteAddress);
 
 // 🔹 Order Management
-router.get('/myOrders', isBlocked, logedin, my_Orders);
-router.get('/orderDetails/:id', isBlocked, logedin, orderDetails);
+router.get('/orders', isBlocked, logedin, my_Orders);
+router.get('/order/:id', isBlocked, logedin, orderDetails);
 
 // 🔹 Cart Management
 router.get('/cart', isBlocked, logedin, loadCartPage);
-router.post('/addtocart/:id', isBlocked, logedin, addToCart);
-router.post('/removeFromCart', isBlocked, logedin, removeFromCart);
-router.post('/updatecart', isBlocked, logedin, updateCart);
-router.post('/checkOutOfStock', checkOutOfStock);
+router.post('/cart/add/:id', isBlocked, logedin, addToCart);
+router.post('/cart/remove', isBlocked, logedin, removeFromCart);
+router.post('/cart/update', isBlocked, logedin, updateCart);
+router.post('/cart/check-stock', checkOutOfStock);
 
 // 🔹 Checkout
-router.get('/cart/checkout', isBlocked, logedin, loadCheckoutPage);
-router.post('/check_addaddress', checkAddressPost);
-router.post('/placeorder', isBlocked, logedin, placeorder);
-router.get('/orderPlaced', isBlocked, logedin, orderSuccess);
-router.get('/payment_failed', isBlocked, logedin, payment_failed);
+router.get('/checkout', isBlocked, logedin, loadCheckoutPage);
+router.post('/checkout/address/check', checkAddressPost);
+router.post('/checkout/place-order', isBlocked, logedin, placeorder);
+router.get('/checkout/success', isBlocked, logedin, orderSuccess);
+router.get('/checkout/payment-failed', isBlocked, logedin, payment_failed);
 
 // 🔹 Cancel & Return Orders
-router.put('/cancel-order/:id', isBlocked, logedin, cancelOrder);
-router.put('/return-order/:id', isBlocked, logedin, returnOrder);
-router.put('/cancel-one-product', isBlocked, logedin, cancelOneProduct);
-router.put('/return-one-product', isBlocked, logedin, returnOneProduct);
+router.put('/order/cancel/:id', isBlocked, logedin, cancelOrder);
+router.put('order/return/:id', isBlocked, logedin, returnOrder);
+router.put('/order/item/cancel', isBlocked, logedin, cancelOneProduct);
+router.put('/order/item/return', isBlocked, logedin, returnOneProduct);
 
 // 🔹 Wishlist Page
 router.get('/wishlist', logedin, isBlocked, showWishlistPage)
@@ -142,7 +142,7 @@ router.post('/removeFromWishList', logedin, isBlocked, removeFromWishList)
 router.post('/checkwishlist', checkWishlist);
 
 
-router.get('/get_invoice', logedin, isBlocked, generateInvoice)
+router.get('/invoice', logedin, isBlocked, generateInvoice)
 
 
 module.exports = router;

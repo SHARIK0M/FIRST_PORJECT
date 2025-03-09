@@ -4,7 +4,7 @@
   <section class="content-main">
     <div class="content-header d-flex justify-content-between align-items-center">
       <h2 class="content-title card-title">Category List</h2>
-      <a class="btn btn-primary btn-sm rounded shadow" href="/admin/addCategory">
+      <a class="btn btn-primary btn-sm rounded shadow" href="/admin/add-category">
         <i class="material-icons md-add"></i> Create New Category
       </a>
     </div>
@@ -39,10 +39,10 @@
             
             <!-- Actions -->
             <div class="col-lg-3 col-md-12 col-12 text-end d-flex justify-content-center gap-2">
-              <a href="/admin/editCategory/{{this._id}}" class="btn btn-sm btn-warning rounded shadow-sm">
+              <a href="/admin/edit-category/{{this._id}}" class="btn btn-sm btn-warning rounded shadow-sm">
                 <i class="material-icons md-edit"></i> Edit
               </a>
-              <a href="/admin/unlistCategory" id="listunlistrod" data-product-id="{{this._id}}" 
+              <a href="/admin/unlist-category" id="listunlistrod" data-product-id="{{this._id}}" 
                  class="btn btn-sm {{#if isListed}}btn-danger{{else}}btn-success{{/if}} rounded shadow-sm">
                 <i class="material-icons md-delete_forever"></i> {{#if isListed}}Unlist{{else}}List{{/if}}
               </a>
@@ -99,7 +99,7 @@ $(document).ready(function () {
                 // Send AJAX request to unlist the product
                 $.ajax({
                     type: 'POST',
-                    url: '/admin/unlistCategory',
+                    url: '/admin/unlist-category',
                     contentType: 'application/json',
                     data: JSON.stringify({ id: id }),
                     success: function (productData) {

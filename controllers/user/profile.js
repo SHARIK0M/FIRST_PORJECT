@@ -71,7 +71,7 @@ const updateUserProfile = async (req, res) => {
     }
 
     // After successful update, redirect to the profile page
-    res.redirect("/edit_profile");
+    res.redirect("/profile/edit");
   } catch (error) {
     console.log("Error updating user profile:", error.message);
     res.status(500).send("Internal Server Error");
@@ -85,7 +85,7 @@ const changePassword = async (req, res) => {
     const user = req.session.user;
     const id = user._id;
     const userData = await User.findById(id);
-    res.render("user/changePassword", { userData });
+    res.render("user/profile/password", { userData });
   } catch (error) {
     console.log(error.message);
     res.status(500).send("Internal Server Error");
@@ -147,7 +147,7 @@ const my_Orders = async (req, res) => {
     const totalPages = Math.ceil(count / limit);
     const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
-    res.render("user/myOrders", {
+    res.render("user/orders", {
       userData,
       myOrders,
       pages,
@@ -200,7 +200,7 @@ const orderDetails = async (req, res) => {
 
     offerprice -= myOrderDetails.total;
 
-    res.render('user/orderDetails', { offerprice, address, orderedProDet, myOrderDetails, userData });
+    res.render('user/order', { offerprice, address, orderedProDet, myOrderDetails, userData });
   } catch (error) {
     console.error("Error fetching order details:", error.message);
     res.status(500).send("Internal Server Error");

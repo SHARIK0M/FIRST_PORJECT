@@ -73,7 +73,7 @@ const checkAddressPost = async (req, res) => {
 
     // Saving the address to the database
     await address.save();
-    res.redirect("/cart/checkout");
+    res.redirect("/checkout");
   } catch (error) {
     console.log(error.message);
     res.status(500).send("Internal Server Error");

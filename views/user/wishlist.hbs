@@ -36,12 +36,12 @@
         {{#each WishListProd}}
         <tr>
             <td class="image product-thumbnail">
-                <a href="/productDetails/{{this.productId}}">
+                <a href="/product/{{this.productId}}">
                     <img src="/assets/imgs/products/{{this.productImage.[0]}}" alt="Product Image">
                 </a>
             </td>
             <td class="product-des product-name">
-                <h5><a href="/productDetails/{{this.productId}}">{{this.productName}}</a></h5>
+                <h5><a href="/product/{{this.productId}}">{{this.productName}}</a></h5>
             </td>
             <td class="price" data-title="Price">
                 <span>₹{{this.productPrice}}</span>
@@ -201,7 +201,7 @@
             let $button = $(this);
 
             $.ajax({
-                url: '/addtocart/' + prodId,
+                url: '/cart/add/' + prodId,
                 method: 'POST',
                 data: { prodId: prodId, quantity: 1 },
                 success: function (result) {

@@ -3,7 +3,7 @@
         <!-- Page Header -->
         <div class="content-header d-flex justify-content-between align-items-center pb-3 border-bottom">
             <h2 class="content-title text-dark">Product Lists</h2>
-            <a href="/admin/addProduct" class="btn btn-primary d-flex align-items-center">
+            <a href="/admin/add-product" class="btn btn-primary d-flex align-items-center">
                 <i class="material-icons md-plus me-1"></i> Create New Product
             </a>
         </div>
@@ -49,10 +49,10 @@
                                 <td class="text-center fw-bold" width="10%">{{stock}}</td>
                                 
                                 <td class="text-center" width="20%">
-                                    <a id="blockprod" data-product-id="{{this._id}}" class="btn btn-outline-danger btn-sm me-1" href="/admin/blockProduct">
+                                    <a id="blockprod" data-product-id="{{this._id}}" class="btn btn-outline-danger btn-sm me-1" href="/admin/block-product">
                                         {{#if isBlocked}} Unblock {{else}} Block {{/if}}
                                     </a>
-                                    <a href="/admin/editProduct/{{this._id}}" class="btn btn-outline-primary btn-sm">
+                                    <a href="/admin/edit-product/{{this._id}}" class="btn btn-outline-primary btn-sm">
                                         <i class="material-icons md-edit"></i> Edit
                                     </a>
                                 </td>
@@ -112,7 +112,7 @@
                 if (result.isConfirmed) {
                     $.ajax({
                         type: 'PUT',
-                        url: '/admin/blockProduct',
+                        url: '/admin/block-product',
                         contentType: 'application/json',
                         data: JSON.stringify({ id: id }),
                         success: function (productData) {

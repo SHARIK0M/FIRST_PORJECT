@@ -23,7 +23,7 @@
                                     <h4>Edit Profile</h4>
                                 </div>
                                 <div class="card-body">
-                                    <form method="post" action="/edit_profile/{{userData._id}}" enctype="multipart/form-data" onsubmit="return validateForm()">
+                                    <form method="post" action="/profile/edit/{{userData._id}}" enctype="multipart/form-data" onsubmit="return validateForm()">
                                         <div class="row">
                                             <div class="col-lg-8">
                                                 <div class="mb-3">
@@ -88,7 +88,7 @@
         return;
     }
 
-    fetch("/send-otp", {
+    fetch("/profile/otp/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: newEmail })
@@ -110,7 +110,7 @@ function verifyOTP() {
     const otp = document.getElementById("otp").value.trim();
     const newEmail = document.getElementById("email").value.trim();
 
-    fetch("/verify-otp", {
+    fetch("/profile/otp/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ otp, email: newEmail })

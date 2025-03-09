@@ -174,7 +174,7 @@ const amount = parseInt(grandTotalText.replace(/[^\d]/g, '')) * 100;
 console.log('Grand Total:', amount);
 const getInvoice = async (id) => {
   try {
-    const response = await fetch(`/get_invoice?id=${id}`, {
+    const response = await fetch(`/invoice?id=${id}`, {
       method: 'GET',
     });
 
@@ -231,7 +231,7 @@ $(document).ready(function () {
     }
 
     function cancelProductOrOrder(orderId, productId, reason) {
-        let url = productId ? '/cancel-one-product' : `/cancel-order/${orderId}`;
+        let url = productId ? '/order/item/cancel' : `/order/cancel/${orderId}`;
         let data = productId ? { id: orderId, prodId: productId, reason: reason } : { reason: reason };
 
         $.ajax({
@@ -257,7 +257,7 @@ $(document).ready(function () {
     }
 
     function returnProductOrOrder(orderId, productId, reason) {
-        let url = productId ? '/return-one-product' : `/return-order/${orderId}`;
+        let url = productId ? '/order/item/return' : `/order/return/${orderId}`;
         let data = productId ? { id: orderId, prodId: productId, reason: reason } : { reason: reason };
 
         $.ajax({

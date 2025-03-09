@@ -30,7 +30,7 @@ const submitMailPost = async (req, res) => {
       req.session.otp = String(otp); // Store only the OTP as a string
       req.session.otpTimestamp = Date.now() + 60 * 1000; // OTP expires in 60 seconds
 
-      res.redirect("/otp");
+      res.redirect("/password/otp");
     } else {
       req.session.mailError = true;
       res.redirect("/forgotPassword");

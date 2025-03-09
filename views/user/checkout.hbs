@@ -98,7 +98,7 @@
                         <div class="panel-collapse collapse coupon_form" id="coupon">
                             <div class="panel-body">
                                 <h4>Address Form</h4>
-                                <form action="/check_addaddress" method="post">
+                                <form action="/checkout/address/check" method="post">
                                     <div class="form-group">
                                         <label>Name</label>
                                         <input type="text" class="form-control" name="name" id="name" placeholder="Enter your name">
@@ -232,7 +232,7 @@
                 requestBody.status = "Payment Failed";
             }
 
-            const response = await fetch('/placeorder', {
+            const response = await fetch('/checkout/place-order', {
                 method: 'POST',
                 headers: {
                     'Content-Type': "application/json",
@@ -245,7 +245,7 @@
             if (placeOrderData) {
                 console.log('Received order data:', placeOrderData);
                 if (paymentStatus) {            
-                    window.location.href = '/orderPlaced'; // Redirect to order confirmation page
+                    window.location.href = '/checkout/success'; // Redirect to order confirmation page
                 } else {
                     // Show alert and redirect on payment failure
                     Swal.fire({
@@ -255,7 +255,7 @@
                         confirmButtonText: 'OK'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = '/payment_failed';
+                            window.location.href = '/checkout/payment-failed';
                         }
                     });
                 }
@@ -271,7 +271,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Get form and input fields
-        const form = document.querySelector('form[action="/check_addaddress"]'); 
+        const form = document.querySelector('form[action="/checkout/address/check"]'); 
         const nameField = document.getElementById('name');
         const mobileField = document.getElementById('mobile');
         const address1Field = document.getElementById('address1');

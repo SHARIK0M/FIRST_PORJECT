@@ -51,7 +51,7 @@
                                     {{/if}}
                                 </div>
                                 <div class="text-center mt-4">
-                                    <a href="/add_address" class="btn btn-primary px-4">+ Add New Address</a>
+                                    <a href="/address/add" class="btn btn-primary px-4">+ Add New Address</a>
                                 </div>
                             </div>
                         </div>
@@ -301,7 +301,7 @@
             };
 
             $.ajax({
-                url: '/edit_address/' + addressId,
+                url: '/address/edit/' + addressId,
                 type: 'POST',
                 data: data,
                 success: function (response) {
@@ -334,7 +334,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '/delete_address/' + addressId,
+                        url: '/address/delete/' + addressId,
                         type: 'DELETE',
                         success: function (response) {
                             if (response.message === "Address deleted successfully") {

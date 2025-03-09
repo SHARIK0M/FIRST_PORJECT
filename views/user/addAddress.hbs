@@ -19,7 +19,7 @@
                         <div class="col-md-9">
                             <div class="dashboard-content card p-4 shadow-sm border-0">
                                 <h3 class="mb-4 text-center">Add New Address</h3>
-                                <form action="/add_address" method="post">
+                                <form action="/address/add" method="post">
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <label class="form-label">Name</label>
@@ -68,7 +68,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const form = document.querySelector('form[action="/add_address"]');
+        const form = document.querySelector('form[action="/address/add"]');
         const submitButton = document.getElementById('submitButton');
         const nameField = document.getElementById('name');
         const mobileField = document.getElementById('mobile');

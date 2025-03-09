@@ -251,7 +251,7 @@
                 if (result.isConfirmed) {
                     $.ajax({
                         type: 'POST',
-                        url: '/removeFromCart',
+                        url: '/cart/remove',
                         contentType: 'application/json',
                         data: JSON.stringify({ id: id }),
                         success: function (response) {
@@ -307,7 +307,7 @@
         // Update cart item quantity in the backend
        function updateCartItemQuantity(cartId, newValue) {
     $.ajax({
-        url: '/updatecart',
+        url: '/cart/update',
         method: 'POST',
         contentType: 'application/json',
         data: JSON.stringify({ cartIdForUpdate: cartId, newValue: newValue }),
@@ -365,7 +365,7 @@
         // Proceed to checkout after checking stock availability
         $('#proceedToCheckoutBtn').on('click', function() {
             $.ajax({
-                url: '/checkOutOfStock',
+                url: '/cart/check-stock',
                 method: 'POST',
                 contentType: 'application/json',
                 success: function(data) {
@@ -377,7 +377,7 @@
                             text: data.message,
                         });
                     } else {
-                        window.location.href = "/cart/checkout";
+                        window.location.href = "/checkout";
                     }
                 },
                 error: function(error) {

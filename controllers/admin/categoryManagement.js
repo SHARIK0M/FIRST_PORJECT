@@ -68,7 +68,7 @@ const addNewCategory = async (req, res) => {
       req.session.catExist = true;
     }
 
-    res.redirect("/admin/addCategory");
+    res.redirect("/admin/add-category");
   } catch (error) {
     console.error("Error adding category:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -121,7 +121,7 @@ const updateCategory = async (req, res) => {
 
     if (categoryExist) {
       req.session.catExist = true;
-      return res.redirect(`/admin/editCategory/${id}`);
+      return res.redirect(`/admin/edit-category/${id}`);
     }
 
     await Category.findByIdAndUpdate(id, { category: newCategoryName, imageUrl: updatedImage }, { new: true });

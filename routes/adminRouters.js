@@ -47,24 +47,24 @@ router.put("/blockuser", isLogin, blockUser);
 
 // 🔹 Product Management
 router.get("/product", isLogin, showProduct);
-router.get("/addProduct", isLogin, addProductPage);
-router.post("/addProduct", isLogin, uploadImages.productImages, addProduct);
-router.put("/blockProduct", isLogin, blockProduct);
-router.post("/unlistCategory", isLogin, unListCategory);
-router.get("/editProduct/:id", isLogin, showeditProduct);
-router.post("/updateProduct/:id", isLogin, uploadImages.productImages, updateProduct);
-router.delete("/product_img_delete", isLogin, deleteProdImage);
+router.get("/add-product", isLogin, addProductPage);
+router.post("/add-product", isLogin, uploadImages.productImages, addProduct);
+router.put("/block-product", isLogin, blockProduct);
+router.post("/unlist-category", isLogin, unListCategory);
+router.get("/edit-product/:id", isLogin, showeditProduct);
+router.post("/update-product/:id", isLogin, uploadImages.productImages, updateProduct);
+router.delete("/product-image-delete", isLogin, deleteProdImage);
 
 // 🔹 Category Management
-router.get("/addCategory", isLogin, addCategoryPage);
-router.post("/addCategory", isLogin, uploadImages.categoryImage, addNewCategory);
+router.get("/add-category", isLogin, addCategoryPage);
+router.post("/add-category", isLogin, uploadImages.categoryImage, addNewCategory);
 router.get("/category", isLogin, showCategoryPage);
-router.get("/editCategory/:id", isLogin, showEditCategory);
-router.post("/updateCategory/:id", isLogin, uploadImages.categoryImage, updateCategory);
+router.get("/edit-category/:id", isLogin, showEditCategory);
+router.post("/update-category/:id", isLogin, uploadImages.categoryImage, updateCategory);
 
 // 🔹 Orders Page
 router.get('/orders', isLogin, ordersPage);
-router.get('/order_details/:id', isLogin, orderDetails);
-router.post('/change_status/:id', isLogin, changeStatus);
+router.get('/order-details/:id', isLogin, orderDetails);
+router.post('/change-status/:id', isLogin, changeStatus);
 
 module.exports = router;

@@ -9,7 +9,7 @@
             <div class="col-lg-12">
                 <div class="card mb-4" style="background-color: #e6b3b3;">
                     <div class="card-body">
-                        <form method="post" class="form-add-product" action="/admin/updateProduct/{{productData._id}}"
+                        <form method="post" class="form-add-product" action="/admin/update-product/{{productData._id}}"
                               enctype="multipart/form-data" onsubmit="return Validation()">
 
                             <!-- Input for Product Name -->
@@ -241,7 +241,7 @@ function Validation() {
 
 const deleteImage = async (productId, imageIndex) => {
     try {
-        const response = await fetch(`/admin/product_img_delete?id=${productId}&image=${imageIndex}`, {
+        const response = await fetch(`/admin/product-image-delete?id=${productId}&image=${imageIndex}`, {
             method: 'DELETE'
         });
 

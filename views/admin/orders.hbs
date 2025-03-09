@@ -34,7 +34,7 @@
                                     {{#if (or (eq this.status "Cancelled") (eq this.status "Returned") (eq this.status "Delivered"))}}
                                         <span class="badge bg-secondary px-3 py-2">{{this.status}}</span>
                                     {{else}}
-                                        <form action="/admin/change_status/{{this._id}}" method="post"
+                                        <form action="/admin/change-status/{{this._id}}" method="post"
                                             onsubmit="return submitform(this);" class="d-flex justify-content-center gap-2">
                                             <select name="status" class="form-select w-auto" aria-label="Select Order Status">
                                                 <option selected disabled hidden>Change status</option>
@@ -46,7 +46,7 @@
                                     {{/if}}
                                 </td>
                                 <td class="text-center">
-                                    <a href="/admin/order_details/{{this._id}}" class="btn btn-outline-primary btn-sm">View Detail</a>
+                                    <a href="/admin/order-details/{{this._id}}" class="btn btn-outline-primary btn-sm">View Detail</a>
                                 </td>
                             </tr>
                             {{/each}}

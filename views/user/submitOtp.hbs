@@ -16,7 +16,7 @@
                   </div>
                   
                   <!-- OTP Form -->
-                  <form id="otp-form" action="/submit_otp" method="post">
+                  <form id="otp-form" action="/otp/submit" method="post">
                     
                     <!-- OTP Input Fields -->
                     <div class="form-floating mb-3 input-control">
@@ -141,7 +141,7 @@
       disableResendButton();
       console.log("Requesting new OTP...");
 
-      const response = await fetch("/resend_otp", { method: "GET" });
+      const response = await fetch("/otp/resend", { method: "GET" });
       const data = await response.json();
 
       if (!response.ok) throw new Error(data.error || "Failed to resend OTP");
@@ -193,7 +193,7 @@
     const otpError = document.getElementById("otp-error");
 
     try {
-      const response = await fetch("/submit_otp", {
+      const response = await fetch("/otp/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ otp }),

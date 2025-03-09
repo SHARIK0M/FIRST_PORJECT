@@ -111,7 +111,7 @@
             var quantity = 1;
 
             $.ajax({
-                url: '/addtocart/' + prodId,
+                url: '/cart/add/' + prodId,
                 method: 'POST',
                 data: { prodId: prodId, quantity: quantity },
                 success: function (result) {

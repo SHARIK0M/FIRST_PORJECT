@@ -140,7 +140,7 @@ const removeFromWishList = async (req, res) => {
 const checkWishlist = async (req, res) => {
     try {
         let { id } = req.body;
-        const userId = new mongoose.Types.ObjectId(req.session.user._id);
+        const userId = new mongoose.Types.ObjectId(req.session.user._id); // Get userId from session or other means
         let productId = new mongoose.Types.ObjectId(id);
 
         let existingWishlist = await Wishlist.findOne({ user: userId, productId: productId });
@@ -154,6 +154,7 @@ const checkWishlist = async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 };
+
 
 
 module.exports = {
