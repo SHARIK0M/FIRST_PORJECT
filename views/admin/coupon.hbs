@@ -1,0 +1,167 @@
+<main class="main-wrap">
+        
+    <section class="content-main">
+        <div class="content-header">
+            <h2 class="content-title">Coupons List</h2>
+            <div>
+                <a href="/admin/addcoupon" class="btn btn-primary"><i class="material-icons md-plus"></i> Create Coupon</a>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <header class="card-header">
+                <div class="row gx-3">
+                    <div class="col-lg-4 col-md-6 me-auto">
+                        <input type="text" placeholder="Search..." class="form-control">
+                    </div>
+
+                    
+                </div>
+            </header> <!-- card-header end// -->
+            <div class="card-body ">
+                {{#if couponMsg}}
+                        <div class="alert alert-success mt-3 alert-dismissible fade {{#if couponMsg}}show{{/if}}" role="alert" style="width: 300px; margin-left: auto; margin-right: auto;">
+                            {{couponMsg}}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {{/if}}
+                        {{#if couponExMsg}}
+                        <div class="alert alert-danger mt-3 alert-dismissible fade {{#if couponExMsg}}show{{/if}}" role="alert" style="width: 300px; margin-left: auto; margin-right: auto;">
+                            {{couponExMsg}}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {{/if}}
+                <div class="table-responsive ">
+                    <table class="table table-hover ">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Coupon Code</th>
+                                <th class="text-center">Discount Percentage</th>
+                                <th class="text-center">Expiry Date</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                         {{#each couponData}}
+                        <tbody>
+                            <tr >
+                                <td width="20%" class="text-center">
+                                        <div class="info pl-3">
+                                            <h6 class="mb-0 title">{{this.code}}</h6>
+                                        </div>
+                                </td>
+                                <td class="text-center" width="20%">{{this.discount}}%</td>
+                                 <td class="text-center" width="20%">{{formatDate this.expiryDate}}</td>
+
+
+                                <td class="text-center" width="20%">
+                                    <a  data-coupon-id="{{this._id}}" class="btn btn-primary"  id="editcoupon">Edit</a>
+                                    <a data-coupon-id="{{this._id}}" id="deletecoupon" type="button" class="btn btn-light">
+                                        Delete
+                                    </a>
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+                        {{/each}}
+                    </table> <!-- table-responsive.// -->
+                </div>
+            </div> <!-- card-body end// -->
+        </div> <!-- card end// -->
+        <div class="pagination-area mt-15 mb-50">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-start">
+                    {{#each pages}}
+                             <li class="page-item active"><a class="page-link" href="?page={{this}}">{{this}}</a></li>
+                    {{/each}}
+                </ul>
+            </nav>
+        </div>
+    </section> <!-- content-main end// -->
+        <footer class="main-footer font-xs">
+            <div class="row pb-30 pt-15">
+                <div class="col-sm-6">
+                    <script data-cfasync="false" src="../../../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+                    document.write(new Date().getFullYear())
+                    </script> ©, Tick Tock .
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-sm-end">
+                        All rights reserved
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <script>
+////////////delete Coupon
+       
+       $(document).ready(function () {
+        $(document).on('click','#deletecoupon',function(e){
+            e.preventDefault();
+            var id = $(this).data('coupon-id');
+            var $this = $(this);
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#088178",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: 'DELETE',
+                        url: '/admin/delete_coupon',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ id: id }),
+                        success: function (productData) {                         
+                            $this.closest('tr').remove(); // Use $this instead of $(this)                               
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error removing product from wishlist:", error);
+                            swal("Error", "Something went wrong. Please try again later.", "error");
+                        }
+                    });
+                    Swal.fire({
+                        title: "Deleted!",
+                        text: "Coupon Deleted Succesfully!",
+                        icon: "success"
+                    }).then(()=> window.location.reload());
+                }
+            });
+
+
+        });
+    });
+       
+
+$(document).on('click', '#editcoupon', function (e) {
+        e.preventDefault();
+        var id = $(this).data('coupon-id');
+        console.log('Coupon ID:', id);
+        var editUrl = '/admin/editcoupon/' + id;  // Assuming the edit URL format is like this
+
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to edit this coupon?",
+            icon: "info",
+            showCancelButton: true,
+            confirmButtonColor: "#088178",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, edit it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // If confirmed, navigate to the edit page
+                window.location.href = editUrl;
+            }
+        });
+    });
+
+
+
+
+
+</script>

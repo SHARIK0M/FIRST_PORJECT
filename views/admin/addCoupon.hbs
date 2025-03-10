@@ -1,0 +1,142 @@
+<main class="main-wrap">
+    <section class="content-main">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-10">
+                <div class="content-header"></div>
+            </div>
+            <div class="col-lg-8 mt-5 justify-content-center">
+                <div class="card">
+                    <div class="card-body">
+                        {{#if couponMsg}}
+                        <div class="alert alert-success mt-3 alert-dismissible fade {{#if couponMsg}}show{{/if}}" role="alert">
+                            {{couponMsg}}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {{/if}}
+                        {{#if couponExMsg}}
+                        <div class="alert alert-danger mt-3 alert-dismissible fade {{#if couponExMsg}}show{{/if}}" role="alert">
+                            {{couponExMsg}}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {{/if}}
+                        <form action="/admin/add_coupon" method="post" onsubmit="return validationf(this)" class="row g-3">
+                            <h5 class="content-title">Add New Coupon</h5>
+                            <div class="col-12">
+                                <label for="coupon-code" class="form-label">Coupon Code</label>
+                                <input type="text" class="form-control" id="coupon-code" placeholder="Enter coupon code" name="code">
+                                <h6 class="alertAddcoupon mt-1" style="color: red" id="couponcodealert"></h6>
+                            </div>
+                            <div class="col-12">
+                                <label for="discount" class="form-label">Discount (%)</label>
+                                <input type="number" class="form-control" id="discount" name="percent" placeholder="Discount %..." aria-label="Discount">
+                                <h6 class="alertAddcoupon mt-1" style="color: red" id="discountalert"></h6>
+                            </div>
+                            <div class="col-12">
+                                <label for="min-purchase" class="form-label">Minimum Purchase Amount</label>
+                                <input type="number" class="form-control" id="min-purchase" placeholder="Enter minimum purchase amount" name="minPurchase">
+                                <h6 class="alertAddcoupon mt-1" style="color: red" id="minalert"></h6>
+                            </div>
+                            <div class="col-12">
+                                <label for="max-discount" class="form-label">Max Discount Amount</label>
+                                <input type="number" class="form-control" id="max-discount" placeholder="Enter maximum discount amount" name="maxDiscount">
+                                <h6 class="alertAddcoupon mt-1" style="color: red" id="maxalert"></h6>
+                            </div>
+                            <div class="form-group">
+                                <label for="expiry-date">Expiry Date</label>
+                                <input type="date" class="form-control" id="expiry-date" name="expDate">
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary">Add Coupon</button>
+                                <a href="/admin/coupons" class="btn btn-primary" id="backbutton">Back</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer font-xs">
+        <div class="row pb-30 pt-15">
+            <div class="col-sm-6">
+                <script>
+                    document.write(new Date().getFullYear())
+                </script> ©, Tick Tock .
+            </div>
+            <div class="col-sm-6">
+                <div class="text-sm-end">
+                    All rights reserved
+                </div>
+            </div>
+        </div>
+    </footer>
+</main>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm"></script>
+<script>
+    $(document).ready(function () {
+        $('#backbutton').click(function (e) {
+            e.preventDefault();
+
+            Swal.fire({
+                title: "Leave the Page?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#088178",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "/admin/coupons";
+                }
+            });
+        });
+    });
+
+    function validationf(form) {
+        let errors = [];
+
+        let couponcode = document.getElementById('coupon-code').value;
+        let discount = document.getElementById('discount').value;
+        let minpurchase = document.getElementById('min-purchase').value;
+        let maxdiscount = document.getElementById('max-discount').value;
+
+        let couponcodePattern = /^[A-Za-z0-9\s]{3,}$/;
+
+        let couponerr = document.getElementById('couponcodealert');
+        let discounterr = document.getElementById('discountalert');
+        let minerror = document.getElementById('minalert');
+        let maxerror = document.getElementById('maxalert');
+
+        couponerr.innerHTML = '';
+        discounterr.innerHTML = '';
+        minerror.innerHTML = '';
+        maxerror.innerHTML = '';
+
+        if (!couponcode.match(couponcodePattern)) {
+            couponerr.innerHTML = 'Coupon code must be at least 3 characters long and only contain alphanumeric characters';
+            errors.push('Invalid coupon code');
+        }
+
+        if (discount <= 0 || discount > 100) {
+            discounterr.innerHTML = 'Discount should be between 1 and 100';
+            errors.push('Invalid discount');
+        }
+
+        if (minpurchase <= 0) {
+            minerror.innerHTML = 'Minimum purchase amount must be greater than 0';
+            errors.push('Invalid minimum purchase amount');
+        }
+
+        if (maxdiscount <= 0) {
+            maxerror.innerHTML = 'Maximum discount amount must be greater than 0';
+            errors.push('Invalid maximum discount amount');
+        }
+
+        if (errors.length > 0) {
+            return false;
+        }
+
+        return true;
+    }
+</script>

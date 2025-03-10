@@ -46,6 +46,7 @@ module.exports = (app) => {
     hbsHelper.ifCondition(Handlebars),
     hbsHelper.statushelper(Handlebars),
     hbsHelper.eqHelper(Handlebars),
-    hbsHelper.orHelper(Handlebars)
+    hbsHelper.orHelper(Handlebars),
+    hbsHelper.addIncludesHelper(Handlebars),
   );
 };

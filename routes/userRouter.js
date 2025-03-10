@@ -47,7 +47,9 @@ const {
 } = require('../controllers/user/cart');
 
 const { 
-  loadCheckoutPage, placeorder, orderSuccess 
+  loadCheckoutPage, placeorder, orderSuccess , validateCoupon,
+  applyCoupon,
+  removeCoupon,
 } = require('../controllers/user/checkoutManagement');
 
 const { 
@@ -148,6 +150,8 @@ router.get('/invoice', logedin, isBlocked, generateInvoice)
 
 router.get("/error",logedin,isBlocked,showError)
 
-
+router.post('/validate_coupon', logedin, isBlocked, validateCoupon)
+router.post('/apply_coupon',logedin, isBlocked, applyCoupon)
+router.post('/remove_coupon', logedin, isBlocked, removeCoupon)
 
 module.exports = router;

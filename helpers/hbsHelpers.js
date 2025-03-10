@@ -45,6 +45,11 @@ function addHelper(Handlebars) {
   });
 }
 
+function addIncludesHelper(hbs) {
+  hbs.registerHelper("includes", function (array, value) {
+    return array && array.includes(value);
+  });
+}
 // Helper to check if two values are equal
 function isequal(Handlebars) {
   Handlebars.registerHelper('ifEquals', function (arg1, arg2, options) {
@@ -205,5 +210,6 @@ module.exports = {
   ifCondition,
   singleIsCancelled,
   eqHelper,
-  orHelper
+  orHelper,
+  addIncludesHelper
 }

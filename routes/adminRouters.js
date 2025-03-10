@@ -29,6 +29,9 @@ const {
   deleteProdImage,
 } = require("../controllers/admin/productManagement");
 
+const { couponPage, addCouponPage, addCouponPost, editCouponPage, editCouponPost, deleteCoupon } = require('../controllers/admin/couponManagement');
+
+
 const { ordersPage, orderDetails, changeStatus } = require("../controllers/admin/ordersManagement");
 
 // 🔹 Admin Authentication Routes
@@ -66,5 +69,13 @@ router.post("/update-category/:id", isLogin, uploadImages.categoryImage, updateC
 router.get('/orders', isLogin, ordersPage);
 router.get('/order-details/:id', isLogin, orderDetails);
 router.post('/change-status/:id', isLogin, changeStatus);
+
+// coupon
+router.get('/coupons',isLogin,couponPage)
+router.get('/addcoupon',isLogin,addCouponPage)
+router.post('/add_coupon', isLogin, addCouponPost)
+router.get('/editcoupon/:id', editCouponPage);
+router.post('/editcoupon/:id', editCouponPost);
+router.delete('/delete_coupon',isLogin,deleteCoupon)
 
 module.exports = router;
