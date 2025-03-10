@@ -118,8 +118,6 @@ const cancelOrder = async (req, res) => {
     }
 };
 
-
-
 // Return the entire order with reason
 const returnOrder = async (req, res) => {
     try {
@@ -151,7 +149,6 @@ const returnOrder = async (req, res) => {
             // If not already returned, mark it as returned
             if (!product.isReturned) {
                 product.isReturned = true;
-                product.returnReason = reason;
                 anyProductReturned = true;
             }
 

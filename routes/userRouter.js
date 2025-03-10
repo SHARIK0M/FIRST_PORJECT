@@ -18,6 +18,8 @@ const {
   productDetails,
 } = require("../controllers/user/userController");
 
+const {showError} = require("../controllers/user/errorController");
+
 const {
   submitMail,
   submitMailPost,
@@ -131,7 +133,7 @@ router.get('/checkout/payment-failed', isBlocked, logedin, payment_failed);
 
 // 🔹 Cancel & Return Orders
 router.put('/order/cancel/:id', isBlocked, logedin, cancelOrder);
-router.put('order/return/:id', isBlocked, logedin, returnOrder);
+router.put('/order/return/:id', isBlocked, logedin, returnOrder);  
 router.put('/order/item/cancel', isBlocked, logedin, cancelOneProduct);
 router.put('/order/item/return', isBlocked, logedin, returnOneProduct);
 
@@ -143,6 +145,9 @@ router.post('/checkwishlist', checkWishlist);
 
 
 router.get('/invoice', logedin, isBlocked, generateInvoice)
+
+router.get("/error",logedin,isBlocked,showError)
+
 
 
 module.exports = router;

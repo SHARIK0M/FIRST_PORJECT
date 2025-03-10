@@ -85,7 +85,7 @@ const changePassword = async (req, res) => {
     const user = req.session.user;
     const id = user._id;
     const userData = await User.findById(id);
-    res.render("user/profile/password", { userData });
+    res.render("user/changePassword", { userData });
   } catch (error) {
     console.log(error.message);
     res.status(500).send("Internal Server Error");
@@ -147,7 +147,7 @@ const my_Orders = async (req, res) => {
     const totalPages = Math.ceil(count / limit);
     const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
-    res.render("user/orders", {
+    res.render("user/myOrders", {
       userData,
       myOrders,
       pages,
@@ -172,6 +172,12 @@ const orderDetails = async (req, res) => {
     // Retrieve user and order data
     const userData = await User.findById(userId).lean();
     const myOrderDetails = await Order.findById(orderId).populate('address').lean();
+
+    // Check if the logged-in user is the owner of the order
+    if (myOrderDetails.userId.toString() !== userId.toString()) {
+      // If the user doesn't own the order, redirect them to an error page or home
+      return res.redirect('/error'); // Or use an appropriate route
+  }
 
     myOrderDetails.product.forEach((product) => {
       if (product.isReturned) ct++;
@@ -200,7 +206,7 @@ const orderDetails = async (req, res) => {
 
     offerprice -= myOrderDetails.total;
 
-    res.render('user/order', { offerprice, address, orderedProDet, myOrderDetails, userData });
+    res.render('user/orderDetails', { offerprice, address, orderedProDet, myOrderDetails, userData });
   } catch (error) {
     console.error("Error fetching order details:", error.message);
     res.status(500).send("Internal Server Error");
