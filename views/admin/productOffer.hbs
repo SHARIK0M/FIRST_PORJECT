@@ -1,0 +1,116 @@
+<main class="main-wrap" style="background-color: #f8f9fa; padding: 20px; border-radius: 10px;">
+    <section class="content-main">
+        <div class="content-header d-flex justify-content-between align-items-center">
+            <h2 class="content-title text-primary">List of Offers</h2>
+            <div>
+                <a href="/admin/addProOffers" class="btn btn-primary shadow"><i class="material-icons md-plus"></i> Create New Product Offer</a>
+            </div>
+        </div>
+        
+        <div class="card mb-4 shadow">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered">
+                        <thead class="table-dark">
+                            <tr>                        
+                                <th class="text-center">Product Name</th>
+                                <th class="text-center">Offer Percentage</th>
+                                <th class="text-center">Start Date</th>
+                                <th class="text-center">End Date</th>
+                                <th class="text-center">Current Status</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        {{#if productOfferData.length}}
+                        {{#each productOfferData}}
+                        <tbody>
+                            <tr class="align-middle">                    
+                                <td class="text-center" width="15%" style="color: #007bff; font-weight: 600;">{{this.productName}}</td>                        
+                                <td class="text-center text-success" width="10%"><strong>{{this.productOfferPercentage}}%</strong></td>                        
+                                <td class="text-center" width="10%" style="color: #17a2b8;">{{this.startDate}}</td>                        
+                                <td class="text-center" width="10%" style="color: #dc3545;">{{this.endDate}}</td>                        
+                                <td class="text-center" width="10%">
+                                    {{#if this.currentStatus}}
+                                        <span class="badge rounded-pill bg-success">Active</span>
+                                    {{else}}
+                                        <span class="badge rounded-pill bg-danger">Inactive</span>
+                                    {{/if}}
+                                </td>                        
+                                <td class="text-center" width="20%">
+                                    <a href="/admin/editProductOffer/{{this._id}}" 
+                                        class="btn btn-sm btn-warning text-white shadow-sm"><i class="material-icons md-edit"></i> Edit</a>
+                                    <a href="javascript:void(0);" onclick="deleteProductOffer('{{this._id}}')"
+                                        class="btn btn-sm btn-danger shadow-sm"><i class="material-icons md-delete"></i> Delete</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                        {{/each}}
+                        {{else}}                
+                        <tbody>
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">No Product Offers Available</td>
+                            </tr>
+                        </tbody>
+                        {{/if}}
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="pagination-area mt-3">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-center">
+                    {{#each pages}}
+                    <li class="page-item active"><a class="page-link bg-primary text-white shadow" href="?page={{this}}">{{this}}</a></li>
+                    {{/each}}
+                </ul>
+            </nav>
+        </div>
+    </section> 
+</main>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  function deleteProductOffer(id) {  
+    // Show confirmation dialog
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Send DELETE request to the server
+        $.ajax({
+          url: `/admin/deleteProOffer/${id}`, 
+          type: "DELETE", 
+          success: function (response) {  
+            // Show success message and reload page          
+            Swal.fire({
+              title: "Deleted!",
+              text: "Product offer deleted successfully.",
+              icon: "success",
+              timer: 2000, 
+              showConfirmButton: false,
+            });          
+            setTimeout(() => location.reload(), 2000);
+          },
+          error: function (xhr, status, error) {  
+            // Show error message if deletion fails        
+            Swal.fire({
+              title: "Error!",
+              text: "Failed to delete the product offer. Please try again.",
+              icon: "error",
+            });
+          },
+        });
+      }
+    });
+  }
+</script>

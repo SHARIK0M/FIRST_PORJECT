@@ -148,9 +148,16 @@ const updateProductList = (products) => {
                             <a href="#">${product.category.category}</a>
                         </div>
                         <h2><a href="/product/${product._id}">${product.name}</a></h2>
-                        <div class="product-price">
-                            <span>₹${product.price}</span>
-                        </div>
+                         <div class="product-price">
+                    ${
+                        product.discountPrice && product.discountPrice < product.price
+                            ? `<span>₹${product.discountPrice}</span>
+                               <span class="old-price">₹${product.price}</span>  <span>%${product.productOffer.productOfferPercentage}</span>` // Show both if discount exists
+                             
+
+                            : `<span>₹${product.price}</span>` // Show only price if no discount
+                    }
+                </div>
                         <div class="product-action-1 show">
                             <a data-id="${product._id}" class="wish action-btn hover-up" href="#"><i class="fa fa-heart"></i>
 </i></a>

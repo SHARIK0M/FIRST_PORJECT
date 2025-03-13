@@ -1,0 +1,176 @@
+
+<link href="assets/img/favicon.png" rel="icon">
+<link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+<!-- Google Fonts -->
+<link href="https://fonts.gstatic.com" rel="preconnect">
+<link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+    rel="stylesheet">
+
+<main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="/" rel="nofollow">Home</a>
+                <span></span> Pages
+                <span></span> Account
+            </div>
+        </div>
+    </div>
+    
+    <section class="pt-50 pb-150">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 m-auto">
+                    <div class="row">
+                        {{> profileHeader}}
+                        
+                        <div class="col-md-9">
+                            <div class="tab-content dashboard-content">
+                                <div class="tab-pane fade active show" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+                                    
+                                    <!-- Wallet Card -->
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 class="mb-0">Wallet</h5>
+                                        </div>
+                                        <div class="card-body d-flex justify-content-between align-items-center">
+                                            <div class="text-center">
+                                                <p class="card-text font-weight-bold">Balance</p>
+                                                <h5 class="card-title text-primary" style="font-size: 1.5rem;">₹{{userData.wallet}}</h5>
+                                            </div>
+                                            <a onclick="addMoney()" class="btn btn-primary"> <i class="fi-rs-box-alt mr-10"></i> Add Money</a>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Transaction History Card -->
+                                    <div class="card mt-5">
+                                        <div class="card-header">
+                                            <h5 class="mb-0">History</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <table class="table table-striped">
+                                                <thead class="thead-dark">
+                                                    <tr>
+                                                        <th>Date</th>
+                                                        <th>Status</th>
+                                                        <th>Amount</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {{#length history}}
+                                                        {{#each history}}
+                                                        <tr>
+                                                            <td>{{formatDate this.date}}</td>
+                                                            <td>{{this.status}}</td>
+                                                            <td>₹{{this.amount}}</td>
+                                                        </tr>
+                                                        {{/each}}
+                                                    {{else}}
+                                                        <tr>
+                                                            <td colspan="3" class="text-center">No history</td>
+                                                        </tr>
+                                                    {{/length}}
+                                                </tbody>
+                                            </table>
+                                            
+                                            <!-- Pagination -->
+                                            <div class="pagination-area mt-15 mb-50">
+                                                <nav aria-label="Page navigation example">
+                                                    <ul class="pagination justify-content-start">
+                                                        {{#each pages}}
+                                                            <li class="page-item"><a class="page-link" href="?page={{this}}">{{this}}</a></li>
+                                                        {{/each}}
+                                                    </ul>
+                                                </nav>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+    async function addMoney() {
+        // Prompt user to enter the amount
+        const { value: amount } = await Swal.fire({
+            title: 'Enter the Amount',
+            input: 'number',
+            inputLabel: 'Amount',
+            inputPlaceholder: '₹'
+        });
+
+        // Send request to add money to the wallet
+        $.ajax({
+            url: "/addmoneytowallet",
+            method: "post",
+            data: { total: amount },
+            success: (data) => {
+                if (data.razorpay) {
+                    var options = {
+                        "key": "rzp_test_QhDPSiMt8ea6IF",
+                        "amount": data.order.amount,
+                        "currency": "INR",
+                        "name": "Floritta",
+                        "description": "Test Transaction",
+                        "order_id": data.order.id,
+                        "handler": function (response) {
+                            verifyPayment(response, data);
+                        },
+                        "prefill": {
+                            "name": "Customer Name",
+                            "email": "customer@example.com",
+                            "contact": "9000090000"
+                        },
+                        "theme": { "color": "#3399cc" }
+                    };
+
+                    console.log("Payment Options:", options);
+                    var rzp1 = new Razorpay(options);
+                    rzp1.open();
+
+                    // Handle payment failure
+                    rzp1.on('payment.failed', function (response) {
+                        console.error('Payment failed:', response.error.code, response.error.description);
+                    });
+                }
+            }
+        });
+    }
+
+    function verifyPayment(response, order) {
+        // Send payment verification request
+        $.ajax({
+            url: '/verify_Payment',
+            method: 'post',
+            data: { order, response, from: "wallet" },
+            success: (response) => {
+                if (response) {
+                    Swal.fire({
+                        title: "Success",
+                        text: "Payment added successfully",
+                        icon: "success"
+                    }).then(function () {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire("PAYMENT ERROR!", "Something went wrong while processing the payment.", "error");
+                    location.reload();
+                }
+            }
+        });
+    }
+</script>

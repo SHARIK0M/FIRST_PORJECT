@@ -271,6 +271,101 @@ const verifyOTP = async (req, res) => {
 };
 
 
+const verify = (req, res) => {
+  console.log(req.body.payment, "Payment verification started");
+  
+  const { orderId } = req.body;
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body.payment;
+  
+  let hmac = crypto.createHmac("sha256", process.env.KEY_SECRET);
+  hmac.update(`${razorpay_order_id}|${razorpay_payment_id}`);
+  hmac = hmac.digest("hex");
+  
+  console.log(hmac, "Generated HMAC");
+  console.log(razorpay_signature, "Received Signature");
+  
+  if (hmac === razorpay_signature) {
+      console.log("Payment verified successfully");
+      changeOrderStatusToConfirmed(orderId);
+      res.json({ status: true });
+  } else {
+      console.log("Payment verification failed");
+      res.json({ status: false });
+  }
+};
+
+const walletpage = async (req, res) => {
+  try {
+      const user = req.session.user;
+      const id = user._id;
+      const userData = await User.findById(id).lean();
+
+      console.log("User data retrieved");
+
+      let page = req.query.page ? req.query.page : 1;
+      let limit = 5;
+      const skip = (page - 1) * limit;
+
+      // Fetching transaction history with pagination
+      const historyData = await User.aggregate([
+          { $match: { _id: userData._id } },
+          { $project: { _id: 0, history: 1 } },
+          { $unwind: "$history" },
+          { $sort: { "history.date": -1 } },
+          { $group: { _id: null, history: { $push: "$history" } } },
+          { $project: { history: { $slice: ["$history", skip, limit] } } }
+      ]);
+
+      // Fetching total count of history items
+      const count = await User.aggregate([
+          { $match: { _id: userData._id } },
+          { $project: { historyCount: { $size: { $ifNull: ["$history", []] } } } }
+      ]);
+      
+      const totalItems = count[0] ? count[0].historyCount : 0;
+      const totalPages = Math.ceil(totalItems / limit);
+      const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+
+      const history = historyData[0] ? historyData[0].history : [];
+
+      console.log("Transaction history retrieved");
+      res.render('user/wallet', { userData, history, pages });
+
+  } catch (error) {
+      console.error("Error fetching wallet page data:", error.message);
+      res.status(HttpStatus.InternalServerError).send("Internal Server Error");
+  }
+};
+
+const retryPayment = async (req, res) => {
+  try {
+      const id = req.params.id;
+      console.log("Retrying payment for Order ID:", id);
+
+      // Updating payment status to 'pending'
+      const updatedOrder = await Order.findByIdAndUpdate(id, { $set: { status: 'pending' } }, { new: true });
+
+      if (!updatedOrder) {
+          return res.status(404).json({
+              success: false,
+              message: "Order not found."
+          });
+      }
+
+      res.json({
+          success: true,
+          message: "Payment status updated to 'pending'. You can retry the payment.",
+          order: updatedOrder
+      });
+  } catch (error) {
+      console.error("Error updating payment status:", error);
+      res.status(HttpStatus.InternalServerError).json({
+          success: false,
+          message: "An error occurred while retrying the payment. Please try again later."
+      });
+  }
+};
+
 
 module.exports = {
   viewUserProfile,
@@ -281,5 +376,8 @@ module.exports = {
   my_Orders,
   orderDetails,
   verifyOTP,
-  sendOTP
+  sendOTP,
+  verify,
+  walletpage,
+  retryPayment
 };

@@ -10,7 +10,7 @@ const Cart = require("../../models/cartSchema");
 
 let otp, userOtp, userEmail, hashedPassword, userRegData, userData;
 
-//Renders the home page.
+
 const getHome = async (req, res) => {
   try {
     const userData = req.session.user;
@@ -25,8 +25,19 @@ const getHome = async (req, res) => {
           as: "category",
         },
       },
+      { $unwind: "$category" },
       {
-        $unwind: "$category",
+        $lookup: {
+          from: "productoffers",
+          localField: "_id",
+          foreignField: "productId",
+          as: "productOffer",
+        },
+      },
+      {
+        $addFields: {
+          productOffer: { $ifNull: [{ $arrayElemAt: ["$productOffer", 0] }, null] },
+        },
       },
       {
         $project: {
@@ -45,14 +56,19 @@ const getHome = async (req, res) => {
             isListed: 1,
             bestSelling: 1,
           },
-         
+          discountPrice: {
+            $cond: {
+              if: { $and: [{ $eq: ["$productOffer.currentStatus", true] }, { $gt: ["$productOffer.discountPrice", 0] }] },
+              then: "$productOffer.discountPrice",  
+              else: null,  
+            },
+          },
         },
       },
-      { $limit: 4 }, // Only fetch 4 products
+      { $limit: 4 }, // Keep this if you only want 4 products
     ]);
 
-    console.log(Products);
-    console.log("Aggregated Product Details 1:", Products);
+    console.log("Aggregated Product Details:", Products);
 
     const category = await Category.find({ isListed: true }).lean();
     res.render("user/home", { category, Products, userData });
@@ -61,6 +77,7 @@ const getHome = async (req, res) => {
     res.status(HttpStatus.InternalServerError).send("Internal Server Error");
   }
 };
+
 
 //Renders the login page with appropriate messages.
 const getLogin = async (req, res) => {
@@ -255,9 +272,6 @@ const resendOtp = async (req, res) => {
 
 
 
-
-
-
 //Handles Google authentication callback.
 const googleCallback = async (req, res) => {
   try {
@@ -289,6 +303,20 @@ const productDetails = async (req, res) => {
 
     const products = await Product.aggregate([
       { $match: { _id: new mongoose.Types.ObjectId(productID) } },
+      {
+        $lookup: {
+          from: "productoffers",  
+          localField: "_id",  
+          foreignField: "productId",  
+          as: "productOffer", 
+        },
+      },
+      {
+        $unwind: {
+          path: "$productOffer",  
+          preserveNullAndEmptyArrays: true,  
+        },
+      },
       
      
     ]);
@@ -323,6 +351,7 @@ const productDetails = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+
 
 module.exports = {
   getHome,

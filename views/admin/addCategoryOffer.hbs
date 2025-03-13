@@ -1,0 +1,131 @@
+<main class="main-wrap">
+    <section class="content-main">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-lg-8 mt-5 justify-content-center">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addCategoryOfferModalLabel">Add Category Offer</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form id="addCategoryOfferForm" role="form" action="/admin/addCatOffers" method="post">
+                            <div class="modal-body">
+                                <div class="input-group mb-3">
+                                    <label class="container">
+                                        <label for="categoryName" class="mb-2" style="width: 100%">Category Name: </label>
+                                        <select name="categoryName" id="categoryName" class="form-select">
+                                            {{#each category}}
+                                            <option value="{{this.category}}">{{this.category}}</option>
+                                            {{/each}}
+                                        </select>
+                                    </label>
+                                </div>
+                                <div class="offerPercentageInput p-2">
+                                    <label for="categoryOfferPercentage" class="mb-2">Category Offer Percentage: </label>
+                                    <div class="input-group">
+                                        <input id="categoryOfferPercentage" name="categoryOfferPercentage" class="form-control" placeholder="Enter the offer percentage">
+                                    </div>
+                                    <div class="form-text">Choose a percentage to be discounted. Between 5% and 90%.</div>
+                                </div>
+                                <div class="startDateInput p-2">
+                                    <label for="categoryOfferStartDate">Offer Start Date: </label>
+                                    <div class="input-group">
+                                        <input id="categoryOfferStartDate" name="categoryOfferStartDate" type="date" class="form-control">
+                                    </div>
+                                    <div class="form-text">Choose a start date for the offer to be considered.</div>
+                                </div>
+                                <div class="endDateInput p-2">
+                                    <label for="categoryOfferEndDate">Offer Expiry Date : </label>
+                                    <div class="input-group">
+                                        <input id="categoryOfferEndDate" name="categoryOfferEndDate" type="date" class="form-control">
+                                    </div>
+                                    <div class="form-text">Choose an expiry date for the offer to end.</div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button id="backbutton" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Back</button>
+                                <button type="submit" class="btn btn-info">Save changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.10/dist/sweetalert2.min.js"></script>
+
+<script>
+    // Function to validate the start and end dates
+    function validateDates() {
+        let startDate = new Date($('#categoryOfferStartDate').val());
+        let endDate = new Date($('#categoryOfferEndDate').val());
+        let today = new Date();
+        today.setHours(0, 0, 0, 0); // Reset time to compare only the date
+
+        // Check if the start date is in the past
+        if (startDate < today) {
+            Swal.fire({
+                title: "Invalid Start Date!",
+                text: "Start date cannot be in the past.",
+                icon: "error",
+                confirmButtonText: "OK"
+            });
+            return false;
+        }
+
+        // Ensure the end date is after the start date
+        if (endDate <= startDate) {
+            Swal.fire({
+                title: "Invalid End Date!",
+                text: "End date must be after the start date.",
+                icon: "error",
+                confirmButtonText: "OK"
+            });
+            return false;
+        }
+        return true;
+    }
+
+    $(document).ready(function () {
+        // Handle form submission
+        $('#addCategoryOfferForm').on('submit', function (e) {
+            e.preventDefault(); 
+            
+            // Validate dates before proceeding
+            if (!validateDates()) {
+                return;
+            }
+
+            const formData = $(this).serialize(); 
+
+            // Send AJAX request to add category offer
+            $.ajax({
+                url: '/admin/addCatOffers',
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    Swal.fire({
+                        title: "Success!",
+                        text: response.message,
+                        icon: "success",
+                        confirmButtonText: "OK"
+                    }).then(() => {
+                        window.location.href = "/admin/categoryOffers"; 
+                    });
+                },
+                error: function (xhr) {
+                    const errorMessage = xhr.responseJSON?.message || "Something went wrong!";
+                    Swal.fire({
+                        title: "Error!",
+                        text: errorMessage,
+                        icon: "error",
+                        confirmButtonText: "OK"
+                    });
+                }
+            });
+        });
+    });
+</script>

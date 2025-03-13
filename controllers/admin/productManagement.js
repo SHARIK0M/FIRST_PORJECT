@@ -2,6 +2,7 @@ const Product = require("../../models/productSchema");
 const fs = require("fs");
 const path = require("path");
 const Category = require("../../models/categorySchema");
+const productOffer = require("../../models/proOfferSchema"); 
 
 // Display Products with Pagination
 const showProduct = async (req, res) => {
@@ -123,6 +124,19 @@ const updateProduct = async (req, res) => {
       { name, price, description, category, stock, isBlocked: false, imageUrl: updImages },
       { new: true }
     );
+
+    if (product.price !== price) {
+      const existingOffer = await productOffer.findOne({
+        productId: product._id,
+        currentStatus: true, 
+      });
+
+      if (existingOffer) {
+        const newDiscountPrice = price - (price * existingOffer.productOfferPercentage) / 100;
+        existingOffer.discountPrice = newDiscountPrice;
+        await existingOffer.save();
+      }
+    }
 
     req.session.productSave = true;
     res.redirect("/admin/product");

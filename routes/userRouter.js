@@ -35,7 +35,9 @@ const { getProduct, searchAndSort } = require("../controllers/user/shopManagemen
 
 const { 
   viewUserProfile, EditUserProfile, updateUserProfile, changePassword, updatePassword, 
-  my_Orders, orderDetails ,sendOTP,verifyOTP
+  my_Orders, orderDetails ,sendOTP,verifyOTP,  verify,
+  walletpage,
+  retryPayment
 } = require('../controllers/user/profile');
 
 const { 
@@ -58,8 +60,10 @@ const {
 
 const { showWishlistPage, addToWishList, removeFromWishList,checkWishlist } = require('../controllers/user/wishlistManagement')
 
-
 const uploadImages = require("../middlewares/multer"); // Import updated multer middleware
+
+const { addMoneyToWallet , verifyPayment }= require('../controllers/user/walletManagement')
+
 
 // 🔹 Google authentication
 router.get('/auth/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
@@ -131,7 +135,7 @@ router.get('/checkout', isBlocked, logedin, loadCheckoutPage);
 router.post('/checkout/address/check', checkAddressPost);
 router.post('/checkout/place-order', isBlocked, logedin, placeorder);
 router.get('/checkout/success', isBlocked, logedin, orderSuccess);
-router.get('/checkout/payment-failed', isBlocked, logedin, payment_failed);
+
 
 // 🔹 Cancel & Return Orders
 router.put('/order/cancel/:id', isBlocked, logedin, cancelOrder);
@@ -148,10 +152,21 @@ router.post('/checkwishlist', checkWishlist);
 
 router.get('/invoice', logedin, isBlocked, generateInvoice)
 
+
 router.get("/error",logedin,isBlocked,showError)
+
 
 router.post('/validate_coupon', logedin, isBlocked, validateCoupon)
 router.post('/apply_coupon',logedin, isBlocked, applyCoupon)
 router.post('/remove_coupon', logedin, isBlocked, removeCoupon)
+
+
+router.post('/verifyPayment', logedin, isBlocked, verify)
+router.post('/retry-payment/:id',logedin, isBlocked, retryPayment)
+router.get('/checkout/payment-failed', isBlocked, logedin, payment_failed);
+
+router.get('/wallet', logedin, isBlocked,walletpage)
+router.post('/addmoneytowallet', logedin, isBlocked,addMoneyToWallet)
+router.post('/verify_Payment', logedin, isBlocked,verifyPayment)
 
 module.exports = router;

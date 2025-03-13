@@ -319,12 +319,12 @@
                 $(`#totalPerItem-${cartId}`).text(data.updatedItem.totalAmount);
 
                 // ✅ Update subtotal dynamically
-                $('#Subtotal').text(data.subTotal);
+               $('#Subtotal').text(`₹${data.cartValue}`);
 
-                // ✅ Update grand total dynamically
-                let shipping = 50;
-                let grandTotal = parseFloat(data.subTotal.replace("₹", "")) + shipping;
-                $('#total').text(`₹${grandTotal}`);
+let shipping = 50;
+let grandTotal = data.cartValue + shipping;
+$('#total').text(`₹${grandTotal}`);
+
             } else {
                 Swal.fire({
                     icon: 'error',

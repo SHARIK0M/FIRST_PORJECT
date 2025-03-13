@@ -94,6 +94,18 @@
                         <span class="text-danger">+₹50</span>
                     </dd>
                 </dl>
+                 <dl class="dlist text-center">
+                    <dt>Discount:</dt>
+                    <dd>
+                        <span class="text-danger">
+                             {{#if myOrderDetails.discountAmt}}
+                                                                                        -₹ {{myOrderDetails.discountAmt}}
+                                                                                    {{else}}
+                                                                                        -₹ 0
+                                                                                    {{/if}}
+                        </span>
+                    </dd>
+                </dl>
                 <dl class="dlist text-center">
                     <dt>Grand Total:</dt>
                     <dd>
@@ -109,6 +121,12 @@
                 {{#statuchecker myOrderDetails}}
                 {{else}}
                 {{/statuchecker}}
+                <dl class="dlist text-center">
+    <dt>Payment Method:</dt>
+    <dd>
+        <b class="h5">{{myOrderDetails.paymentMethod}}</b>
+    </dd>
+</dl>
             </article>
         </td>
     </tr>
@@ -308,5 +326,130 @@ $(document).ready(function () {
         showReasonPrompt('return', orderId);
     });
 });
+    // Event listener for retrying payment when the order's status is "Payment Failed"
+
+   $('body').on('click', '#retryPayment', function () {
+    const orderId = $(this).data('order-id');
+    console.log("orderId ", orderId);
+
+    if (orderId) {       
+        console.log("amount ", amount);
+        payment(orderId);
+    } else {
+        alert('Invalid order ID.');
+    }
+});
+
+const payment = (orderId) => {
+
+    
+
+    var options = {
+        "key": "rzp_test_OsDtnewxAfAwm0", 
+        "amount": amount, 
+        "currency": "INR",
+        "name": "Floritta",
+        "order_id": undefined, 
+        "handler": async function (response) {
+            try{
+                await retryPayment(orderId, 'Pending');
+            }catch (error) {
+            console.error("Error during retryPayment:", error);
+        }
+    },
+            
+    
+        "modal": {
+            "ondismiss": function() {
+                console.log('Payment modal dismissed');
+            }
+        }
+    };
+
+
+
+
+        var options = {
+      "key": "rzp_test_OsDtnewxAfAwm0", 
+      "amount": parseInt(amount),
+      "currency": "INR",
+        
+      "name" : "Floritta",
+      "order_id": undefined,
+      "handler": function (response) {
+        retryPayment(orderId, 'Pending');
+      },
+
+    };
+
+
+
+    var rzp1 = new Razorpay(options);
+
+    rzp1.on('payment.failed', function (response) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Payment Failed',
+            text: 'Your payment could not be processed. Please try again later.',
+            confirmButtonText: 'OK'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                location.reload(); 
+            }
+        });
+    });
+
+    rzp1.open();
+};
+
+// Retry Payment function (update payment status)
+
+const retryPayment = async (orderId, status) => {
+    try {
+        const response = await fetch(`/retry-payment/${orderId}`, {
+            method: 'POST', 
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: status }) 
+        });
+
+        
+        if (!response.ok) {
+            throw new Error('Failed to update payment status');
+        }
+
+        const data = await response.json();
+       
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Payment Retry Successful',
+                text: data.message, 
+                showConfirmButton: false,
+                timer: 1500
+            }).then(() => {
+                window.location.reload(); 
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Payment Retry Failed',
+                text: data.message, 
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred while retrying payment. Please try again.',
+            showConfirmButton: false,
+            timer: 1500
+        });
+    }
+};
 
 </script>

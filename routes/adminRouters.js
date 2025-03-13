@@ -34,6 +34,9 @@ const { couponPage, addCouponPage, addCouponPost, editCouponPage, editCouponPost
 
 const { ordersPage, orderDetails, changeStatus } = require("../controllers/admin/ordersManagement");
 
+const{ productOfferPage, addProductOfferPage, addProductOffer, editProductOfferPage, editProductOffer, deleteProductOffer, categoryOfferPage, addCategoryOfferPage, addCategoryOffer, editCategoryOfferPage, editCategoryOffer, deleteCategoryOffer } = require('../controllers/admin/offerManagement');
+
+
 // 🔹 Admin Authentication Routes
 router.get("/login", isLogout, getLogin);
 router.post("/login", isLogout, doLogin);
@@ -77,5 +80,21 @@ router.post('/add_coupon', isLogin, addCouponPost)
 router.get('/editcoupon/:id', editCouponPage);
 router.post('/editcoupon/:id', editCouponPost);
 router.delete('/delete_coupon',isLogin,deleteCoupon)
+
+
+router.get('/productOffers', isLogin, productOfferPage)
+router.get('/addProOffers', isLogin, addProductOfferPage)
+router.post('/addProOffers', isLogin, addProductOffer)
+router.get('/editProductOffer/:id', isLogin, editProductOfferPage)
+router.post("/editProductOffer/:id", isLogin, editProductOffer);
+router.delete('/deleteProOffer/:id', isLogin, deleteProductOffer)
+
+router.get('/categoryOffers', isLogin, categoryOfferPage)
+router.get('/addCatOffers', isLogin, addCategoryOfferPage)
+router.post('/addCatOffers', isLogin, addCategoryOffer)
+router.get('/editCategoryOffer/:id', isLogin, editCategoryOfferPage)
+router.post("/editCategoryOffer/:id", isLogin, editCategoryOffer);
+router.delete('/deleteCatOffer/:id', isLogin, deleteCategoryOffer)
+
 
 module.exports = router;

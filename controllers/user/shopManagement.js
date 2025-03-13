@@ -34,12 +34,9 @@ const getProduct = async (req, res) => {
 
 
 
-
-
-
 const searchAndSort = async (req, res) => {
   const { searchQuery, sortOption, categoryFilter, page, limit } = req.body;
-console.log(sortOption)
+
   const matchStage = { $match: {isBlocked: false} };
   if (searchQuery) {
     matchStage.$match.name = { $regex: searchQuery, $options: "i" };
@@ -92,8 +89,20 @@ console.log(sortOption)
         preserveNullAndEmptyArrays: true, 
       },
     },
-    
-    
+    {
+      $lookup: {
+        from: "productoffers",  
+        localField: "_id",  
+        foreignField: "productId",  
+        as: "productOffer",
+      },
+    },
+    {
+      $unwind: {
+        path: "$productOffer",
+        preserveNullAndEmptyArrays: true, 
+      },
+    },
     {
       $project: {
         _id: 1,
@@ -133,8 +142,6 @@ console.log(sortOption)
 
   res.json({ products, totalProducts });
 };
-
-
 
 
 module.exports = {

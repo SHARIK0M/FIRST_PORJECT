@@ -205,6 +205,18 @@
                                     <dt>Delivery:</dt>
                                     <dd><span class="text-danger">+₹50</span></dd>
                                 </dl>
+                                 <dl class="dlist text-center">
+                    <dt>Discount:</dt>
+                    <dd>
+                        <span class="text-danger">
+                             {{#if myOrderDetails.discountAmt}}
+                                                                                        -₹ {{myOrderDetails.discountAmt}}
+                                                                                    {{else}}
+                                                                                        -₹ 0
+                                                                                    {{/if}}
+                        </span>
+                    </dd>
+                </dl>
                                 <dl class="dlist text-center">
                                     <dt>Grand Total:</dt>
                                     <dd><b id="grandTotal" class="h5">₹{{add myOrderDetails.total 0}}</b></dd>

@@ -1,0 +1,145 @@
+<main class="main-wrap">
+    <section class="content-main">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-10">
+                <div class="content-header"></div>
+            </div>
+
+            <div class="col-lg-8 mt-5 d-flex justify-content-center">
+                <div class="card shadow-lg border-0 rounded">
+                    <div class="card-body p-4">
+                        <h4 class="text-center mb-4">Add Product Offer</h4>
+                        <form id="addProductOfferForm" action="/admin/addProOffers" method="post">
+                            
+                            <!-- Product Name Selection -->
+                            <div class="mb-3">
+                                <label for="productName" class="form-label">Product Name:</label>
+                                <select name="productName" id="productName" class="form-select">
+                                    {{#each products}}
+                                    <option value="{{this.name}}">{{this.name}}</option>
+                                    {{/each}}
+                                </select>
+                            </div>
+
+                            <!-- Offer Percentage -->
+                            <div class="mb-3">
+                                <label for="productOfferPercentage" class="form-label">Product Offer Percentage:</label>
+                                <div class="input-group">
+                                    <input id="productOfferPercentage" name="productOfferPercentage" type="number"
+                                        class="form-control" placeholder="Enter the offer percentage" min="5" max="90">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <div class="form-text">Choose a percentage to be discounted. Between 5% and 90%.</div>
+                            </div>
+
+                            <!-- Offer Start Date -->
+                            <div class="mb-3">
+                                <label for="startDate" class="form-label">Offer Start Date:</label>
+                                <input id="startDate" name="startDate" type="date" class="form-control">
+                                <div class="form-text">Choose a start date for the offer to be considered.</div>
+                            </div>
+
+                            <!-- Offer Expiry Date -->
+                            <div class="mb-3">
+                                <label for="endDate" class="form-label">Offer Expiry Date:</label>
+                                <input id="endDate" name="endDate" type="date" class="form-control">
+                                <div class="form-text">Choose an expiry date for the offer to end.</div>
+                            </div>
+
+                            <!-- Form Actions -->
+                            <div class="d-flex justify-content-end gap-2">
+                                <button id="backbutton" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Back</button>
+                                <button type="submit" class="btn btn-info">Save Changes</button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.10/dist/sweetalert2.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        // Handle product offer form submission
+        $('#addProductOfferForm').on('submit', function (e) {
+            e.preventDefault();
+
+            const startDate = new Date($('#startDate').val());
+            const endDate = new Date($('#endDate').val());
+            const today = new Date();
+
+            // Validate start date
+            if (startDate < today.setHours(0, 0, 0, 0)) {
+                Swal.fire({
+                    title: "Invalid Start Date!",
+                    text: "Start date cannot be in the past.",
+                    icon: "error",
+                    confirmButtonText: "OK"
+                });
+                return;
+            }
+
+            // Validate end date
+            if (endDate <= startDate) {
+                Swal.fire({
+                    title: "Invalid End Date!",
+                    text: "End date must be after the start date.",
+                    icon: "error",
+                    confirmButtonText: "OK"
+                });
+                return;
+            }
+
+            const formData = $(this).serialize();
+
+            // Submit form data via AJAX
+            $.ajax({
+                url: '/admin/addProOffers',
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    Swal.fire({
+                        title: "Success!",
+                        text: response.message,
+                        icon: "success",
+                        confirmButtonText: "OK"
+                    }).then(() => {
+                        window.location.href = "/admin/productOffers";
+                    });
+                },
+                error: function (xhr) {
+                    const errorMessage = xhr.responseJSON?.message || "Something went wrong!";
+                    Swal.fire({
+                        title: "Error!",
+                        text: errorMessage,
+                        icon: "error",
+                        confirmButtonText: "OK"
+                    });
+                }
+            });
+        });
+
+        // Handle back button click event
+        $('#backbutton').click(function (e) {
+            e.preventDefault();
+            Swal.fire({
+                title: "Leave the Page?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#088178",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "/admin/productOffers";
+                }
+            });
+        });
+    });
+</script>
