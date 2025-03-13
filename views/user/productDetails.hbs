@@ -88,6 +88,11 @@
                                       </span>
                                       {{/if}}
                                       {{/if}}
+                                      <span id="addwishlist">
+    <button id="wishlist-btn" data-product-id="{{product._id}}" class="button button-add-to-wishlist">Add to Wishlist</button>
+    <p id="wishlist-message" class="wishlist-message mt-2" style="color: green; display: none;"></p>
+</span>
+
 
                                     <div class="bt-1 border-color-1 mt-30 mb-30"></div>
                                 </div>
@@ -101,10 +106,51 @@
     </section>
 </main>
 
+<style>
+    .wishlist-message {
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+</style>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".button-add-to-wishlist").forEach(button => {
+        button.addEventListener("click", async function () {
+            let productId = this.getAttribute("data-product-id");
+            let messageElement = document.getElementById("wishlist-message");
+
+            let response = await fetch("/addtowishlist", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: productId })
+            });
+
+            let result = await response.json();
+
+            if (result.success) {
+                messageElement.style.color = "green";
+                messageElement.textContent = "Added to Wishlist!";
+            } else {
+                messageElement.style.color = "red";
+                messageElement.textContent = result.message;
+            }
+
+            messageElement.style.display = "block"; // Show the message
+
+            // Remove the message after 5 seconds
+            setTimeout(() => {
+                messageElement.style.display = "none";
+            }, 2000);
+        });
+    });
+});
+
     $(document).ready(function () {
         $('.button.button-add-to-cart').on('click', function (e) {
             var prodId = $(this).data('product-id');

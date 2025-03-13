@@ -64,7 +64,6 @@ let addMoneyToWallet = async (req, res) => {
 
 
 
-
 const verifyPayment = async (req, res) => {
     try {
         let details = req.body

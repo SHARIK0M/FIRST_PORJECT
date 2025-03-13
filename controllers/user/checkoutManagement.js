@@ -248,7 +248,20 @@ const placeorder = async (req, res) => {
         return res.status(400).json({ error: "Insufficient wallet balance" });
       }
       walletBalance -= grandTotal;
-      await User.updateOne({ _id: userID }, { $set: { wallet: walletBalance } });
+      await User.updateOne(
+        {
+            _id: req.session.user._id
+        },
+        {
+            $push: {
+                history: {
+                    amount: grandTotal,
+                    status: "Debited",
+                    date: Date.now()
+                }
+            }
+        }
+    )
     }
 
     const order = new Order({

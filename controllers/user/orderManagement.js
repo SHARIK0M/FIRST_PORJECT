@@ -74,15 +74,20 @@ const cancelOrder = async (req, res) => {
             order.status = "Partially Cancelled";
         }
 
-        // Apply Coupon Discount Calculation
-        if (order.discountAmt && newlyCancelledProducts.length > 0) {
-            let discountPerProduct = order.discountAmt / order.product.length;
-            let totalDiscountToDeduct = discountPerProduct * newlyCancelledProducts.length;
-            console.log(`Discount Per Product: ${discountPerProduct}, Newly Canceled Products: ${newlyCancelledProducts.length}, Total Discount Deducted: ${totalDiscountToDeduct}`);
+    // Apply Coupon Discount Calculation
+if (order.discountAmt && newlyCancelledProducts.length > 0) {
+    if (allProductsCancelled) {
+        // If all products are cancelled, deduct the full discount amount
+        totalRefund -= order.discountAmt;
+    } else {
+        let discountPerProduct = order.discountAmt / order.product.length;
+        let totalDiscountToDeduct = discountPerProduct * newlyCancelledProducts.length;
+        totalRefund -= totalDiscountToDeduct;
+    }
 
-            totalRefund -= totalDiscountToDeduct;
-            if (totalRefund < 0) totalRefund = 0;
-        }
+    if (totalRefund < 0) totalRefund = 0;
+}
+
         console.log(`Total Refund After Coupon Adjustment: ${totalRefund}`);
 
         await order.save();
