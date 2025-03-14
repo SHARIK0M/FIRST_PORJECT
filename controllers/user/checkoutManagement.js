@@ -36,7 +36,7 @@ const loadCheckoutPage = async (req, res) => {
     const cartItemtoRender = await Cart.find({ userId: ID })
       .populate({ path: "product_Id", model: "Product" })
       .lean();
-
+const balnace = Math.floor(userData.wallet)
     // If no items in the cart, return empty cart details
     if (!cartItems.length) {
       return res.render("user/checkout", {
@@ -45,6 +45,7 @@ const loadCheckoutPage = async (req, res) => {
         subTotal: 0,
         cart: [],
         coupon,
+        balnace
       });
     }
 
@@ -105,6 +106,7 @@ const loadCheckoutPage = async (req, res) => {
       subTotal,
       cart,
       coupon,
+      balnace
     });
   } catch (error) {
     console.log("Error loading checkout page:", error.message);

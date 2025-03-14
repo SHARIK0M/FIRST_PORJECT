@@ -35,6 +35,7 @@ const { couponPage, addCouponPage, addCouponPost, editCouponPage, editCouponPost
 const { ordersPage, orderDetails, changeStatus } = require("../controllers/admin/ordersManagement");
 
 const{ productOfferPage, addProductOfferPage, addProductOffer, editProductOfferPage, editProductOffer, deleteProductOffer, categoryOfferPage, addCategoryOfferPage, addCategoryOffer, editCategoryOfferPage, editCategoryOffer, deleteCategoryOffer } = require('../controllers/admin/offerManagement');
+const {  loadDashboard, getSales}=require('../controllers/admin/dashBoardManagement');
 
 
 // 🔹 Admin Authentication Routes
@@ -43,9 +44,8 @@ router.post("/login", isLogout, doLogin);
 router.get("/logout", isLogin, doLogout);  // 🔹 Ensure only logged-in admins can log out
 
 // 🔹 Admin Dashboard
-router.get("/home", isLogin, (req, res) => {
-  res.render("admin/home", { layout: "adminLayout" });
-});
+router.get('/home', isLogin, loadDashboard)
+
 
 // 🔹 User Management
 router.get("/users", isLogin, usersPage);
@@ -95,6 +95,9 @@ router.post('/addCatOffers', isLogin, addCategoryOffer)
 router.get('/editCategoryOffer/:id', isLogin, editCategoryOfferPage)
 router.post("/editCategoryOffer/:id", isLogin, editCategoryOffer);
 router.delete('/deleteCatOffer/:id', isLogin, deleteCategoryOffer)
+
+
+router.get('/get_sales',isLogin, getSales)
 
 
 module.exports = router;

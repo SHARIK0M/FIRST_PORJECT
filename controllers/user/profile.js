@@ -327,9 +327,9 @@ const walletpage = async (req, res) => {
       const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
       const history = historyData[0] ? historyData[0].history : [];
-
+      const balnace = Math.floor(userData.wallet)
       console.log("Transaction history retrieved");
-      res.render('user/wallet', { userData, history, pages });
+      res.render('user/wallet', { userData,balnace, history, pages });
 
   } catch (error) {
       console.error("Error fetching wallet page data:", error.message);

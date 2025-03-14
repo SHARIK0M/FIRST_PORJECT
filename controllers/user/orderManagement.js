@@ -50,22 +50,39 @@ const cancelOrder = async (req, res) => {
         }
 
         let totalRefund = 0;
-        let totalOrderValue = order.product.reduce((acc, product) => acc + (product.price * product.quantity), 0);
-        console.log(`Total Order Value Before Cancellation: ${totalOrderValue}`);
-
         let newlyCancelledProducts = [];
+
+        // Calculate total order amount & discount percentage
+        const totalAmt = order.totalAmt && order.totalAmt > 0 
+            ? order.totalAmt 
+            : order.product.reduce((sum, p) => sum + (p.price * p.quantity), 0);
+        const discountAmt = order.discountAmt || 0;
+        const discountPercentage = totalAmt > 0 ? (discountAmt / totalAmt) * 100 : 0;
+
+        console.log("Total Order Value:", totalAmt);
+        console.log("Discount Percentage:", discountPercentage.toFixed(2) + "%");
 
         for (let product of order.product) {
             if (!product.isCancelled) {
                 product.isCancelled = true;
                 product.status = "Cancelled";
-                totalRefund += product.price * product.quantity;
                 newlyCancelledProducts.push(product);
-                console.log(`Cancelled Product: ${product.name}, Price: ${product.price}, Quantity: ${product.quantity}, Refund Added: ${totalRefund}`);
+
+                // Calculate refund amount per product
+                const productTotal = product.price * product.quantity;
+                const productDiscount = (productTotal * discountPercentage) / 100;
+                const refundAmount = Math.max(productTotal - productDiscount, 0);
+
+                totalRefund += refundAmount;
+
+                console.log(`Cancelled Product: ${product.name}, Price: ${product.price}, Quantity: ${product.quantity}`);
+                console.log(`Product Discount: ${productDiscount}, Final Refund: ${refundAmount}`);
             }
         }
 
+        // Check if all products are cancelled
         let allProductsCancelled = order.product.every(p => p.isCancelled);
+
         if (allProductsCancelled) {
             order.status = "Cancelled";
             order.cancelReason = reason;
@@ -74,46 +91,34 @@ const cancelOrder = async (req, res) => {
             order.status = "Partially Cancelled";
         }
 
-    // Apply Coupon Discount Calculation
-if (order.discountAmt && newlyCancelledProducts.length > 0) {
-    if (allProductsCancelled) {
-        // If all products are cancelled, deduct the full discount amount
-        totalRefund -= order.discountAmt;
-    } else {
-        let discountPerProduct = order.discountAmt / order.product.length;
-        let totalDiscountToDeduct = discountPerProduct * newlyCancelledProducts.length;
-        totalRefund -= totalDiscountToDeduct;
-    }
-
-    if (totalRefund < 0) totalRefund = 0;
-}
-
         console.log(`Total Refund After Coupon Adjustment: ${totalRefund}`);
 
         await order.save();
 
+        // Restore stock for newly cancelled products
         for (const product of newlyCancelledProducts) {
             await Product.updateOne(
-                { _id: product.id },
+                { _id: product._id },
                 { $inc: { stock: product.quantity } }
             );
             product.refunded = true;
             console.log(`Stock Updated for Product: ${product.name}, Quantity Restocked: ${product.quantity}`);
         }
 
+        // Process refund for newly cancelled products
         if (totalRefund > 0) {
             await User.updateOne(
                 { _id: req.session.user._id },
                 { $inc: { wallet: totalRefund } }
             );
-            console.log(`Final Refund Processed: ${totalRefund}`);
-
+            console.log("Final Refund Processed:", totalRefund);
+        
             await User.updateOne(
                 { _id: req.session.user._id },
                 {
                     $push: {
                         history: {
-                            amount: totalRefund,
+                            amount: Math.floor(totalRefund),
                             status: `Refund for Order ID: ${id}`,
                             date: Date.now()
                         }
@@ -158,25 +163,34 @@ const returnOrder = async (req, res) => {
         let totalRefund = 0;
         let newlyReturnedProducts = [];
 
-        // Calculate total order value before return
-        let totalOrderValue = order.product.reduce((acc, product) => {
-            return acc + (product.price * product.quantity);
-        }, 0);
+        // Calculate total order amount & discount percentage
+        const totalAmt = order.totalAmt && order.totalAmt > 0 
+            ? order.totalAmt 
+            : order.product.reduce((sum, p) => sum + (p.price * p.quantity), 0);
+        const discountAmt = order.discountAmt || 0;
+        const discountPercentage = totalAmt > 0 ? (discountAmt / totalAmt) * 100 : 0;
 
-        console.log("Total Order Value Before Return:", totalOrderValue);
+        console.log("Total Order Value:", totalAmt);
+        console.log("Discount Percentage:", discountPercentage.toFixed(2) + "%");
 
         for (let product of order.product) {
-            // Skip cancelled products (they cannot be returned)
-            if (product.isCancelled) continue;
-
-            // Skip already returned products to prevent double refund
-            if (product.isReturned) continue;
+            // Skip cancelled or already returned products
+            if (product.isCancelled || product.isReturned) continue;
 
             // Mark the product as returned
             product.isReturned = true;
-            totalRefund += product.price * product.quantity;
+            product.status = "Returned";
             newlyReturnedProducts.push(product);
-            console.log(`Returned Product: ${product.name}, Price: ${product.price}, Quantity: ${product.quantity}, Refund Added: ${totalRefund}`);
+
+            // Calculate refund amount per product
+            const productTotal = product.price * product.quantity;
+            const productDiscount = (productTotal * discountPercentage) / 100;
+            const refundAmount = Math.max(productTotal - productDiscount, 0);
+
+            totalRefund += refundAmount;
+
+            console.log(`Returned Product: ${product.name}, Price: ${product.price}, Quantity: ${product.quantity}`);
+            console.log(`Product Discount: ${productDiscount}, Final Refund: ${refundAmount}`);
         }
 
         // Check if all products are returned
@@ -189,22 +203,12 @@ const returnOrder = async (req, res) => {
             order.status = "Partially Returned";
         }
 
-        // **Apply Coupon Refund Logic**
-        if (order.discountAmt && newlyReturnedProducts.length > 0) {
-            let discountPerProduct = order.discountAmt / order.product.length;
-            let discountToDeduct = newlyReturnedProducts.length * discountPerProduct;
-            totalRefund -= discountToDeduct;
-
-            console.log(`Discount Per Product: ${discountPerProduct}, Returned Products: ${newlyReturnedProducts.length}, Total Discount Deducted: ${discountToDeduct}`);
-            if (totalRefund < 0) totalRefund = 0; // Ensure refund is not negative
-        }
-
         await order.save();
 
         // Restore stock for newly returned products
         for (const product of newlyReturnedProducts) {
             await Product.updateOne(
-                { _id: product.id },
+                { _id: product._id },
                 { $inc: { stock: product.quantity } }
             );
             console.log(`Stock Updated for Product: ${product.name}, Quantity Restocked: ${product.quantity}`);
@@ -223,7 +227,7 @@ const returnOrder = async (req, res) => {
                 { 
                     $push: { 
                         history: { 
-                            amount: totalRefund, 
+                            amount: Math.floor(totalRefund), 
                             status: `Refund for Order ID: ${id}`, 
                             date: Date.now() 
                         } 
@@ -244,7 +248,6 @@ const returnOrder = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
-
 
 const cancelOneProduct = async (req, res) => {
     try {
@@ -279,19 +282,25 @@ const cancelOneProduct = async (req, res) => {
         product.status = "Cancelled";
         product.cancelReason = reason;
 
-        // Calculate proportional discount for this product
-        const totalProducts = order.product.length;
-        const discountAmt = order.discountAmt || 0;  // Ensure discountAmt exists
-        const productDiscount = discountAmt / totalProducts;  // Divide discount equally
+        // Correctly retrieve total order amount and discount
+        const totalAmt = order.totalAmt && order.totalAmt > 0 ? order.totalAmt : order.product.reduce((sum, p) => sum + (p.price * p.quantity), 0);
+        const discountAmt = order.discountAmt || 0;
 
-        // Calculate refund amount (Price * Quantity - Proportional Discount)
+        // Calculate correct discount percentage
+        const discountPercentage = totalAmt > 0 ? (discountAmt / totalAmt) * 100 : 0;
+
+        // Calculate refund amount with correct discount reduction
         const productQuantity = product.quantity;
         const productPrice = product.price * productQuantity;
-        const refundAmount = productPrice - productDiscount;
+        const discountForProduct = (productPrice * discountPercentage) / 100;
+        const refundAmount = Math.max(productPrice - discountForProduct, 0);
 
+        console.log("Subtotal:", totalAmt);
+        console.log("Total Order Amount:", totalAmt);
         console.log("Product Price:", productPrice);
-        console.log("Discount Per Product:", productDiscount);
-        console.log("Refund Amount:", refundAmount);
+        console.log("Discount Percentage:", discountPercentage.toFixed(2) + "%");
+        console.log("Discount Amount for Product:", discountForProduct);
+        console.log("Final Refund Amount:", refundAmount);
 
         // Save the updated order
         await order.save();
@@ -314,7 +323,7 @@ const cancelOneProduct = async (req, res) => {
             { 
                 $push: { 
                     history: { 
-                        amount: refundAmount, 
+                        amount: Math.floor(refundAmount), 
                         status: `Refund for ${product.name} (Order ID: ${id})`, 
                         date: Date.now() 
                     } 
@@ -365,19 +374,25 @@ const returnOneProduct = async (req, res) => {
         product.status = "Returned";
         product.returnReason = reason;
 
-        // Calculate proportional discount for this product
-        const totalProducts = order.product.length;
-        const discountAmt = order.discountAmt || 0;  // Ensure discountAmt exists
-        const productDiscount = discountAmt / totalProducts;  // Divide discount equally
+        // Correctly retrieve total order amount and discount
+        const totalAmt = order.totalAmt && order.totalAmt > 0 ? order.totalAmt : order.product.reduce((sum, p) => sum + (p.price * p.quantity), 0);
+        const discountAmt = order.discountAmt || 0;
 
-        // Calculate refund amount (Price * Quantity - Proportional Discount)
+        // Calculate correct discount percentage
+        const discountPercentage = totalAmt > 0 ? (discountAmt / totalAmt) * 100 : 0;
+
+        // Calculate refund amount with correct discount reduction
         const productQuantity = product.quantity;
         const productPrice = product.price * productQuantity;
-        const refundAmount = productPrice - productDiscount;
+        const discountForProduct = (productPrice * discountPercentage) / 100;
+        const refundAmount = Math.max(productPrice - discountForProduct, 0);
 
+        console.log("Subtotal:", totalAmt);
+        console.log("Total Order Amount:", totalAmt);
         console.log("Product Price:", productPrice);
-        console.log("Discount Per Product:", productDiscount);
-        console.log("Refund Amount:", refundAmount);
+        console.log("Discount Percentage:", discountPercentage.toFixed(2) + "%");
+        console.log("Discount Amount for Product:", discountForProduct);
+        console.log("Final Refund Amount:", refundAmount);
 
         // Save the updated order
         await order.save();
@@ -400,7 +415,7 @@ const returnOneProduct = async (req, res) => {
             { 
                 $push: { 
                     history: { 
-                        amount: refundAmount, 
+                        amount: Math.floor(refundAmount), 
                         status: `[return] Refund for ${product.name} (Order ID: ${id})`, 
                         date: Date.now() 
                     } 
@@ -417,7 +432,6 @@ const returnOneProduct = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
-
 
 
 const generateInvoice = async (req, res) => {

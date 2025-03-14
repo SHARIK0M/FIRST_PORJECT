@@ -1,0 +1,278 @@
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/handlebars/dist/handlebars.min.js"></script>
+</head>
+
+<main class="main-wrap">   
+    <section class="content-main">
+        <!-- Dashboard Header -->
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Dashboard</h2>
+                <p>Overview of your business data</p>
+            </div>
+        </div>
+        
+        <!-- Summary Cards -->
+       <div class="row">
+    <!-- Total Revenue -->
+    <div class="col-lg-3 col-md-6">
+        <div class="card shadow-sm border-0 rounded-lg mb-4">
+            <div class="card-body d-flex align-items-center">
+                <div class="icon icon-sm rounded-circle bg-primary-light d-flex align-items-center justify-content-center me-3">
+                    <i class="text-primary material-icons md-monetization_on"></i>
+                </div>
+                <div class="text">
+                    <h6 class="mb-1 text-muted">Total Revenue</h6>
+                    <h5 class="fw-bold text-dark">₹{{totalRevnue}}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Orders -->
+    <div class="col-lg-3 col-md-6">
+        <div class="card shadow-sm border-0 rounded-lg mb-4">
+            <div class="card-body d-flex align-items-center">
+                <div class="icon icon-sm rounded-circle bg-success-light d-flex align-items-center justify-content-center me-3">
+                    <i class="text-success material-icons md-local_shipping"></i>
+                </div>
+                <div class="text">
+                    <h6 class="mb-1 text-muted">Total Orders</h6>
+                    <h5 class="fw-bold text-dark">{{thisMonthOrder}}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- This Month Sales -->
+    <div class="col-lg-3 col-md-6">
+        <div class="card shadow-sm border-0 rounded-lg mb-4">
+            <div class="card-body d-flex align-items-center">
+                <div class="icon icon-sm rounded-circle bg-warning-light d-flex align-items-center justify-content-center me-3">
+                    <i class="text-warning material-icons md-qr_code"></i>
+                </div>
+                <div class="text">
+                    <h6 class="mb-1 text-muted">This Month Sales</h6>
+                    <h5 class="fw-bold text-dark">{{thisMonthOrder}}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Earning -->
+    <div class="col-lg-3 col-md-6">
+        <div class="card shadow-sm border-0 rounded-lg mb-4">
+            <div class="card-body d-flex align-items-center">
+                <div class="icon icon-sm rounded-circle bg-info-light d-flex align-items-center justify-content-center me-3">
+                    <i class="text-info material-icons md-shopping_basket"></i>
+                </div>
+                <div class="text">
+                    <h6 class="mb-1 text-muted">Monthly Earning</h6>
+                    <h5 class="fw-bold text-dark">₹{{thisMonthSales}}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+     
+        <!-- Sales Report Filter -->
+        <div class="container mt-3 mb-4">
+    <div class="row align-items-end">
+        <!-- Date Range Selection -->
+        <div class="col-md-3">
+            <label for="date-range" class="form-label">Select Range:</label>
+            <select class="form-control" id="date-range" onchange="toggleDateInputs()">
+                <option value="select">Select</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="custom">Custom</option>
+            </select>
+        </div>
+
+        <!-- Start Date Input -->
+        <div class="col-md-3 d-none" id="start-date-group">
+            <label for="start-date" class="form-label">Start Date:</label>
+            <input type="date" class="form-control" value="2024-07-12" id="start-date" min="" max="">
+        </div>
+
+        <!-- End Date Input -->
+        <div class="col-md-3 d-none" id="end-date-group">
+            <label for="end-date" class="form-label">End Date:</label>
+            <input type="date" class="form-control" value="2024-07-18" id="end-date" min="" max="">
+        </div>
+
+        <!-- Generate Report Button -->
+        <div class="col-md-3 text-md-start text-center mt-2 mt-md-0">
+            <button onclick="getSalesData()" type="button" class="btn btn-primary">
+                <i class="material-icons md-post_add"></i> Create Report
+            </button>
+        </div>
+    </div>
+
+    <!-- Hidden Input for Revenue -->
+    <input id="revenue" type="hidden" value="{{revenueByMonth}}">
+</div>
+
+
+        <div class="row" id="table"></div>
+
+        <!-- Best Selling and Popular Products Section -->
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <header class="card-header">
+                        <h5>Best Selling Products</h5>
+                    </header>
+                    <div class="card-body">
+                        {{#each bestSellings}}
+                        <article class="itemlist">
+                            <div class="row align-items-center">
+                                <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 col-name">
+                                    <a class="itemside" href="#">
+                                        <div class="left">
+                                            <img src="/assets/imgs/products/{{imageUrl.[0]}}" class="img-sm img-thumbnail" alt="Item">
+                                        </div>
+                                        <div class="info">
+                                            <h6 class="mb-0">{{name}}</h6>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+                        {{/each}}
+                    </div>
+                </div>
+            </div>
+              
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <header class="card-header">
+                        <h5>Popular Products</h5>
+                    </header>
+                    <div class="card-body">
+                        {{#each popuarProducts}}
+                        <article class="itemlist">
+                            <div class="row align-items-center">
+                                <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 col-name">
+                                    <a class="itemside" href="#">
+                                        <div class="left">
+                                            <img src="/assets/imgs/products/{{imageUrl.[0]}}" class="img-sm img-thumbnail" alt="Item">
+                                        </div>
+                                        <div class="info">
+                                            <h6 class="mb-0">{{name}}</h6>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+                        {{/each}}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <header class="card-header">
+                        <h5>Best Selling Categories</h5>
+                    </header>
+                    <div class="card-body">
+                        {{#each bestSellingCategory}}
+                        <article class="itemlist">
+                            <div class="row align-items-center">
+                                <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 col-name">
+                                    <a class="itemside" href="#">
+                                        <div class="left">
+                                            <img src="/assets/imgs/products/{{imageUrl}}" class="img-sm img-thumbnail" alt="Item">
+                                        </div>
+                                        <div class="info">
+                                            <h6 class="mb-0">{{category}}</h6>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+                        {{/each}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/javascripts/chart.js"></script>
+
+<script>
+    let months, ordersByMonth, revenueByMonth, categories, revenues;
+
+    // Fetch chart data from the server and update graphs
+    const getChartData = async () => {
+        try {
+            const response = await fetch('/get_chart_data', {
+                headers: { 'Content-Type': 'application/json' },
+            });
+            
+            const data = await response.json();
+            console.log('Data received:', data);
+
+            // Assigning received data to variables
+            months = data.months;
+            ordersByMonth = data.odersByMonth; // Fix potential typo
+            revenueByMonth = data.revnueByMonth; // Fix potential typo
+            categories = data.cat;
+            revenues = data.revenue;
+
+            // Updating graphs with fetched data
+            salesGraph(months, ordersByMonth);
+            revenue(months, revenueByMonth);
+            categoryRevenue(categories, revenues);
+        } catch (error) {
+            console.error('Error fetching or processing data:', error);
+        }
+    };
+
+    getChartData();
+
+    // Toggle date input fields based on the selected range
+    function toggleDateInputs() {
+        const dateRange = document.getElementById("date-range").value;
+        const startDateGroup = document.getElementById("start-date-group");
+        const endDateGroup = document.getElementById("end-date-group");
+        const startDateInput = document.getElementById("start-date");
+        const endDateInput = document.getElementById("end-date");
+
+        const today = new Date().toISOString().split('T')[0];
+
+        switch (dateRange) {
+            case "daily":
+                startDateInput.value = endDateInput.value = today;
+                break;
+            case "weekly":
+                const lastWeek = new Date();
+                lastWeek.setDate(lastWeek.getDate() - 6);
+                startDateInput.value = lastWeek.toISOString().split('T')[0];
+                endDateInput.value = today;
+                break;
+            case "monthly":
+                const lastMonth = new Date();
+                lastMonth.setDate(lastMonth.getDate() - 30);
+                startDateInput.value = lastMonth.toISOString().split('T')[0];
+                endDateInput.value = today;
+                break;
+            case "custom":
+                startDateInput.value = endDateInput.value = "";
+                break;
+            default:
+                startDateInput.value = endDateInput.value = "";
+                break;
+        }
+
+        // Show or hide date input fields based on the selected range
+        const isCustom = dateRange === "custom";
+        startDateGroup.style.display = isCustom ? "block" : "none";
+        endDateGroup.style.display = isCustom ? "block" : "none";
+    }
+</script>
