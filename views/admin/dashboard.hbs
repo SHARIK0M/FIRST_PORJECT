@@ -13,7 +13,7 @@
         </div>
         
         <!-- Summary Cards -->
-       <div class="row">
+       {{!-- <div class="row">
     <!-- Total Revenue -->
     <div class="col-lg-3 col-md-6">
         <div class="card shadow-sm border-0 rounded-lg mb-4">
@@ -73,7 +73,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}
 
      
         <!-- Sales Report Filter -->
@@ -271,8 +271,9 @@
         }
 
         // Show or hide date input fields based on the selected range
-        const isCustom = dateRange === "custom";
-        startDateGroup.style.display = isCustom ? "block" : "none";
-        endDateGroup.style.display = isCustom ? "block" : "none";
+       const isCustom = dateRange === "custom";
+startDateGroup.classList.toggle("d-none", !isCustom);
+endDateGroup.classList.toggle("d-none", !isCustom);
+
     }
 </script>

@@ -406,7 +406,7 @@ const payment = (orderId) => {
 
 const retryPayment = async (orderId, status) => {
     try {
-        const response = await fetch(`/retry-payment/${orderId}`, {
+        const response = await fetch(`/retrypayment/${orderId}`, {
             method: 'POST', 
             headers: {
                 'Content-Type': 'application/json',

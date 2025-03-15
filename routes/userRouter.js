@@ -2,67 +2,20 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 require("../middlewares/googleAuth");
-
 const { logedout, logedin, isBlocked } = require("../middlewares/userAuth");
-const {
-  getHome,
-  getLogin,
-  getSignup,
-  doSignup,
-  getOtp,
-  submitOtp,
-  resendOtp,
-  doLogin,
-  doLogout,
-  googleCallback,
-  productDetails,
-} = require("../controllers/user/userController");
-
+const {getHome,getLogin,getSignup,doSignup,getOtp,submitOtp,resendOtp,doLogin,doLogout,googleCallback,productDetails,verifyReferelCode,} = require("../controllers/user/userController");
 const {showError} = require("../controllers/user/errorController");
-
-const {
-  submitMail,
-  submitMailPost,
-  forgotOtppage,
-  forgotOtpSubmit,
-  resetPasswordPage,
-  resetPassword,
-  resendOTP
- 
-} = require("../controllers/user/forgotPassword");
-
+const {submitMail,submitMailPost,forgotOtppage,forgotOtpSubmit,resetPasswordPage,resetPassword,resendOTP} = require("../controllers/user/forgotPassword");
 const { getProduct, searchAndSort } = require("../controllers/user/shopManagement");
-
-const { 
-  viewUserProfile, EditUserProfile, updateUserProfile, changePassword, updatePassword, 
-  my_Orders, orderDetails ,sendOTP,verifyOTP,  verify,
-  walletpage,
-  retryPayment
-} = require('../controllers/user/profile');
-
-const { 
-  addAddress, addAddressPost, manageAddress,  editAddressPost, deleteAddress ,checkAddressPost
-} = require('../controllers/user/addressManagement');
-
-const { 
-  loadCartPage, addToCart, removeFromCart, updateCart, checkOutOfStock 
-} = require('../controllers/user/cart');
-
-const { 
-  loadCheckoutPage, placeorder, orderSuccess , validateCoupon,
-  applyCoupon,
-  removeCoupon,
-} = require('../controllers/user/checkoutManagement');
-
-const { 
-  payment_failed, cancelOrder, returnOrder, cancelOneProduct, returnOneProduct ,generateInvoice
-} = require('../controllers/user/orderManagement');
-
+const { viewUserProfile, EditUserProfile, updateUserProfile, changePassword, updatePassword, my_Orders, orderDetails ,sendOTP,verifyOTP,  verify,walletpage,retryPayment} = require('../controllers/user/profile');
+const { addAddress, addAddressPost, manageAddress,  editAddressPost, deleteAddress ,checkAddressPost} = require('../controllers/user/addressManagement');
+const { loadCartPage, addToCart, removeFromCart, updateCart, checkOutOfStock } = require('../controllers/user/cart');
+const { loadCheckoutPage, placeorder, orderSuccess , validateCoupon,applyCoupon,removeCoupon,} = require('../controllers/user/checkoutManagement');
+const { payment_failed, cancelOrder, returnOrder, cancelOneProduct, returnOneProduct ,generateInvoice} = require('../controllers/user/orderManagement');
 const { showWishlistPage, addToWishList, removeFromWishList,checkWishlist } = require('../controllers/user/wishlistManagement')
-
-const uploadImages = require("../middlewares/multer"); // Import updated multer middleware
-
+const uploadImages = require("../middlewares/multer");
 const { addMoneyToWallet , verifyPayment }= require('../controllers/user/walletManagement')
+
 
 
 // 🔹 Google authentication
@@ -76,7 +29,7 @@ router.get("/", getHome);
 // 🔹 Login & Logout
 router.get("/login", logedout, getLogin);
 router.post('/login', doLogin);
-router.get('/logout', logedin, doLogout); // Ensure only logged-in users can log out
+router.get('/logout', logedin, doLogout);
 
 // 🔹 Signup
 router.get("/signup", logedout, getSignup);
@@ -103,7 +56,7 @@ router.post('/search', searchAndSort);
 // 🔹 Product Detail Page
 router.get('/product/:id', productDetails);
 
-// 🔹 User Profile Page (Ensure blocked users can't access)
+// 🔹 User Profile Page
 router.get('/profile', isBlocked, logedin, viewUserProfile);
 router.get('/profile/edit', isBlocked, logedin, EditUserProfile);
 router.post('/profile/edit/:id', isBlocked, logedin, uploadImages.profileImage, updateUserProfile);
@@ -135,6 +88,7 @@ router.get('/checkout', isBlocked, logedin, loadCheckoutPage);
 router.post('/checkout/address/check', checkAddressPost);
 router.post('/checkout/place-order', isBlocked, logedin, placeorder);
 router.get('/checkout/success', isBlocked, logedin, orderSuccess);
+router.get('/checkout/payment-failed', isBlocked, logedin, payment_failed);
 
 
 // 🔹 Cancel & Return Orders
@@ -150,23 +104,28 @@ router.post('/removeFromWishList', logedin, isBlocked, removeFromWishList)
 router.post('/checkwishlist', checkWishlist);
 
 
-router.get('/invoice', logedin, isBlocked, generateInvoice)
+// 🔹 coupon Page
+router.post('/coupon/validate', logedin, isBlocked, validateCoupon)
+router.post('/coupon/apply',logedin, isBlocked, applyCoupon)
+router.post('/coupon/remove', logedin, isBlocked, removeCoupon)
 
 
-router.get("/error",logedin,isBlocked,showError)
-
-
-router.post('/validate_coupon', logedin, isBlocked, validateCoupon)
-router.post('/apply_coupon',logedin, isBlocked, applyCoupon)
-router.post('/remove_coupon', logedin, isBlocked, removeCoupon)
-
-
-router.post('/verifyPayment', logedin, isBlocked, verify)
-router.post('/retry-payment/:id',logedin, isBlocked, retryPayment)
-router.get('/checkout/payment-failed', isBlocked, logedin, payment_failed);
-
+// 🔹 Wallet Page
 router.get('/wallet', logedin, isBlocked,walletpage)
 router.post('/addmoneytowallet', logedin, isBlocked,addMoneyToWallet)
-router.post('/verify_Payment', logedin, isBlocked,verifyPayment)
+router.post('/verifypayment', logedin, isBlocked,verifyPayment)
+router.post('/verifyPayment', logedin, isBlocked, verify)
+router.post('/retrypayment/:id',logedin, isBlocked, retryPayment)
+
+// 🔹 Referal Page
+router.post('/verifyReferalCode',verifyReferelCode)
+
+
+// 🔹 Invoice Page
+router.get('/invoice', logedin, isBlocked, generateInvoice)
+
+// 🔹 Error Page
+router.get("/error",logedin,isBlocked,showError)
+
 
 module.exports = router;

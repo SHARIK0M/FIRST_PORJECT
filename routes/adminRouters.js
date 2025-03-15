@@ -1,47 +1,22 @@
 const express = require("express");
 const router = express.Router();
-const {
-  getLogin,
-  doLogin,
-  doLogout,
-} = require("../controllers/admin/adminController");
-
+const {getLogin,doLogin,doLogout,} = require("../controllers/admin/adminController");
 const { isLogin, isLogout } = require("../middlewares/adminAuth");
 const { usersPage, blockUser } = require("../controllers/admin/UserManagement");
 const uploadImages = require("../middlewares/multer");
-
-const {
-  addCategoryPage,
-  addNewCategory,
-  showCategoryPage,
-  unListCategory,
-  showEditCategory,
-  updateCategory,
-} = require("../controllers/admin/categoryManagement");
-
-const {
-  showProduct,
-  addProductPage,
-  addProduct,
-  blockProduct,
-  showeditProduct,
-  updateProduct,
-  deleteProdImage,
-} = require("../controllers/admin/productManagement");
-
+const {addCategoryPage,addNewCategory,showCategoryPage,unListCategory,showEditCategory,updateCategory,} = require("../controllers/admin/categoryManagement");
+const {showProduct,addProductPage,addProduct,blockProduct,showeditProduct,updateProduct,deleteProdImage,} = require("../controllers/admin/productManagement");
 const { couponPage, addCouponPage, addCouponPost, editCouponPage, editCouponPost, deleteCoupon } = require('../controllers/admin/couponManagement');
-
-
 const { ordersPage, orderDetails, changeStatus } = require("../controllers/admin/ordersManagement");
-
 const{ productOfferPage, addProductOfferPage, addProductOffer, editProductOfferPage, editProductOffer, deleteProductOffer, categoryOfferPage, addCategoryOfferPage, addCategoryOffer, editCategoryOfferPage, editCategoryOffer, deleteCategoryOffer } = require('../controllers/admin/offerManagement');
 const {  loadDashboard, getSales}=require('../controllers/admin/dashBoardManagement');
+
 
 
 // 🔹 Admin Authentication Routes
 router.get("/login", isLogout, getLogin);
 router.post("/login", isLogout, doLogin);
-router.get("/logout", isLogin, doLogout);  // 🔹 Ensure only logged-in admins can log out
+router.get("/logout", isLogin, doLogout); 
 
 // 🔹 Admin Dashboard
 router.get('/home', isLogin, loadDashboard)
@@ -73,31 +48,31 @@ router.get('/orders', isLogin, ordersPage);
 router.get('/order-details/:id', isLogin, orderDetails);
 router.post('/change-status/:id', isLogin, changeStatus);
 
-// coupon
+// 🔹 Coupon Page
 router.get('/coupons',isLogin,couponPage)
-router.get('/addcoupon',isLogin,addCouponPage)
-router.post('/add_coupon', isLogin, addCouponPost)
-router.get('/editcoupon/:id', editCouponPage);
-router.post('/editcoupon/:id', editCouponPost);
-router.delete('/delete_coupon',isLogin,deleteCoupon)
+router.get('/add-coupon',isLogin,addCouponPage)
+router.post('/add-coupon', isLogin, addCouponPost)
+router.get('/edit-coupon/:id', editCouponPage);
+router.post('/edit-coupon/:id', editCouponPost);
+router.delete('/delete-coupon',isLogin,deleteCoupon)
 
-
+// 🔹 productOffer Page
 router.get('/productOffers', isLogin, productOfferPage)
-router.get('/addProOffers', isLogin, addProductOfferPage)
-router.post('/addProOffers', isLogin, addProductOffer)
-router.get('/editProductOffer/:id', isLogin, editProductOfferPage)
-router.post("/editProductOffer/:id", isLogin, editProductOffer);
-router.delete('/deleteProOffer/:id', isLogin, deleteProductOffer)
+router.get('/add-ProductOffers', isLogin, addProductOfferPage)
+router.post('/add-ProductOffers', isLogin, addProductOffer)
+router.get('/edit-ProductOffer/:id', isLogin, editProductOfferPage)
+router.post("/edit-ProductOffer/:id", isLogin, editProductOffer);
+router.delete('/delete-ProductOffer/:id', isLogin, deleteProductOffer)
 
+// 🔹 CategoryOffer Page
 router.get('/categoryOffers', isLogin, categoryOfferPage)
-router.get('/addCatOffers', isLogin, addCategoryOfferPage)
-router.post('/addCatOffers', isLogin, addCategoryOffer)
-router.get('/editCategoryOffer/:id', isLogin, editCategoryOfferPage)
-router.post("/editCategoryOffer/:id", isLogin, editCategoryOffer);
-router.delete('/deleteCatOffer/:id', isLogin, deleteCategoryOffer)
+router.get('/add-CategoryOffers', isLogin, addCategoryOfferPage)
+router.post('/add-CategoryOffers', isLogin, addCategoryOffer)
+router.get('/edit-CategoryOffer/:id', isLogin, editCategoryOfferPage)
+router.post("/edit-CategoryOffer/:id", isLogin, editCategoryOffer);
+router.delete('/delete-CategoryOffer/:id', isLogin, deleteCategoryOffer)
 
-
-router.get('/get_sales',isLogin, getSales)
-
+// 🔹 Sales Page
+router.get('/get-sales',isLogin, getSales)
 
 module.exports = router;

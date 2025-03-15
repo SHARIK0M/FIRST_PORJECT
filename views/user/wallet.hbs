@@ -154,7 +154,7 @@
     function verifyPayment(response, order) {
         // Send payment verification request
         $.ajax({
-            url: '/verify_Payment',
+            url: '/verifypayment',
             method: 'post',
             data: { order, response, from: "wallet" },
             success: (response) => {

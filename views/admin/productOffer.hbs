@@ -3,7 +3,7 @@
         <div class="content-header d-flex justify-content-between align-items-center">
             <h2 class="content-title text-primary">List of Offers</h2>
             <div>
-                <a href="/admin/addProOffers" class="btn btn-primary shadow"><i class="material-icons md-plus"></i> Create New Product Offer</a>
+                <a href="/admin/add-ProductOffers" class="btn btn-primary shadow"><i class="material-icons md-plus"></i> Create New Product Offer</a>
             </div>
         </div>
         
@@ -37,7 +37,7 @@
                                     {{/if}}
                                 </td>                        
                                 <td class="text-center" width="20%">
-                                    <a href="/admin/editProductOffer/{{this._id}}" 
+                                    <a href="/admin/edit-ProductOffer/{{this._id}}" 
                                         class="btn btn-sm btn-warning text-white shadow-sm"><i class="material-icons md-edit"></i> Edit</a>
                                     <a href="javascript:void(0);" onclick="deleteProductOffer('{{this._id}}')"
                                         class="btn btn-sm btn-danger shadow-sm"><i class="material-icons md-delete"></i> Delete</a>
@@ -88,7 +88,7 @@
       if (result.isConfirmed) {
         // Send DELETE request to the server
         $.ajax({
-          url: `/admin/deleteProOffer/${id}`, 
+          url: `/admin/delete-ProductOffer/${id}`, 
           type: "DELETE", 
           success: function (response) {  
             // Show success message and reload page          

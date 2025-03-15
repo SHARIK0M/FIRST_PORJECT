@@ -289,7 +289,7 @@ const toggleCoupon = async () => {
     }
 
     const currentStatus = couponBtn.innerText.trim();
-    const endpoint = currentStatus === 'Apply' ? '/apply_coupon' : '/remove_coupon';
+    const endpoint = currentStatus === 'Apply' ? '/coupon/apply' : '/coupon/remove';
 
     const response = await fetch(endpoint, {
         method: 'POST',
@@ -341,7 +341,7 @@ const validateCoupon = async () => {
 
     console.log(couponEl);
     console.log('heloooo from validate coupon...............');
-    const response = await fetch('/validate_coupon', {
+    const response = await fetch('/coupon/validate', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

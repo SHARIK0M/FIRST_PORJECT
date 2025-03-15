@@ -9,7 +9,7 @@
                 <div class="card shadow-lg border-0 rounded">
                     <div class="card-body p-4">
                         <h4 class="text-center mb-4">Add Product Offer</h4>
-                        <form id="addProductOfferForm" action="/admin/addProOffers" method="post">
+                        <form id="addProductOfferForm" action="/admin/add-ProductOffers" method="post">
                             
                             <!-- Product Name Selection -->
                             <div class="mb-3">
@@ -100,7 +100,7 @@
 
             // Submit form data via AJAX
             $.ajax({
-                url: '/admin/addProOffers',
+                url: '/admin/add-ProductOffers',
                 type: 'POST',
                 data: formData,
                 success: function (response) {

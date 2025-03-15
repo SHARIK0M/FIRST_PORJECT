@@ -9,7 +9,7 @@
                     <h5 class="modal-title" id="addCategoryOfferModalLabel">Add Category Offer</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="addCategoryOfferForm" role="form" action="/admin/editCategoryOffer/{{editCategoryOfferData._id}}" method="post">
+                <form id="addCategoryOfferForm" role="form" action="/admin/edit-CategoryOffer/{{editCategoryOfferData._id}}" method="post">
                     <div class="modal-body">
 
                         <div class="input-group mb-3">
@@ -111,7 +111,7 @@
 
             // Submit form via AJAX
             $.ajax({
-                url: '/admin/editCategoryOffer/{{editCategoryOfferData._id}}',
+                url: '/admin/edit-CategoryOffer/{{editCategoryOfferData._id}}',
                 type: 'POST',
                 data: formData,
                 success: function (response) {

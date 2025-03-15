@@ -9,7 +9,7 @@
             <div class="col-10 mt-5 justify-content-center">
                 <div class="card">
                     <div class="card-body">
-                        <form action="/admin/editProductOffer/{{editProductOfferData._id}}" id="editProductOfferForm" role="form"  method="post">
+                        <form action="/admin/edit-ProductOffer/{{editProductOfferData._id}}" id="editProductOfferForm" role="form"  method="post">
                             <input type="hidden" name="offerId" value="{{editProductOfferData._id}}" />
                             
                             <div class="modal-body">
@@ -111,7 +111,7 @@
 
             // Send AJAX request to update product offer
             $.ajax({
-                url: '/admin/editProductOffer/{{editProductOfferData._id}}',
+                url: '/admin/edit-ProductOffer/{{editProductOfferData._id}}',
                 type: 'POST',
                 data: formData,
                 success: function (response) {

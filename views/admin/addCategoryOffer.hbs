@@ -8,7 +8,7 @@
                             <h5 class="modal-title" id="addCategoryOfferModalLabel">Add Category Offer</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <form id="addCategoryOfferForm" role="form" action="/admin/addCatOffers" method="post">
+                        <form id="addCategoryOfferForm" role="form" action="/admin/add-CategoryOffers" method="post">
                             <div class="modal-body">
                                 <div class="input-group mb-3">
                                     <label class="container">
@@ -103,7 +103,7 @@
 
             // Send AJAX request to add category offer
             $.ajax({
-                url: '/admin/addCatOffers',
+                url: '/admin/add-CategoryOffers',
                 type: 'POST',
                 data: formData,
                 success: function (response) {

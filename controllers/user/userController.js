@@ -6,9 +6,13 @@ const HttpStatus = require("../../httpStatus");
 const Category = require("../../models/categorySchema");
 const Product = require("../../models/productSchema");
 const Cart = require("../../models/cartSchema");
+const Referral=require("../../models/referalSchema")
+const {v4:uuidv4}=require("uuid")
 
 
-let otp, userOtp, userEmail, hashedPassword, userRegData, userData;
+
+
+let otp, userOtp, userEmail, hashedPassword, userRegData, userData,referalAmount,OwnerId
 
 
 const getHome = async (req, res) => {
@@ -174,7 +178,7 @@ const doSignup = async (req, res) => {
       req.session.otp = otp;
       req.session.otpTimestamp = otpTimestamp;
 
-      return res.render("user/submitOtp");
+      return res.render("user/referal");
     }
 
     res.render("user/signup", {
@@ -182,10 +186,10 @@ const doSignup = async (req, res) => {
       message1: mobileExist ? "!!Mobile Number Already Exists!!" : "",
     });
   } catch (error) {
+    console.error("Error during signup: ", error);
     res.render("user/signup", { message: "An error occurred. Please try again." });
   }
 };
-
 
 
 //Renders the OTP submission page
@@ -201,7 +205,6 @@ const getOtp = (req, res) => {
 const submitOtp = async (req, res) => {
   try {
     let userOtp = req.body.otp;
-
     if (!req.session.otp || !req.session.otpTimestamp) {
       return res.status(400).json({ error: "Session expired. Please request a new OTP." });
     }
@@ -219,7 +222,7 @@ const submitOtp = async (req, res) => {
         return res.status(400).json({ error: "Session expired. Please start the registration process again." });
       }
 
-      const newUser = new User({
+      const newUser = await User.create({
         name: req.session.userRegData.name,
         email: req.session.userRegData.email,
         mobile: req.session.userRegData.phone,
@@ -227,19 +230,63 @@ const submitOtp = async (req, res) => {
         isVerified: true,
         isBlocked: false,
       });
+      
+      const userId = newUser._id;
+      const { redeemAmount, referalAmount, OwnerId } = req.session;
 
-      await newUser.save();
+      if (redeemAmount) {
+        await User.updateOne(
+          { _id: userId },
+          {
+            $inc: { wallet: redeemAmount },
+            $push: {
+              history: {
+                amount: redeemAmount,
+                status: 'Referred',
+                date: Date.now(),
+              },
+            },
+          }
+        );
+      }
+
+      const generateReferalCode = uuidv4();
+      await new Referral({
+        userId: userId,
+        referralCode: generateReferalCode,
+      }).save();
+
+      if (referalAmount && OwnerId) {
+        await User.updateOne(
+          { _id: OwnerId },
+          {
+            $inc: { wallet: referalAmount },
+            $push: {
+              history: {
+                amount: referalAmount,
+                status: "Referred",
+                date: Date.now(),
+              },
+            },
+          }
+        );
+      }
+      
       req.session.regSuccessMsg = true;
       req.session.otp = null;
       req.session.otpTimestamp = null;
       req.session.userRegData = null;
       req.session.hashedPassword = null;
+      req.session.redeemAmount = null;
+      req.session.OwnerId = null;
+      req.session.referalAmount = null;
 
       return res.status(200).json({ success: true, redirectUrl: "/login" });
     } else {
       return res.status(400).json({ error: "Incorrect OTP" });
     }
   } catch (error) {
+    console.error("Error submitting OTP: ", error);
     return res.status(500).json({ error: "An error occurred while submitting the OTP." });
   }
 };
@@ -269,8 +316,6 @@ const resendOtp = async (req, res) => {
     return res.status(500).json({ error: "Failed to resend OTP" });
   }
 };
-
-
 
 //Handles Google authentication callback.
 const googleCallback = async (req, res) => {
@@ -352,6 +397,35 @@ const productDetails = async (req, res) => {
   }
 };
 
+const verifyReferelCode = async (req, res) => {
+  try {
+    const referalCode = req.body.referalCode;
+    console.log("referalCode: ", referalCode);
+
+    const Owner = await Referral.findOne({ referralCode: referalCode });
+    
+    if (!Owner) {
+      return res.json({ message: "Invalid referral code!" });
+    }
+
+    console.log("Owner: ", Owner);
+    const OwnerId = Owner.userId;
+    const referalAmount = 200;
+    const redeemAmount = 100;
+
+    req.session.redeemAmount = redeemAmount;
+    req.session.OwnerId = OwnerId;
+    req.session.referalAmount = referalAmount;
+    
+    res.json({ message: "Referral code verified successfully!" });
+  } catch (error) {
+    console.error("Error verifying referral code: ", error.message);
+    res.status(500).json({ message: "An error occurred while verifying the referral code." });
+  }
+};
+
+
+
 
 module.exports = {
   getHome,
@@ -365,4 +439,5 @@ module.exports = {
   doLogout,
   googleCallback,
   productDetails,
+  verifyReferelCode,
 };

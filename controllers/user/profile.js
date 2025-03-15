@@ -5,6 +5,7 @@ const argon2 = require("argon2");
 const mongoose = require("mongoose");
 const { Types: { ObjectId } } = mongoose;
 const userHelper = require("../../helpers/user.helper");
+const referralSchema = require("../../models/referalSchema")
 
 
 // View User Profile
@@ -14,7 +15,9 @@ const viewUserProfile = async (req, res) => {
     const id = user._id;
     const userData = await User.findById(id);
     const userDataObject = userData.toObject();
-    res.render("user/profile", { userData: userDataObject });
+    const referralData=await referralSchema.find({userId:id},{referralCode:1}).lean()
+
+    res.render("user/profile", { userData: userDataObject , referralData });
   } catch (error) {
     console.log(error.message);
     res.status(500).send("Internal Server Error");
@@ -77,7 +80,6 @@ const updateUserProfile = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
-
 
 // Change User Password
 const changePassword = async (req, res) => {

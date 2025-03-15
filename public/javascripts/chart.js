@@ -169,7 +169,7 @@ const getSalesData = async () => {
   
   
     // Fetch sales data
-    const response = await fetch(`/admin/get_sales?stDate=${startDate}&edDate=${endDate}`, {
+    const response = await fetch(`/admin/get-sales?stDate=${startDate}&edDate=${endDate}`, {
         headers: { 'Content-Type': 'application/json' },
     });
 

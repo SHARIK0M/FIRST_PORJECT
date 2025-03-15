@@ -175,8 +175,9 @@ const getSales = async (req, res) => {
                 coupon: order.coupon,
                 couponUsed: order.couponUsed,
                 proName: order.product,
-                discountAmt: order.discountAmt,
+                discountAmt: order.discountAmt || 0 // ✅ Ensure discount amount is included
             });
+            
             grandTotal += order.total;
         });
 

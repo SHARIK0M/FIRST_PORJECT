@@ -5,7 +5,7 @@
             <h2 class="content-title text-primary fw-bold">
                  List of Offers
             </h2>            
-            <a href="/admin/addCatOffers" class="btn btn-primary shadow-lg">
+            <a href="/admin/add-CategoryOffers" class="btn btn-primary shadow-lg">
                 <i class="material-icons md-plus"></i> Create New Category Offer
             </a>            
         </div>
@@ -41,7 +41,7 @@
                                     {{/if}}
                                 </td>
                                 <td>
-                                    <a href="/admin/editCategoryOffer/{{this._id}}" class="btn btn-warning btn-sm text-white shadow">
+                                    <a href="/admin/edit-CategoryOffer/{{this._id}}" class="btn btn-warning btn-sm text-white shadow">
                                         <i class="material-icons md-edit"></i> Edit
                                     </a>
                                     <a href="javascript:void(0);" onclick="deleteCategoryOffer('{{this._id}}')" 
@@ -98,7 +98,7 @@
     }).then((result) => {
       if (result.isConfirmed) {
         $.ajax({
-          url: `/admin/deleteCatOffer/${id}`,
+          url: `/admin/delete-CategoryOffer/${id}`,
           type: "DELETE",
           success: function () {          
             Swal.fire({
