@@ -434,28 +434,27 @@ const returnOneProduct = async (req, res) => {
 };
 
 
+
 const generateInvoice = async (req, res) => {
     try {
         const orderId = req.query.id;
         const order = await Order.findById(orderId);
 
         if (!order) {
-            return res.status(404).send({ message: 'Order not found' });
+            return res.status(HttpStatus.NotFound).send({ message: 'Order not found' });
         }
 
-        // Fetch user and address details
-        const { userId, address: addressId } = order;
+        const { userId, address: addressId, discountAmt = 0 } = order;
         const [user, address] = await Promise.all([
             User.findById(userId),
             Address.findById(addressId),
         ]);
 
         if (!user || !address) {
-            return res.status(404).send({ message: 'User or address not found' });
+            return res.status(HttpStatus.NotFound).send({ message: 'User or address not found' });
         }
 
-        // Prepare invoice data
-        const products = order.product.map((product) => ({
+        let products = order.product.map((product) => ({
             quantity: product.quantity.toString(),
             description: product.name,
             tax: product.tax,
@@ -464,21 +463,35 @@ const generateInvoice = async (req, res) => {
 
         // Add delivery charge
         products.push({
-            quantity: '1',
+            quantity: '1', 
             description: 'Delivery Charge',
-            tax: 0,
-            price: 50,
+            tax: 0, 
+            price: 50, 
+            
         });
+
+        // Add discount as a separate item
+        if (discountAmt > 0) {
+            products.push({
+                quantity: '1',
+                description: 'Discount Applied',
+                tax: 0,
+                price: `-${discountAmt}`,
+                  // Ensure discount is negative
+            });
+        }
 
         const date = moment(order.date).format('MMMM D, YYYY');
 
         const data = {
+            mode: "development",
             currency: 'INR',
             taxNotation: 'vat',
             marginTop: 25,
             marginRight: 25,
             marginLeft: 25,
             marginBottom: 25,
+          
             sender: {
                 company: 'Floritta',
                 address: 'Park Avenue',
@@ -488,19 +501,18 @@ const generateInvoice = async (req, res) => {
             },
             client: {
                 company: user.name,
-                address: address.addressLine1,
+                address: address.adressLine1,
                 zip: address.pin,
                 city: address.city,
                 country: 'India',
             },
             information: {
-                number: `INV-${orderId}`,
                 date: date,
             },
             products: products,
+            bottomNotice: "Thank you for your purchase!", // Add a bottom note
         };
 
-        // Generate invoice PDF
         easyinvoice.createInvoice(data, function (result) {
             const fileName = `invoice_${orderId}.pdf`;
             const pdfBuffer = Buffer.from(result.pdf, 'base64');
@@ -511,9 +523,15 @@ const generateInvoice = async (req, res) => {
 
     } catch (error) {
         console.error('Error generating invoice:', error);
-        res.status(500).send({ message: 'Internal Server Error' });
+        res.status(HttpStatus.InternalServerError).send('Internal Server Error');
     }
-}
+};
+
+
+
+
+
+
 
 module.exports = {
     payment_failed,

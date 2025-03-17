@@ -164,11 +164,12 @@
                                    
                                 </div>
                             </div>
-                            <div class="col-lg-6 col-md-6 ms-auto text-md-end">
+                           <div class="col-lg-6 col-md-6 ms-auto text-md-end">
     <a href="#" class="btn btn-secondary print ms-2" onclick="getInvoice('{{myOrderDetails._id}}'); return false;">
-        <i class="fa fa-print" style="font-size: 1rem;"></i>
+        <i class="fa fa-print" style="font-size: 1rem;"></i> Download Invoice
     </a>
 </div>
+
 
                         </section>
                     </div>
@@ -190,31 +191,39 @@
 var grandTotalText = document.getElementById("grandTotal").innerText;
 const amount = parseInt(grandTotalText.replace(/[^\d]/g, '')) * 100;
 console.log('Grand Total:', amount);
-const getInvoice = async (id) => {
+
+    const getInvoice = async (id) => {
   try {
     const response = await fetch(`/invoice?id=${id}`, {
       method: 'GET',
+      headers: {
+        'Content-Type': 'application/pdf'
+      }
     });
-
-    console.log("Response status:", response.status);
-
+    
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to fetch invoice: ${errorText}`);
+      throw new Error('Failed to fetch invoice');
     }
-
+    
     const blob = await response.blob();
+
+    // Create a URL for the downloaded file
     const url = URL.createObjectURL(blob);
+
+    // Create a link element to trigger the download
     const link = document.createElement('a');
     link.href = url;
-    link.download = `invoice_${id}.pdf`;
+    link.download = 'invoice.pdf';
+
     link.click();
+
+    // Clean up the URL object
     URL.revokeObjectURL(url);
   } catch (error) {
-    console.error('Error fetching invoice:', error);
-    alert(`Error: ${error.message}`);
+    console.error('Error fetching invoice:', error);    
   }
 };
+
 
 
 

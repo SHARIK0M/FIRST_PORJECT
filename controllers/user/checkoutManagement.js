@@ -151,6 +151,8 @@ const placeorder = async (req, res) => {
     let totalAmount = req.session.discountedTotal || req.body.amount;
     const appliedCoupon = req.session.appliedCoupon || req.body.couponVal;
 
+    console.log("addressId ..................................",addressId)
+
     if (!addressId || !payMethod || !totalAmount) {
       return res.status(400).json({ error: "Missing required order details" });
     }

@@ -187,7 +187,8 @@
                         <div class="address-selection mb-4">
                             <select id="selectedAddress" class="form-select ">
                                 {{#each addressData}}
-                                <option value="{{this._id}}">{{this.city}}</option>
+                               
+                            <option value="{{this._id}}">{{this.name}}, {{this.addressLine1}},{{this.city}}, {{this.state}} - {{this.pin}}, {{this.mobile}}</option>
                                 {{/each}}
                             </select>
                         </div>
@@ -375,6 +376,7 @@ paymentOptions.forEach((option) => {
 
 // Function to handle placing an order
 const placeOrder = () => {
+    console.log("sharik.................................................................>")
     const productStock = parseInt(document.getElementById('productStock').value, 10);
     const productQuantity = parseInt(document.getElementById('productQuantity').value, 10);
 
@@ -400,6 +402,7 @@ const placeOrder = () => {
 
     // Validate if an address is selected
     const selectedAddress = document.getElementById('selectedAddress').value;
+    console.log("selected Address..............................",selectedAddress)
     if (!selectedAddress) {
         Swal.fire('Error', 'Please select a delivery address.', 'error');
         return;

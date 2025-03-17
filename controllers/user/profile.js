@@ -204,7 +204,9 @@ const orderDetails = async (req, res) => {
       { $project: { _id: 1, product: 1 } },
     ]);
 
-    const address = await Address.findOne({ userId }).lean();
+    const address = await Address.findOne({
+      _id: myOrderDetails.address,
+    }).lean();
 
     offerprice -= myOrderDetails.total;
 
