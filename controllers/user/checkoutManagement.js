@@ -371,7 +371,7 @@ const applyCoupon = async (req, res) => {
       return res.json({ status: "min_purchase_not_met" });
     }
 
-    // ✅ Check if the coupon is already used by this user
+    //  Check if the coupon is already used by this user
     const isCouponUsed = await Coupon.exists({ code: couponVal, usedBy: userId });
 
     if (isCouponUsed) {
@@ -381,7 +381,7 @@ const applyCoupon = async (req, res) => {
     let discountAmt = Math.min((subTotal * coupon.discount) / 100, coupon.maxDiscount);
     const newTotal = subTotal - discountAmt;
 
-    // ✅ Store coupon details in session
+    //  Store coupon details in session
     req.session.appliedCoupon = couponVal;
     req.session.discountedTotal = newTotal;
     req.session.discountAmount = discountAmt;
@@ -404,12 +404,12 @@ const removeCoupon = async (req, res) => {
       return res.json({ status: "invalid" });
     }
 
-    // ✅ Check if the coupon is applied in session
+    //  Check if the coupon is applied in session
     if (req.session.appliedCoupon !== couponVal) {
       return res.json({ status: "not_applied" }); // 🔹 New status for better debugging
     }
 
-    // ✅ Remove from session and database (if previously used)
+    // Remove from session and database (if previously used)
     req.session.appliedCoupon = null;
 
     if (coupon.usedBy.includes(userId)) {
@@ -418,7 +418,7 @@ const removeCoupon = async (req, res) => {
 
     return res.json({ discountAmt: 0, newTotal: subTotal, status: "removed", couponVal });
   } catch (error) {
-    console.log("❌ Error in removeCoupon:", error);
+    console.log(" Error in removeCoupon:", error);
     res.status(500).json({ status: "error", error });
   }
 };

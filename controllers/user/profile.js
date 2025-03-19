@@ -124,12 +124,12 @@ const my_Orders = async (req, res) => {
     const user = req.session.user;
     const id = user._id;
     const userData = await User.findById(id).lean();
-    let page = req.query.page || 1;
+    let page = parseInt(req.query.page) || 1;
     const limit = 5;
     const skip = (page - 1) * limit;
 
     const myOrders = await Order.aggregate([
-      { $match: { userId: new mongoose.Types.ObjectId(id) } },
+      { $match: { userId: new mongoose.Types.ObjectId(id) } }, // Filter only user's orders
       {
         $project: {
           _id: 1,
@@ -145,7 +145,7 @@ const my_Orders = async (req, res) => {
       { $limit: limit },
     ]);
 
-    const count = await Order.find({}).countDocuments();
+    const count = await Order.countDocuments({ userId: id }); // Count only this user's orders
     const totalPages = Math.ceil(count / limit);
     const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
@@ -160,6 +160,7 @@ const my_Orders = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+
 
 // View Order Details
 const orderDetails = async (req, res) => {

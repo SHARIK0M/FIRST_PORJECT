@@ -32,11 +32,6 @@ app.use(function(req,res,next){
   res.status(404).render('404',{ layout: "empty",})
 })
 
-//error handler middleware
-app.use(function(err,req,res,next){
-  res.status(500)
-  res.render('error',{error:err},{ layout: "empty",})
-})
 
 // 🔹 Start Server
 const PORT = process.env.PORT || 5000;

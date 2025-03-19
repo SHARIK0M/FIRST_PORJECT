@@ -12,7 +12,6 @@ const walletManagement = async (req, res) => {
         // Extract transaction history from each user
         users.forEach(user => {
             user.history.forEach(transaction => {
-                console.log(`Transaction Amount: ${transaction.amount}, User: ${user.name}`);
 
                 transactions.push({
                     transactionId: transaction.date,
