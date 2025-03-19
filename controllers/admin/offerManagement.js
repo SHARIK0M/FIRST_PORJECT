@@ -68,12 +68,17 @@ const addProductOffer = async (req, res) => {
         }
 
         const isActive = new Date(endDate) >= new Date() && new Date(startDate) <= new Date();
-        const discountPrice = product.price - (product.price * discount) / 100;
+        
+        // Check if category offer exists and apply only the greater offer
+        const existingCategoryOffer = await categoryOffer.findOne({ categoryId: product.category, currentStatus: true });
+        const categoryDiscount = existingCategoryOffer ? existingCategoryOffer.categoryOfferPercentage : 0;
+        const finalDiscount = Math.max(discount, categoryDiscount);
+        const discountPrice = product.price - (product.price * finalDiscount) / 100;
 
         const proOffer = new productOffer({
             productId: product._id,
             productName,
-            productOfferPercentage: discount,
+            productOfferPercentage: finalDiscount,
             discountPrice,
             startDate: new Date(startDate),
             endDate: new Date(endDate),
@@ -198,6 +203,7 @@ const addCategoryOfferPage = async (req, res) => {
     }
 };
 
+
 const addCategoryOffer = async (req, res) => {
     try {
         const { categoryName, categoryOfferPercentage, categoryOfferStartDate, categoryOfferEndDate } = req.body;
@@ -227,13 +233,15 @@ const addCategoryOffer = async (req, res) => {
         const productsInCategory = await Product.find({ category: category._id });
         for (const product of productsInCategory) {
             const existingProductOffer = await productOffer.findOne({ productId: product._id });
-            const discountPrice = product.price - (product.price * discount) / 100;
+            const productDiscount = existingProductOffer ? existingProductOffer.productOfferPercentage : 0;
+            const finalDiscount = Math.max(discount, productDiscount);
+            const discountPrice = product.price - (product.price * finalDiscount) / 100;
             
             if (existingProductOffer) {
-                Object.assign(existingProductOffer, { productOfferPercentage: discount, discountPrice, startDate: new Date(categoryOfferStartDate), endDate: new Date(categoryOfferEndDate), currentStatus: new Date(categoryOfferEndDate) >= new Date() && new Date(categoryOfferStartDate) <= new Date() });
+                Object.assign(existingProductOffer, { productOfferPercentage: finalDiscount, discountPrice, startDate: new Date(categoryOfferStartDate), endDate: new Date(categoryOfferEndDate), currentStatus: new Date(categoryOfferEndDate) >= new Date() && new Date(categoryOfferStartDate) <= new Date() });
                 await existingProductOffer.save();
             } else {
-                await new productOffer({ productId: product._id, productName: product.name, productOfferPercentage: discount, discountPrice, startDate: new Date(categoryOfferStartDate), endDate: new Date(categoryOfferEndDate), currentStatus: new Date(categoryOfferEndDate) >= new Date() && new Date(categoryOfferStartDate) <= new Date() }).save();
+                await new productOffer({ productId: product._id, productName: product.name, productOfferPercentage: finalDiscount, discountPrice, startDate: new Date(categoryOfferStartDate), endDate: new Date(categoryOfferEndDate), currentStatus: new Date(categoryOfferEndDate) >= new Date() && new Date(categoryOfferStartDate) <= new Date() }).save();
             }
         }
         return res.status(HttpStatus.OK).json({ message: "Category offer added successfully!" });

@@ -176,6 +176,7 @@ const deleteProdImage = async (req, res) => {
 };
 
 // Toggle Product Block Status
+
 const blockProduct = async (req, res) => {
   try {
     const { id } = req.body;

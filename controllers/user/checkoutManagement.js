@@ -117,25 +117,22 @@ const balnace = Math.floor(userData.wallet)
 
 const orderSuccess = async (req, res) => {
   try {
-    // ✅ Ensure session exists
     if (!req.session || !req.session.user) {
-      console.error("❌ Error: User session not found!");
       return res.status(400).send("User session not found. Please log in again.");
     }
 
-    // ✅ Define userData properly
-    const userData = req.session.user;
-
-    res.render("user/orderPlaced", {
-      title: "Order Placed",
-      userData, // ✅ Now userData is defined
+    res.set({
+      "Cache-Control": "no-store, no-cache, must-revalidate, private",
+      "Pragma": "no-cache",
+      "Expires": "0",
     });
 
+    res.render("user/orderPlaced", { title: "Order Placed", userData: req.session.user });
   } catch (error) {
-    console.log("❌ Error in orderSuccess:", error.message);
     res.status(500).send("Internal Server Error");
   }
 };
+
 
 
 const placeorder = async (req, res) => {
@@ -312,8 +309,9 @@ const placeorder = async (req, res) => {
     req.session.discountAmount = null;
 
     if (req.headers.accept.includes("text/html")) {
-      res.redirect("/checkout/success");
+       res.redirect("/order-success"); // Redirect to success page
     } else {
+      req.session.orderCompleted = true; 
       res.json({ success: true, orderId, grandTotal, appliedCoupon, walletBalance });
     }
   } catch (error) {
@@ -427,6 +425,7 @@ const removeCoupon = async (req, res) => {
 
 
 
+
 module.exports = {
   loadCheckoutPage,
   placeorder,
@@ -434,4 +433,5 @@ module.exports = {
   validateCoupon,
   applyCoupon,
   removeCoupon,
+  
 };

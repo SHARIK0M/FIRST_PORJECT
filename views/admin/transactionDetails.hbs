@@ -1,0 +1,61 @@
+<main class="main-wrap bg-light py-4">
+    <section class="content-main container">
+        <div class="content-header mb-3 text-center">
+            <h2 class="content-title text-primary fw-bold">Transaction Details</h2>
+        </div>
+
+        <div class="card shadow-lg border-0 rounded-3">
+            <div class="card-body p-4">
+                <table class="table table-striped align-middle">
+                    <tbody>
+                        <tr>
+                            <th class="text-secondary">Transaction ID:</th>
+                            <td class="fw-bold text-dark">{{transaction.transactionId}}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-secondary">Transaction Date:</th>
+                            <td class="text-dark">{{transaction.transactionDate}}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-secondary">User Name:</th>
+                            <td class="text-dark">{{transaction.user.name}}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-secondary">Email:</th>
+                            <td class="text-dark">{{transaction.user.email}}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-secondary">Transaction Type:</th>
+                            <td>
+                                {{#if (eq transaction.transactionType "Credit")}}
+                                    <span class="badge bg-success text-white px-3 py-2">Credit</span>
+                                {{else}}
+                                    <span class="badge bg-danger text-white px-3 py-2">Debit</span>
+                                {{/if}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-secondary">Amount:</th>
+                            <td class="fw-bold text-dark">${{transaction.amount}}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-secondary">Transaction Source:</th>
+                            <td class="text-dark">{{transaction.status}}</td>
+                        </tr>
+                        {{#if transaction.orderId}}
+                        <tr>
+                            <th class="text-secondary">Related Order:</th>
+                            <td>
+                                <a href="/admin/order-details/{{transaction.orderId}}" 
+                                   class="btn btn-sm btn-info text-white fw-bold shadow-sm">
+                                    View Order Details
+                                </a>
+                            </td>
+                        </tr>
+                        {{/if}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</main>

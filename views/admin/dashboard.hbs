@@ -13,7 +13,7 @@
         </div>
         
         <!-- Summary Cards -->
-       {{!-- <div class="row">
+       <div class="row">
     <!-- Total Revenue -->
     <div class="col-lg-3 col-md-6">
         <div class="card shadow-sm border-0 rounded-lg mb-4">
@@ -73,8 +73,36 @@
             </div>
         </div>
     </div>
-</div> --}}
+</div>
 
+<div class="row">
+                <div class="col-xl-4 col-lg-12">
+                    <div class="card mb-4">
+                        <article class="card-body">
+                            <h5 class="card-title">Sale statistics</h5>
+                            <canvas id="myChart1" height="300px"></canvas>
+                        </article>
+                    </div>
+
+                </div>
+                <div class="col-xl-4 col-lg-12">
+                    <div class="card mb-4">
+                        <article class="card-body">
+                            <h5 class="card-title">Revenue</h5>
+                            <canvas id="myChar" height="300px"></canvas>
+                        </article>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-lg-12">
+                    <div class="card mb-4">
+                        <article class="card-body">
+                            <h5 class="card-title">Category Revenue</h5>
+                            <canvas id="revenueChart" height="120px"></canvas>
+                        </article>
+                    </div>
+
+                </div>
+            </div>
      
         <!-- Sales Report Filter -->
         <div class="container mt-3 mb-4">
@@ -119,7 +147,7 @@
         <div class="row" id="table"></div>
 
         <!-- Best Selling and Popular Products Section -->
-        {{!-- <div class="row">
+        <div class="row">
             <div class="col-lg-4">
                 <div class="card mb-4">
                     <header class="card-header">
@@ -197,7 +225,7 @@
                     </div>
                 </div>
             </div>
-        </div> --}}
+        </div>
     </section>
 </main>
 
@@ -208,10 +236,11 @@
 <script>
     let months, ordersByMonth, revenueByMonth, categories, revenues;
 
+
     // Fetch chart data from the server and update graphs
     const getChartData = async () => {
         try {
-            const response = await fetch('/get_chart_data', {
+            const response = await fetch('/admin/get_chart_data', {
                 headers: { 'Content-Type': 'application/json' },
             });
             
@@ -235,6 +264,157 @@
     };
 
     getChartData();
+    
+
+function categoryRevenue(categories, revenues) {
+    console.log("Categories:", categories);
+    console.log("Revenues:", revenues);
+
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: categories,
+            datasets: [{
+                label: 'Revenue by Category',
+                data: revenues,
+                backgroundColor: [
+                    'rgba(0, 123, 255, 0.6)',   // Blue
+                    'rgba(40, 167, 69, 0.6)',   // Green
+                    'rgba(255, 193, 7, 0.6)',   // Yellow
+                    'rgba(220, 53, 69, 0.6)',   // Red
+                    'rgba(108, 117, 125, 0.6)', // Gray
+                    'rgba(23, 162, 184, 0.6)'   // Cyan
+                ],
+                borderColor: [
+                    'rgba(0, 123, 255, 1)',
+                    'rgba(40, 167, 69, 1)',
+                    'rgba(255, 193, 7, 1)',
+                    'rgba(220, 53, 69, 1)',
+                    'rgba(108, 117, 125, 1)',
+                    'rgba(23, 162, 184, 1)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            plugins: {
+                datalabels: {
+                    color: '#fff', // White text for contrast
+                    font: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    formatter: (value, context) => {
+                        return `${context.chart.data.labels[context.dataIndex]}: ${value}`;
+                    },
+                    anchor: 'end',
+                    align: 'start',
+                    offset: 10
+                }
+            }
+        }
+    });
+}
+   function salesGraph(months, ordersByMonth) {
+    const ctx = document.getElementById('myChart1').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: months,
+            datasets: [{
+                label: '# of Sales',
+                data: ordersByMonth,
+                backgroundColor: [
+                    'rgba(30, 144, 255, 0.6)',  // DodgerBlue
+                    'rgba(50, 205, 50, 0.6)',   // LimeGreen
+                    'rgba(255, 140, 0, 0.6)',   // DarkOrange
+                    'rgba(220, 20, 60, 0.6)',   // Crimson
+                    'rgba(138, 43, 226, 0.6)',  // BlueViolet
+                    'rgba(255, 215, 0, 0.6)',   // Gold
+                    'rgba(30, 144, 255, 0.6)',  // DodgerBlue
+                    'rgba(50, 205, 50, 0.6)',   // LimeGreen
+                    'rgba(255, 140, 0, 0.6)',   // DarkOrange
+                    'rgba(220, 20, 60, 0.6)',   // Crimson
+                    'rgba(138, 43, 226, 0.6)',  // BlueViolet
+                    'rgba(255, 215, 0, 0.6)'    // Gold
+                ],
+                borderColor: [
+                    'rgba(30, 144, 255, 1)',
+                    'rgba(50, 205, 50, 1)',
+                    'rgba(255, 140, 0, 1)',
+                    'rgba(220, 20, 60, 1)',
+                    'rgba(138, 43, 226, 1)',
+                    'rgba(255, 215, 0, 1)',
+                    'rgba(30, 144, 255, 1)',
+                    'rgba(50, 205, 50, 1)',
+                    'rgba(255, 140, 0, 1)',
+                    'rgba(220, 20, 60, 1)',
+                    'rgba(138, 43, 226, 1)',
+                    'rgba(255, 215, 0, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            return tooltipItem.label + ': ' + tooltipItem.raw + ' sales';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function revenue(months, revenueByMonth) {
+    const ctx1 = document.getElementById('myChar').getContext('2d');
+    new Chart(ctx1, {
+        type: 'bar', 
+        data: {
+            labels: months,
+            datasets: [{
+                label: 'Revenue',
+                data: revenueByMonth,
+                backgroundColor: 'rgba(255, 99, 132, 0.2)', // Light red color for the bars
+                borderColor: 'rgba(255, 99, 132, 1)', // Darker red border color
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            scales: {
+                x: {
+                    beginAtZero: true,
+                },
+                y: {
+                    beginAtZero: true
+                }
+            },
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            return tooltipItem.label + ': ' + tooltipItem.raw + ' revenue';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
 
     // Toggle date input fields based on the selected range
     function toggleDateInputs() {
@@ -276,4 +456,5 @@ startDateGroup.classList.toggle("d-none", !isCustom);
 endDateGroup.classList.toggle("d-none", !isCustom);
 
     }
+
 </script>

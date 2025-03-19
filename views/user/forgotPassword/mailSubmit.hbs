@@ -23,21 +23,18 @@
                                     </div>
 
                                     <!-- Email Input Form -->
-                                    <form action="/password/forgot" method="post">
-                                        <!-- Error Message Display -->
-                                        <h6 style="color: red;" class="text-center mb-5">{{mailError}}</h6>
+                                  <form id="emailForm">
+    <h6 style="color: red;" class="text-center mb-5" id="errorMessage"></h6>
 
-                                        <!-- Email Input Field -->
-                                        <div class="form-floating mb-3 input-control">
-                                            <input type="text" class="form-control" id="email" placeholder="Enter your email" name="email" required>
-                                            <label for="email">Email</label>
-                                        </div>
+    <div class="form-floating mb-3 input-control">
+        <input type="text" class="form-control" id="email" placeholder="Enter your email" name="email" required>
+        <label for="email">Email</label>
+    </div>
 
-                                        <!-- Submit Button -->
-                                        <div class="text-center">
-                                            <button type="submit" class="btn btn-fill-out btn-block hover-up">Submit</button>
-                                        </div>
-                                    </form>
+    <div class="text-center">
+        <button type="submit" class="btn btn-fill-out btn-block hover-up">Submit</button>
+    </div>
+</form>
                                 </div>
                             </div>
                         </div>
@@ -47,3 +44,31 @@
         </div>
     </section>
 </main>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.getElementById("emailForm").addEventListener("submit", async function (event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const email = document.getElementById("email").value;
+
+        const response = await fetch("/password/forgot", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            window.location.href = result.redirectUrl; // Redirect on success
+        } else {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: result.message,
+            });
+        }
+    });
+</script>

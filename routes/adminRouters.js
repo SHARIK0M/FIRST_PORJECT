@@ -9,7 +9,8 @@ const {showProduct,addProductPage,addProduct,blockProduct,showeditProduct,update
 const { couponPage, addCouponPage, addCouponPost, editCouponPage, editCouponPost, deleteCoupon } = require('../controllers/admin/couponManagement');
 const { ordersPage, orderDetails, changeStatus } = require("../controllers/admin/ordersManagement");
 const{ productOfferPage, addProductOfferPage, addProductOffer, editProductOfferPage, editProductOffer, deleteProductOffer, categoryOfferPage, addCategoryOfferPage, addCategoryOffer, editCategoryOfferPage, editCategoryOffer, deleteCategoryOffer } = require('../controllers/admin/offerManagement');
-const {  loadDashboard, getSales}=require('../controllers/admin/dashBoardManagement');
+const {  loadDashboard, getSales,getChartData}=require('../controllers/admin/dashBoardManagement');
+const { walletManagement, transactionDetails } = require('../controllers/admin/walletManagement');
 
 
 
@@ -74,5 +75,10 @@ router.delete('/delete-CategoryOffer/:id', isLogin, deleteCategoryOffer)
 
 // 🔹 Sales Page
 router.get('/get-sales',isLogin, getSales)
+router.get('/get_chart_data',isLogin, getChartData)
+
+
+router.get('/wallet' , walletManagement)
+router.get('/wallet/:transactionId', transactionDetails);
 
 module.exports = router;

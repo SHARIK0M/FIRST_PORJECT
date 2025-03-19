@@ -120,7 +120,8 @@ const cancelOrder = async (req, res) => {
                         history: {
                             amount: Math.floor(totalRefund),
                             status: `Refund for Order ID: ${id}`,
-                            date: Date.now()
+                            date: Date.now(),
+                            orderId: id
                         }
                     }
                 }
@@ -134,6 +135,99 @@ const cancelOrder = async (req, res) => {
                 : 'Partially cancelled the order'
         });
 
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
+const cancelOneProduct = async (req, res) => {
+    try {
+        const { id, prodId, reason } = req.body;
+
+        if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(prodId)) {
+            return res.status(400).json({ error: 'Invalid order or product ID' });
+        }
+
+        const ID = new mongoose.Types.ObjectId(id);
+        const PRODID = new mongoose.Types.ObjectId(prodId);
+
+        const order = await Order.findById(ID);
+
+        if (!order) {
+            return res.status(404).json({ error: 'Order not found' });
+        }
+
+        // Find the product in the order
+        const product = order.product.find(p => p._id.toString() === prodId);
+
+        if (!product) {
+            return res.status(404).json({ error: 'Product not found in order' });
+        }
+
+        if (product.isCancelled) {
+            return res.status(400).json({ error: 'Product is already cancelled' });
+        }
+
+        // Mark product as cancelled
+        product.isCancelled = true;
+        product.status = "Cancelled";
+        product.cancelReason = reason;
+
+        // Correctly retrieve total order amount and discount
+        const totalAmt = order.totalAmt && order.totalAmt > 0 ? order.totalAmt : order.product.reduce((sum, p) => sum + (p.price * p.quantity), 0);
+        const discountAmt = order.discountAmt || 0;
+
+        // Calculate correct discount percentage
+        const discountPercentage = totalAmt > 0 ? (discountAmt / totalAmt) * 100 : 0;
+
+        // Calculate refund amount with correct discount reduction
+        const productQuantity = product.quantity;
+        const productPrice = product.price * productQuantity;
+        const discountForProduct = (productPrice * discountPercentage) / 100;
+        const refundAmount = Math.max(productPrice - discountForProduct, 0);
+
+        console.log("Subtotal:", totalAmt);
+        console.log("Total Order Amount:", totalAmt);
+        console.log("Product Price:", productPrice);
+        console.log("Discount Percentage:", discountPercentage.toFixed(2) + "%");
+        console.log("Discount Amount for Product:", discountForProduct);
+        console.log("Final Refund Amount:", refundAmount);
+
+        // Save the updated order
+        await order.save();
+
+        // Update product stock
+        await Product.findOneAndUpdate(
+            { _id: PRODID },
+            { $inc: { stock: productQuantity } }
+        );
+
+        // Refund user (adjusted for discount)
+        await User.updateOne(
+            { _id: req.session.user._id },
+            { $inc: { wallet: refundAmount } }
+        );
+
+        // Add refund history
+        await User.updateOne(
+            { _id: req.session.user._id },
+            { 
+                $push: { 
+                    history: { 
+                        amount: Math.floor(refundAmount), 
+                        status: `Refund for ${product.name} (Order ID: ${id})`, 
+                        date: Date.now(),
+                        orderId: id
+                    } 
+                } 
+            }
+        );
+
+        res.json({
+            success: true,
+            message: 'Successfully cancelled product and processed refund'
+        });
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Internal Server Error');
@@ -229,7 +323,8 @@ const returnOrder = async (req, res) => {
                         history: { 
                             amount: Math.floor(totalRefund), 
                             status: `Refund for Order ID: ${id}`, 
-                            date: Date.now() 
+                            date: Date.now(),
+                            orderId: id
                         } 
                     } 
                 }
@@ -243,98 +338,6 @@ const returnOrder = async (req, res) => {
                 : 'Partially returned the order'
         });
 
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).send('Internal Server Error');
-    }
-};
-
-const cancelOneProduct = async (req, res) => {
-    try {
-        const { id, prodId, reason } = req.body;
-
-        if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(prodId)) {
-            return res.status(400).json({ error: 'Invalid order or product ID' });
-        }
-
-        const ID = new mongoose.Types.ObjectId(id);
-        const PRODID = new mongoose.Types.ObjectId(prodId);
-
-        const order = await Order.findById(ID);
-
-        if (!order) {
-            return res.status(404).json({ error: 'Order not found' });
-        }
-
-        // Find the product in the order
-        const product = order.product.find(p => p._id.toString() === prodId);
-
-        if (!product) {
-            return res.status(404).json({ error: 'Product not found in order' });
-        }
-
-        if (product.isCancelled) {
-            return res.status(400).json({ error: 'Product is already cancelled' });
-        }
-
-        // Mark product as cancelled
-        product.isCancelled = true;
-        product.status = "Cancelled";
-        product.cancelReason = reason;
-
-        // Correctly retrieve total order amount and discount
-        const totalAmt = order.totalAmt && order.totalAmt > 0 ? order.totalAmt : order.product.reduce((sum, p) => sum + (p.price * p.quantity), 0);
-        const discountAmt = order.discountAmt || 0;
-
-        // Calculate correct discount percentage
-        const discountPercentage = totalAmt > 0 ? (discountAmt / totalAmt) * 100 : 0;
-
-        // Calculate refund amount with correct discount reduction
-        const productQuantity = product.quantity;
-        const productPrice = product.price * productQuantity;
-        const discountForProduct = (productPrice * discountPercentage) / 100;
-        const refundAmount = Math.max(productPrice - discountForProduct, 0);
-
-        console.log("Subtotal:", totalAmt);
-        console.log("Total Order Amount:", totalAmt);
-        console.log("Product Price:", productPrice);
-        console.log("Discount Percentage:", discountPercentage.toFixed(2) + "%");
-        console.log("Discount Amount for Product:", discountForProduct);
-        console.log("Final Refund Amount:", refundAmount);
-
-        // Save the updated order
-        await order.save();
-
-        // Update product stock
-        await Product.findOneAndUpdate(
-            { _id: PRODID },
-            { $inc: { stock: productQuantity } }
-        );
-
-        // Refund user (adjusted for discount)
-        await User.updateOne(
-            { _id: req.session.user._id },
-            { $inc: { wallet: refundAmount } }
-        );
-
-        // Add refund history
-        await User.updateOne(
-            { _id: req.session.user._id },
-            { 
-                $push: { 
-                    history: { 
-                        amount: Math.floor(refundAmount), 
-                        status: `Refund for ${product.name} (Order ID: ${id})`, 
-                        date: Date.now() 
-                    } 
-                } 
-            }
-        );
-
-        res.json({
-            success: true,
-            message: 'Successfully cancelled product and processed refund'
-        });
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Internal Server Error');
@@ -417,7 +420,8 @@ const returnOneProduct = async (req, res) => {
                     history: { 
                         amount: Math.floor(refundAmount), 
                         status: `[return] Refund for ${product.name} (Order ID: ${id})`, 
-                        date: Date.now() 
+                        date: Date.now(),
+                        orderId: id
                     } 
                 } 
             }

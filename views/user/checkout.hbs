@@ -102,41 +102,43 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-4">
+                        <div class="col-lg-4">
+    <!-- Button to Show Coupons -->
+    <button type="button" class="btn btn-fill-out btn-block" data-bs-toggle="collapse" data-bs-target="#couponList" 
+        aria-expanded="false" aria-controls="couponList">
+        <i class="fi-rs-label me-2"></i> Show Available Coupons
+    </button>
 
-                                <button type="button" class="btn btn-fill-out btn-block " data-bs-toggle="collapse" data-bs-target="#couponList" aria-expanded="false" aria-controls="couponList"> <i class="fi-rs-label mr-10"></i> Show Available Coupons</button>
+    <!-- Coupon List -->
+    <div class="collapse coupon_form mt-3" id="couponList">
+        <div class="panel-body p-3 border rounded bg-light">
+            {{#each coupon}}
+            <article class="itemlist mb-2 p-2 border rounded bg-white shadow-sm">
+                <div class="row align-items-center text-center">
+                    
+                    <!-- Coupon Code -->
+                    <div class="col-lg-4 col-sm-4 col-4">
+                        <h6 class="mb-1 coupon-code text-primary fw-bold">{{this.code}}</h6>
+                    </div>
 
-                                <div class="panel-collapse1 collapse coupon_form " id="couponList">
-                                    <div class="panel-body">
-                                        {{#each coupon}}
-                                        <article class="itemlist">
-                                            <div class="row align-items-center">
-                                               
-                                                <div
-                                                    class="col-lg-2 col-sm-2 col-2 flex-grow-1 col-name text-align-center">
-                                                    <a class="itemside">
+                    <!-- Discount Percentage -->
+                    <div class="col-lg-4 col-sm-4 col-4">
+                        <h6 class="mb-1 text-success fw-semibold">{{this.discount}}%</h6>
+                    </div>
 
-                                                        <div class="info">
-                                                            <h6 class="mb-2">{{this.code}}</h6>
-                                                        </div>
-                                                    </a>
-                                                </div>
-                                                <div
-                                                    class="col-lg-2 col-sm-2 col-2 flex-grow-1 col-name text-align-center">
-                                                    <a class="itemside">
+                    <!-- Copy Button -->
+                    <div class="col-lg-4 col-sm-4 col-4">
+                        <button class="btn btn-sm btn-outline-primary copy-btn" data-code="{{this.code}}">
+                            Copy
+                        </button>
+                    </div>
+                </div>
+            </article>
+            {{/each}}
+        </div>
+    </div>
+</div>
 
-                                                        <div class="info">
-                                                            <h6 class="mb-0">{{this.discount}}%</h6>
-                                                        </div>
-                                                    </a>
-                                                </div>
-                                               
-                                            </div> 
-                                        </article>
-                                        {{/each}}
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
                             <!-- Payment Method Section -->
@@ -580,7 +582,18 @@ function verifyPayment(response, order) {
     });
 }
 
-
+  document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".copy-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                let couponCode = this.getAttribute("data-code");
+                navigator.clipboard.writeText(couponCode).then(() => {
+                  
+                }).catch(err => {
+                    console.error("Failed to copy: ", err);
+                });
+            });
+        });
+    });
 </script>
 
 <script>

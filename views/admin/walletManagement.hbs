@@ -1,0 +1,73 @@
+<main class="main-wrap">
+    <section class="content-main">
+        <div class="content-header">
+            <h2 class="content-title text-primary">Wallet Transactions</h2>
+        </div>
+
+        <div class="card mb-4 shadow-lg border-0">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered">
+                        <thead class="bg-dark text-white">
+                            <tr>
+                                <th class="text-center">Transaction ID</th>
+                                <th class="text-center">User Name</th>
+                                <th class="text-center">Transaction Type</th>
+                                <th class="text-center">Date</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        {{#if transactions.length}}
+                        <tbody>
+                            {{#each transactions}}
+                            <tr>
+                                <td class="text-center text-primary fw-bold">{{this.transactionId}}</td>
+                                <td class="text-center text-dark">{{this.user.name}}</td>
+                                <td class="text-center">
+                                    {{#if (eq this.transactionType "Credit")}}
+                                        <span class="badge rounded-pill bg-success px-3 py-2">Credit</span>
+                                    {{else}}
+                                        <span class="badge rounded-pill bg-danger px-3 py-2">Debit</span>
+                                    {{/if}}
+                                </td>
+                                <td class="text-center text-muted">{{this.transactionDate}}</td>
+                                <td class="text-center">
+                                    <a href="/admin/wallet/{{this.transactionId}}" 
+                                        class="btn btn-sm btn-primary rounded-pill px-3">
+                                        <i class="material-icons md-visibility"></i> View Details
+                                    </a>
+                                </td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                        {{else}}
+                        <tbody>
+                            <tr>
+                                <td colspan="5" class="text-center text-danger fw-bold py-3">
+                                    No Transactions Found
+                                </td>
+                            </tr>
+                        </tbody>
+                        {{/if}}
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination Section -->
+        <div class="pagination-area mt-4 mb-5">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-center">
+                    {{#each pages}}
+                    <li class="page-item">
+                        <a class="page-link bg-primary text-white border-0 rounded-pill mx-1 px-3" href="?page={{this}}">
+                            {{this}}
+                        </a>
+                    </li>
+                    {{/each}}
+                </ul>
+            </nav>
+        </div>
+
+    </section>
+</main>

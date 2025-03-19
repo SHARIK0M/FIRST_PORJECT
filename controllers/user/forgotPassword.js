@@ -30,16 +30,16 @@ const submitMailPost = async (req, res) => {
       req.session.otp = String(otp); // Store only the OTP as a string
       req.session.otpTimestamp = Date.now() + 60 * 1000; // OTP expires in 60 seconds
 
-      res.redirect("/password/otp");
+      return res.json({ success: true, redirectUrl: "/password/otp" });
     } else {
-      req.session.mailError = true;
-      res.redirect("/forgotPassword");
+      return res.json({ success: false, message: "Invalid Email. Please try again!" });
     }
   } catch (error) {
     console.error(error.message);
-    res.status(500).send("Internal Server Error");
+    return res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+
 
 // Render OTP Submission Page
 const forgotOtppage = async (req, res) => {

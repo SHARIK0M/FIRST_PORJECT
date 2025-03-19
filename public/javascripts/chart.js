@@ -17,7 +17,7 @@ startDateField.addEventListener("change", function () {
 });
 
 endDateField.addEventListener("change", function () {
-    startDateField.setAttribute("max", endDateField.value);
+    startDateField.setAttribute("max", endDateField.value); 
 });
 
 // Function to fetch and render sales data
@@ -35,6 +35,12 @@ const getSalesData = async () => {
         return accum;
     });
 
+    Handlebars.registerHelper('formatDate', function (date) {
+      if (!date) return '';
+      return new Date(date).toISOString().split('T')[0]; // Extract YYYY-MM-DD
+  });
+  
+  
     // Define Handlebars template
     const salesReportTemplate = `
     <div class="col-xl-12">
@@ -58,7 +64,7 @@ const getSalesData = async () => {
            <tbody>
   {{#each data.orders}}
   <tr>
-    <td>{{this.date}}</td>
+    <td>{{formatDate this.date}}</td>
     <td>{{this.orderId}}</td>
     <td>{{this.payMethod}}</td>
     <td>{{this.coupon}} (₹{{this.discountAmt}})</td> <!-- Updated line -->
@@ -118,49 +124,58 @@ const getSalesData = async () => {
                       extend: 'pdfHtml5',
                       text: 'Export to PDF',
                       title: 'Floritta',  // ✅ Set Title to "Floritta" Only
-                      customize: function (doc) {
-                          // Remove extra text
-                          doc.content[0].text = 'Floritta';  // ✅ Change header text
-                          doc.content[0].fontSize = 16;
-                          doc.content[0].bold = true;
-                          doc.content[0].alignment = 'center';
-  
-                          // Set table styles
-                          doc.content[1].table.widths = ['12%', '12%', '12%', '10%', '8%', '32%', '14%'];
-                          doc.styles.tableHeader.fillColor = 'black';
-                          doc.styles.tableHeader.color = 'white';
-                          doc.styles.tableHeader.alignment = 'center';
-                          doc.styles.tableHeader.bold = true;
-  
-                          // Apply black borders
-                          doc.content[1].layout = {
-                              hLineWidth: function () { return 1; },
-                              vLineWidth: function () { return 1; },
-                              hLineColor: function () { return 'black'; },
-                              vLineColor: function () { return 'black'; },
-                          };
-  
-                          // Adjust product details formatting
-                          doc.content[1].table.body.forEach((row, index) => {
-                              if (index === 0) return;
-                              row[5].text = row[5].text.replace(/Name:/g, "\nName:");
-                              row[5].text = row[5].text.replace(/Quantity:/g, "\nQuantity:");
-                              row[5].text = row[5].text.replace(/Price:/g, "\nPrice:");
-                              row[5].text = row[5].text.replace(/Delivery Charge:/g, "\nDelivery Charge:");
-                              row[5].alignment = 'left';
-                          });
-  
-                          // Add Total Revenue & Sales Count at the bottom
-                          doc.content.push({
-                              text: `\nTotal Revenue: ₹${data.grandTotal}\nTotal Sales Count: ${data.salesCount}`,
-                              margin: [0, 20, 0, 0],
-                              alignment: 'left',
-                              bold: true
-                          });
-  
-                          // Adjust default font size
-                          doc.defaultStyle.fontSize = 10;
-                      }
+                     customize: function (doc) {
+    // Remove extra text
+    doc.content[0].text = `Floritta\nSales Report (${startDate} to ${endDate})`; // ✅ Add date range in the title
+    doc.content[0].fontSize = 16;
+    doc.content[0].bold = true;
+    doc.content[0].alignment = 'center';
+
+    // Set table styles
+    doc.content[1].table.widths = ['12%', '12%', '12%', '10%', '8%', '32%', '14%'];
+    doc.styles.tableHeader.fillColor = 'black';
+    doc.styles.tableHeader.color = 'white';
+    doc.styles.tableHeader.alignment = 'center';
+    doc.styles.tableHeader.bold = true;
+
+    // Apply black borders
+    doc.content[1].layout = {
+        hLineWidth: function () { return 1; },
+        vLineWidth: function () { return 1; },
+        hLineColor: function () { return 'black'; },
+        vLineColor: function () { return 'black'; },
+    };
+
+    // Remove time part from date values
+    doc.content[1].table.body.forEach((row, index) => {
+        if (index === 0) return; // Skip the header row
+        
+        // Format date column (Assuming date is in column 0)
+        row[0].text = row[0].text.split(' ')[0]; // ✅ Remove time from date
+    });
+
+    // Adjust product details formatting
+    doc.content[1].table.body.forEach((row, index) => {
+        if (index === 0) return;
+        row[5].text = row[5].text.replace(/Name:/g, "\nName:");
+        row[5].text = row[5].text.replace(/Quantity:/g, "\nQuantity:");
+        row[5].text = row[5].text.replace(/Price:/g, "\nPrice:");
+        row[5].text = row[5].text.replace(/Delivery Charge:/g, "\nDelivery Charge:");
+        row[5].alignment = 'left';
+    });
+
+    // Add Total Revenue & Sales Count at the bottom
+    doc.content.push({
+        text: `\nTotal Revenue: ₹${data.grandTotal}\nTotal Sales Count: ${data.salesCount}`,
+        margin: [0, 20, 0, 0],
+        alignment: 'left',
+        bold: true
+    });
+
+    // Adjust default font size
+    doc.defaultStyle.fontSize = 10;
+}
+
                   }
               ]
           });

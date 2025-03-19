@@ -1,9 +1,6 @@
 const moment = require('moment');
 const Sale = require("../../models/orderSchema");
 const Order = require("../../models/orderSchema");
-const PDFDocument = require('pdfkit');
-const hbs = require('hbs');
-const Handlebars = require('handlebars');
 const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
 const HttpStatus = require('../../httpStatus');
@@ -141,7 +138,6 @@ const loadDashboard = async (req, res) => {
     }
 };
 
-
 const getSales = async (req, res) => {
     const { stDate, edDate } = req.query;
 
@@ -195,9 +191,23 @@ const getSales = async (req, res) => {
     }
 };
 
-
+const getChartData = (req, res) => {
+    try {
+        res.json({
+            months: months,
+            revnueByMonth: revnueByMonth,
+            odersByMonth: odersByMonth,
+            cat: categories,
+            revenue: revenues
+        });
+    } catch (error) {
+        console.error('Error fetching chart data:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
 
 module.exports = {
     loadDashboard,
     getSales,
+    getChartData
 };

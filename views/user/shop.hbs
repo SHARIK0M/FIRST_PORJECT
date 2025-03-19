@@ -75,12 +75,40 @@
 </main>
 
 <style>
-   .wishlist-added i {
-    color: red; /* Outer color of the heart icon */
+.wish i {
+    color: blue; /* Default color when not added to wishlist */
+    transition: color 0.2s linear; /* Smooth transition */
 }
 
-.wishlist-added i svg path {
-    fill: red; /* Inner color of the heart icon (SVG path fill) */
+.wishlist-added i {
+    color: red !important; /* Color when added to wishlist */
+}
+
+/* Ensuring no fade when removed */
+.wish:not(.wishlist-added) i {
+    color: blue !important; /* Set back to blue instantly */
+}
+
+/* Highlight active category */
+.categories li a.active {
+    font-weight: bold;
+    color: #ff6f61; /* Change to your preferred highlight color */
+    text-decoration: underline;
+}
+
+/* Highlight active filter */
+.widget-category ul li a.active {
+    font-weight: bold;
+    color: #ff6f61; /* Change to your preferred highlight color */
+    text-decoration: underline;
+}
+
+/* Add hover effect */
+.categories li a:hover,
+.widget-category ul li a:hover {
+    color: #ff6f61;
+    text-decoration: underline;
+    cursor: pointer;
 }
 
 
@@ -261,16 +289,31 @@ const updatePagination = (totalProducts) => {
     }
 };
 
+
+function setActiveFilter(filterName, filterFunction) {
+    currentSort = filterName;
+    fetchProducts();
+
+    $('.widget-category ul li a').removeClass('active');
+    $(`.widget-category ul li a[onclick="${filterFunction}()"]`).addClass('active');
+}
+
 const updateProductCount = (totalProducts) => $('#count').text(totalProducts);
 const goToPage = (page) => { currentPage = page; fetchProducts(); };
 const searchProducts = () => { searchQuery = $('#searchInput').val(); fetchProducts(); };
-const sortLowToHigh = () => { currentSort = 'priceAsc'; fetchProducts(); };
-const sortHighToLow = () => { currentSort = 'priceDesc'; fetchProducts(); };
-const sortAZ = () => { currentSort = 'nameAsc'; fetchProducts(); };
-const sortZA = () => { currentSort = 'nameDesc'; fetchProducts(); };
-const newArrivals = () => { currentSort = 'newArrivals'; fetchProducts(); };
-const popularity = () => { currentSort = 'popularity'; fetchProducts(); };
-const filterByCategory = (categoryId) => { currentCategory = categoryId; fetchProducts(); };
+const sortLowToHigh = () => setActiveFilter('priceAsc', 'sortLowToHigh');
+const sortHighToLow = () => setActiveFilter('priceDesc', 'sortHighToLow');
+const sortAZ = () => setActiveFilter('nameAsc', 'sortAZ');
+const sortZA = () => setActiveFilter('nameDesc', 'sortZA');
+const newArrivals = () => setActiveFilter('newArrivals', 'newArrivals');
+const popularity = () => setActiveFilter('popularity', 'popularity');
+function filterByCategory(categoryId) {
+    currentCategory = categoryId;
+    fetchProducts();
+
+    $('.categories li a').removeClass('active');
+    $(`.categories li a[onclick="filterByCategory('${categoryId}')"]`).addClass('active');
+}
 const limits = (ct) => { limit = ct; currentPage = 1; fetchProducts(); };
 const clearfilter = () => {
     currentPage = 1;
@@ -278,8 +321,14 @@ const clearfilter = () => {
     currentCategory = '';
     searchQuery = '';
     limit = 6;
+    
+    // Remove active class from all filters
+    $('.categories li a').removeClass('active');
+    $('.widget-category ul li a').removeClass('active');
+
     fetchProducts();
 };
+
 
 fetchProducts();
 

@@ -17,6 +17,7 @@ let otp, userOtp, userEmail, hashedPassword, userRegData, userData,referalAmount
 
 const getHome = async (req, res) => {
   try {
+    req.session.orderCompleted = false;
     const userData = req.session.user;
 
     const Products = await Product.aggregate([
@@ -424,6 +425,16 @@ const verifyReferelCode = async (req, res) => {
   }
 };
 
+const aboutpage = async (req, res) => {
+  try {
+      res.render('user/about', {userData})
+
+  } catch (error) {
+      console.log(error.message);
+      res.status(HttpStatus.InternalServerError).send("Internal Server Error");
+
+  }
+}
 
 
 
@@ -440,4 +451,5 @@ module.exports = {
   googleCallback,
   productDetails,
   verifyReferelCode,
+  aboutpage
 };

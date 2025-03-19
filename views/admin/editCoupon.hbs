@@ -81,8 +81,8 @@
         });
     });
 
-    // Validation function
-    function validationf(form) {
+  // Validation function
+function validationf(form) {
     let errors = [];
 
     let couponcode = document.getElementById('coupon-code').value;
@@ -105,10 +105,10 @@
         document.getElementById('couponcodealert').innerHTML = 'Coupon code must be at least 3 characters long and only contain alphanumeric characters';
     }
 
-    // Check if the discount is valid
-    if (discount <= 0 || discount > 100) {
+    // Check if the discount is valid (should be between 5% and 90%)
+    if (discount < 5 || discount > 90) {
         errors.push('Invalid discount value');
-        document.getElementById('discountalert').innerHTML = 'Discount should be between 1 and 99';
+        document.getElementById('discountalert').innerHTML = 'Discount should be between 5% and 90%';
     }
 
     // Check if the minimum purchase is valid
@@ -124,11 +124,8 @@
     }
 
     // If there are any errors, return false and prevent form submission
-    if (errors.length > 0) {
-        return false;
-    }
-
-    return true;
+    return errors.length === 0;
 }
+
 
 </script>

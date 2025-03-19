@@ -150,8 +150,9 @@
     </section> 
 </main>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
 
-<script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -163,19 +164,27 @@
         document.getElementById('imgView1').src = URL.createObjectURL(event.target.files[0]);
     }
 
-    // Function to handle image preview and cropping
-    function viewImage(event, index) {
-        let input = event.target;
-        let reader = new FileReader();
+ function viewImage(event, index) {
+    let input = event.target;
+    let reader = new FileReader();
 
-        reader.onload = function () {
-            let dataURL = reader.result;
-            let image = document.getElementById('imgView' + index);
-            image.src = dataURL;
+    reader.onload = function () {
+        let dataURL = reader.result;
+        let image = document.getElementById('imgView' + index);
+        
+        // Set the image source
+        image.src = dataURL;
 
-            // Initialize Cropper.js
-            let cropper = new Cropper(image, {
-                aspectRatio: 1 / 1, 
+        // Wait for image to load before initializing Cropper
+        image.onload = function () {
+            // Destroy previous instance if exists
+            if (image.cropper) {
+                image.cropper.destroy();
+            }
+
+            // Initialize Cropper
+            image.cropper = new Cropper(image, {
+                aspectRatio: 1 / 1,
                 viewMode: 1,
                 guides: true,
                 background: false,
@@ -183,32 +192,33 @@
                 zoomable: true
             });
 
-            // Display cropped image container
-            let cropperContainer = document.querySelector('#croppedImg' + index).parentNode;
-            cropperContainer.style.display = 'block';
+            // Show cropping section
+            document.querySelector('#croppedImg' + index).parentNode.style.display = 'block';
 
-            // Save cropped image when button is clicked
+            // Handle save button
             let saveButton = document.querySelector('#saveButton' + index);
-            saveButton.addEventListener('click', async function () {
-                let croppedCanvas = cropper.getCroppedCanvas();
+            saveButton.onclick = async function () {
+                let croppedCanvas = image.cropper.getCroppedCanvas();
                 let croppedImage = document.getElementById("croppedImg" + index);
                 croppedImage.src = croppedCanvas.toDataURL('image/jpeg', 1.0);
 
-                // Generate unique filename using timestamp
+                // Generate a unique filename
                 let timestamp = new Date().getTime();
                 let fileName = `cropped-img-${timestamp}-${index}.png`;
 
                 await croppedCanvas.toBlob(blob => {
-                    let input = document.getElementById('input' + index);
-                    let imgFile = new File([blob], fileName, blob);
-                    const fileList = new DataTransfer();
+                    let imgFile = new File([blob], fileName, { type: 'image/png' });
+                    let fileList = new DataTransfer();
                     fileList.items.add(imgFile);
                     input.files = fileList.files;
-                }); 
-            });
+                });
+            };
         };
-        reader.readAsDataURL(input.files[0]);
-    }
+    };
+    
+    reader.readAsDataURL(input.files[0]);
+}
+
 
     // Function to validate form inputs
     function Validation() {

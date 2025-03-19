@@ -3,18 +3,19 @@ const router = express.Router();
 const passport = require("passport");
 require("../middlewares/googleAuth");
 const { logedout, logedin, isBlocked } = require("../middlewares/userAuth");
-const {getHome,getLogin,getSignup,doSignup,getOtp,submitOtp,resendOtp,doLogin,doLogout,googleCallback,productDetails,verifyReferelCode,} = require("../controllers/user/userController");
+const {getHome,getLogin,getSignup,doSignup,getOtp,submitOtp,resendOtp,doLogin,doLogout,googleCallback,productDetails,verifyReferelCode,aboutpage} = require("../controllers/user/userController");
 const {showError} = require("../controllers/user/errorController");
 const {submitMail,submitMailPost,forgotOtppage,forgotOtpSubmit,resetPasswordPage,resetPassword,resendOTP} = require("../controllers/user/forgotPassword");
 const { getProduct, searchAndSort } = require("../controllers/user/shopManagement");
 const { viewUserProfile, EditUserProfile, updateUserProfile, changePassword, updatePassword, my_Orders, orderDetails ,sendOTP,verifyOTP,  verify,walletpage,retryPayment} = require('../controllers/user/profile');
 const { addAddress, addAddressPost, manageAddress,  editAddressPost, deleteAddress ,checkAddressPost} = require('../controllers/user/addressManagement');
 const { loadCartPage, addToCart, removeFromCart, updateCart, checkOutOfStock } = require('../controllers/user/cart');
-const { loadCheckoutPage, placeorder, orderSuccess , validateCoupon,applyCoupon,removeCoupon,} = require('../controllers/user/checkoutManagement');
+const { loadCheckoutPage,placeorder, orderSuccess , validateCoupon,applyCoupon,removeCoupon,} = require('../controllers/user/checkoutManagement');
 const { payment_failed, cancelOrder, returnOrder, cancelOneProduct, returnOneProduct ,generateInvoice} = require('../controllers/user/orderManagement');
 const { showWishlistPage, addToWishList, removeFromWishList,checkWishlist } = require('../controllers/user/wishlistManagement')
 const uploadImages = require("../middlewares/multer");
-const { addMoneyToWallet , verifyPayment }= require('../controllers/user/walletManagement')
+const { addMoneyToWallet , verifyPayment }= require('../controllers/user/walletManagement');
+const { isOrderPlaced } = require("../middlewares/checkOut");
 
 
 
@@ -84,7 +85,7 @@ router.post('/cart/update', isBlocked, logedin, updateCart);
 router.post('/cart/check-stock', checkOutOfStock);
 
 // 🔹 Checkout
-router.get('/checkout', isBlocked, logedin, loadCheckoutPage);
+router.get('/checkout', isBlocked, logedin, isOrderPlaced,loadCheckoutPage);
 router.post('/checkout/address/check', checkAddressPost);
 router.post('/checkout/place-order', isBlocked, logedin, placeorder);
 router.get('/checkout/success', isBlocked, logedin, orderSuccess);
@@ -127,5 +128,7 @@ router.get('/invoice', logedin, isBlocked, generateInvoice)
 // 🔹 Error Page
 router.get("/error",logedin,isBlocked,showError)
 
+// 🔹 About Page
+router.get('/about', aboutpage)
 
 module.exports = router;
