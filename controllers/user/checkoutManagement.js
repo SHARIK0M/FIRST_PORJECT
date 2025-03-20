@@ -311,6 +311,7 @@ const placeorder = async (req, res) => {
     if (req.headers.accept.includes("text/html")) {
        res.redirect("/order-success"); // Redirect to success page
     } else {
+    await Product.findByIdAndUpdate(productID, {$inc: {bestSelling: 1}})
       req.session.orderCompleted = true; 
       res.json({ success: true, orderId, grandTotal, appliedCoupon, walletBalance });
     }

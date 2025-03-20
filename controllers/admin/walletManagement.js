@@ -17,7 +17,9 @@ const walletManagement = async (req, res) => {
                     transactionId: transaction.date,
                     transactionDate: new Date(transaction.date).toLocaleString(),
                     user: { name: user.name },
-                    transactionType: transaction.status.startsWith("Refund") ? "Debit" : (transaction.amount < 0 ? "Debit" : "Credit"),
+                    transactionType: (transaction.status.startsWith("Refund") || transaction.status.startsWith("[return]")) 
+                    ? "Debit" 
+                    : (transaction.amount < 0 ? "Debit" : "Credit"),                
                 });
             });
         });
@@ -77,7 +79,9 @@ const transactionDetails = async (req, res) => {
             transactionId: transaction.date,
             transactionDate: new Date(transaction.date).toLocaleString(),
             user: { name: user.name, email: user.email },
-            transactionType: transaction.status.startsWith("Refund") ? "Debit" : (transaction.amount < 0 ? "Debit" : "Credit"),
+            transactionType: (transaction.status.startsWith("Refund") || transaction.status.startsWith("[return]")) 
+    ? "Debit" 
+    : (transaction.amount < 0 ? "Debit" : "Credit"),
             amount: transaction.amount,
             status: transaction.status,
             orderId: transaction.orderId
