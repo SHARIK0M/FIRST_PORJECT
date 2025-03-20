@@ -521,20 +521,37 @@ const Cod = async () => {
 };
 
 const online = () => {
-    let subTotal = Number(document.getElementsByName('subTotal')[0].value) + (ct === 0 ? 50 : 0);
+    let subTotal = Number(document.getElementsByName('subTotal')[0].value);
+
+    console.log("Subtotal before discount:", subTotal);
+
+    // Apply coupon discount
+    if (couponData && couponData.status === 'applied') {
+        console.log("Coupon applied:", couponData.discountAmount);
+        subTotal -= couponData.discountAmount;
+    }
+
+    console.log("Subtotal after discount:", subTotal);
+
+    // Ensure delivery charge is not added again if already included
+    if (subTotal !== 1850) { 
+        subTotal += 50; 
+    }
+
+    console.log("Final amount sent to Razorpay:", subTotal);
 
     var options = {
         key: "rzp_test_QhDPSiMt8ea6IF",
-        amount: subTotal * 100, // Convert amount to smallest currency unit
+        amount: subTotal * 100,
         currency: "INR",
         name: "Floritta",
         image: "/images/logo/Logo_CH.png",
-        order_id: undefined, // Order ID should be assigned dynamically
+        order_id: undefined,
         handler: function (response) {
             Cod();
         }
     };
-    
+
     var rzp1 = new Razorpay(options);
     rzp1.on('payment.failed', function () {
         paymentStatus = false;
@@ -550,9 +567,10 @@ const online = () => {
             }
         });
     });
-    
+
     rzp1.open();
 };
+
 
 function verifyPayment(response, order) {
     $.ajax({

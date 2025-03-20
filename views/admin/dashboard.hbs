@@ -380,13 +380,27 @@ function revenue(months, revenueByMonth) {
         type: 'bar', 
         data: {
             labels: months,
-            datasets: [{
-                label: 'Revenue',
-                data: revenueByMonth,
-                backgroundColor: 'rgba(255, 99, 132, 0.2)', // Light red color for the bars
-                borderColor: 'rgba(255, 99, 132, 1)', // Darker red border color
-                borderWidth: 1
-            }]
+            datasets: [
+                {
+                    label: 'Revenue (Bar)',
+                    data: revenueByMonth,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1,
+                    yAxisID: 'y',
+                },
+                {
+                    label: 'Revenue (Line)',
+                    data: revenueByMonth,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderWidth: 2,
+                    type: 'line',
+                    pointRadius: 5,
+                    pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                    yAxisID: 'y',
+                }
+            ]
         },
         options: {
             indexAxis: 'y',
@@ -414,7 +428,6 @@ function revenue(months, revenueByMonth) {
         }
     });
 }
-
 
     // Toggle date input fields based on the selected range
     function toggleDateInputs() {
