@@ -29,7 +29,7 @@ const showProduct = async (req, res) => {
     const totalPages = Math.ceil(count / limit);
     const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
-    res.render("admin/product", { layouts: "adminLayout", product, pages });
+    res.render("admin/product", { layout: "adminLayout", product, pages });
   } catch (error) {
     console.error(error);
   }
@@ -39,7 +39,7 @@ const showProduct = async (req, res) => {
 const addProductPage = async (req, res) => {
   try {
     const category = await Category.find({}).lean();
-    res.render("admin/add_product", { layout: "adminlayout", category });
+    res.render("admin/add_product", { layout: "adminLayout", category });
   } catch (error) {
     console.error(error);
   }
