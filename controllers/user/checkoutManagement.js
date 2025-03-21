@@ -307,12 +307,12 @@ const placeorder = async (req, res) => {
     req.session.appliedCoupon = null;
     req.session.discountedTotal = null;
     req.session.discountAmount = null;
-
+    req.session.orderCompleted = true; 
+    
     if (req.headers.accept.includes("text/html")) {
        res.redirect("/order-success"); // Redirect to success page
     } else {
     await Product.findByIdAndUpdate(productID, {$inc: {bestSelling: 1}})
-      req.session.orderCompleted = true; 
       res.json({ success: true, orderId, grandTotal, appliedCoupon, walletBalance });
     }
   } catch (error) {
