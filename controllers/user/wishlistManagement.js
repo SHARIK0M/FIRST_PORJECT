@@ -90,11 +90,11 @@ const addToWishList = async (req, res) => {
         let productId = new mongoose.Types.ObjectId(id);
   
         // Check if the product already exists in the wishlist
-        let existingWishlist = await Wishlist.findOne({ user: userId, productId: productId });
+        // let existingWishlist = await Wishlist.findOne({ user: userId, productId: productId });
   
-        if (existingWishlist) {
-            return res.json({ success: false, message: "Already in wishlist" });
-        }
+        // if (existingWishlist) {
+        //     return res.json({ success: false, message: "Already in wishlist" });
+        // }
   
         // Add the product if not already in wishlist
         let wishlistData = await Wishlist.findOneAndUpdate(

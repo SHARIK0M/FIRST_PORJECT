@@ -237,7 +237,7 @@ $(document).ready(function () {
             data: JSON.stringify({ id: id, userId: userId }),
             success: (response) => {
                 if (response.exists) {
-                    Swal.fire('Info!', 'Product is already in your Wishlist!', 'info');
+                 console.log("hi")
                 } else {
                     // If not in wishlist, add to wishlist
                     $.ajax({
