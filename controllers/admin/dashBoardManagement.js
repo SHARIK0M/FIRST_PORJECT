@@ -117,7 +117,7 @@ const loadDashboard = async (req, res) => {
         let bestSellingCategory = await Category.find().sort({ bestSelling: -1 }).limit(5).lean();
 
     // Render dashboard with calculated data
-        res.render('admin/dashBoard', {
+        res.render('admin/dashboard', {
             categoryCount,
             revnueByMonth,
             bestSellingCategory,
