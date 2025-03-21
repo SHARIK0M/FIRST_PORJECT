@@ -74,7 +74,7 @@ const orderDetails = async (req, res) => {
     res.render("admin/order_Details", {
       admin: true,
       orderedProDet,
-      layout: "adminlayout",
+      layout: "adminLayout",
       address,
       myOrderDetails,
     });

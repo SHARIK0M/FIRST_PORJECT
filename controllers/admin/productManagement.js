@@ -92,7 +92,7 @@ const showeditProduct = async (req, res) => {
     res.render("admin/editProduct", {
       productData,
       categories,
-      layout: "adminlayout",
+      layout: "adminLayout",
     });
   } catch (error) {
     console.error(error);

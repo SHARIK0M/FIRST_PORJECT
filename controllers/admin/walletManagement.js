@@ -48,7 +48,7 @@ const walletManagement = async (req, res) => {
             currentPage: page,
             totalPages: totalPages,
             pages: pages, 
-            layout: 'adminlayout'
+            layout: 'adminLayout'
         });
     } catch (error) {
         console.error("Error fetching wallet transactions:", error);
@@ -90,7 +90,7 @@ const transactionDetails = async (req, res) => {
         // Render the transaction details page
         res.render("admin/transactionDetails", {
             transaction: transactionDetails,
-            layout: 'adminlayout'
+            layout: 'adminLayout'
         });
     } catch (error) {
         console.error("Error fetching transaction details:", error);

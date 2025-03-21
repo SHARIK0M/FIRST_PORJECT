@@ -43,7 +43,7 @@ const addCategoryPage = (req, res) => {
       req.session.catExist = false; // Reset session flag
     }
 
-    res.render("admin/add_category", { ...messages, layout: "adminlayout" });
+    res.render("admin/add_category", { ...messages, layout: "adminLayout" });
   } catch (error) {
     console.error("Error rendering add category page:", error);
   }
@@ -97,7 +97,7 @@ const unListCategory = async (req, res) => {
 const showEditCategory = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id).lean();
-    res.render("admin/editCategory", { layout: "adminlayout", category });
+    res.render("admin/editCategory", { layout: "adminLayout", category });
   } catch (error) {
     console.error("Error rendering edit category page:", error);
   }
