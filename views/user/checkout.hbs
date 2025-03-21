@@ -529,7 +529,6 @@ const online = () => {
     if (couponData && couponData.status === 'applied') {
         console.log("Coupon applied:", couponData.discountAmount);
         subTotal -= couponData.discountAmount;
-        subTotal-=50
     }
 
     console.log("Subtotal after discount:", subTotal);
