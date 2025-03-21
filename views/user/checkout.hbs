@@ -529,6 +529,7 @@ const online = () => {
     if (couponData && couponData.status === 'applied') {
         console.log("Coupon applied:", couponData.discountAmount);
         subTotal -= couponData.discountAmount;
+        subTotal-=50
     }
 
     console.log("Subtotal after discount:", subTotal);
@@ -536,7 +537,6 @@ const online = () => {
     // Ensure delivery charge is not added again if already included
 
     console.log("Final amount sent to Razorpay:", subTotal);
-    subTotal-=50
     var options = {
         key: "rzp_test_QhDPSiMt8ea6IF",
         amount: subTotal * 100,
