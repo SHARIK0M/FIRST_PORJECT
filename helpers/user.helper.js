@@ -23,7 +23,7 @@ const verifyEmail = async (email) => {
 
     const mailOptions = {
       from: process.env.USER_MAIL,
-      to:`${process.env.USER_MAIL}` ,
+      to:email ,
       // Ensure email is correctly passed
       subject: "OTP Verification",
       text: `Your OTP for Floritta is: ${otp}`,
