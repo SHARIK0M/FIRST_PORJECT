@@ -373,43 +373,67 @@ function categoryRevenue(categories, revenues) {
         }
     });
 }
-
 function revenue(months, revenueByMonth) {
     const ctx1 = document.getElementById('myChar').getContext('2d');
     new Chart(ctx1, {
-        type: 'bar', 
+        type: 'bar',
         data: {
             labels: months,
             datasets: [
                 {
                     label: 'Revenue (Bar)',
                     data: revenueByMonth,
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
                     borderColor: 'rgba(255, 99, 132, 1)',
                     borderWidth: 1,
-                    yAxisID: 'y',
+                    yAxisID: 'yBar',
+                    order: 2
                 },
                 {
                     label: 'Revenue (Line)',
                     data: revenueByMonth,
                     borderColor: 'rgba(54, 162, 235, 1)',
                     backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderWidth: 2,
+                    borderWidth: 3,
                     type: 'line',
-                    pointRadius: 5,
+                    pointRadius: 6,
                     pointBackgroundColor: 'rgba(54, 162, 235, 1)',
-                    yAxisID: 'y',
+                    tension: 0.3,  // Smooth curve effect
+                    yAxisID: 'yLine',
+                    order: 1
                 }
             ]
         },
         options: {
-            indexAxis: 'y',
             scales: {
-                x: {
+                yBar: {
                     beginAtZero: true,
+                    position: 'left',
+                    grid: {
+                        drawBorder: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Revenue (Bar)',
+                        color: '#ff6384'
+                    }
                 },
-                y: {
-                    beginAtZero: true
+                yLine: {
+                    beginAtZero: true,
+                    position: 'right',
+                    grid: {
+                        drawOnChartArea: false // Prevents grid overlap
+                    },
+                    title: {
+                        display: true,
+                        text: 'Revenue (Line)',
+                        color: '#36a2eb'
+                    }
+                },
+                x: {
+                    grid: {
+                        drawBorder: false
+                    }
                 }
             },
             responsive: true,
@@ -420,7 +444,7 @@ function revenue(months, revenueByMonth) {
                 tooltip: {
                     callbacks: {
                         label: function(tooltipItem) {
-                            return tooltipItem.label + ': ' + tooltipItem.raw + ' revenue';
+                            return tooltipItem.dataset.label + ': ' + tooltipItem.raw + ' revenue';
                         }
                     }
                 }
@@ -428,6 +452,8 @@ function revenue(months, revenueByMonth) {
         }
     });
 }
+
+
 
     // Toggle date input fields based on the selected range
     function toggleDateInputs() {
